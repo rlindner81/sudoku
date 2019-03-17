@@ -1,5 +1,8 @@
 # sudoku
 
+similar to
+https://codepen.io/pavlovsk/pen/XmjPOE
+
 ## Project setup
 ```
 npm install
