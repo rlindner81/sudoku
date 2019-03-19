@@ -18,23 +18,23 @@ export default {
   },
   data() {
     return {
-      boxSize: 2,
-      boardSize: 4,
-      board: "crazy"
+      boxSize: 3,
+      boardSize: 5,
+      board: null
     };
   },
   methods: {
     getBoard(template) {
-      if (template === undefined || template === null) {
+      if (template === undefined || template === null) {
         let board = Array(this.boardSize).fill(Array(this.boardSize).fill(1));
         return board;
       }
       if (template === "crazy") {
         return [
-          [1, 1, 1, 0, 0],
-          [1, 1, 0, 1, 0],
+          [1, 1, 0, 0, 0],
+          [1, 1, 1, 1, 0],
           [1, 1, 1, 1, 1],
-          [0, 1, 1, 0, 1],
+          [0, 1, 0, 0, 1],
           [0, 0, 1, 1, 1]
         ];
       }
@@ -45,11 +45,13 @@ export default {
 
 <style lang="scss">
 .board {
+  box-sizing: content-box;
   border-collapse: collapse;
+  table-layout: fixed;
 
   .board-row {
     .board-column {
-      border: 1px solid black;
+      border: 2px solid black;
     }
   }
 }
