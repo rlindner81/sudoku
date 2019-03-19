@@ -20,7 +20,7 @@ export default {
     return {
       boxSize: 3,
       boardSize: 5,
-      board: null
+      board: "crazy"
     };
   },
   methods: {

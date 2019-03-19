@@ -31,10 +31,9 @@ export default {
 
 <style lang="scss">
 .box {
-  width: 100%;
-  height: 100%;
+  width: calc(100% + 1px);
+  height: calc(100% + 1px);
   border-collapse: collapse;
-  border-spacing: 0;
   table-layout: fixed;
   vertical-align: middle;
   text-align: center;
