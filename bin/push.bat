@@ -4,6 +4,8 @@ SETLOCAL
 SET PROJECT=sudoku
 SET SSH=plink -batch -load "goodnogood.org"
 SET SCP=pscp
+SET NODE_ENV=production
+SET BASE_URL=/sudoku/
 
 CALL npm run build
 %SSH% ^
