@@ -1,17 +1,17 @@
 <template>
   <div class="home">
     <h1>Play Sudoku</h1>
-    <SudokuBoard class="sudoku-board"/>
+    <Board class="board"/>
   </div>
 </template>
 
 <script>
-import SudokuBoard from "@/components/SudokuBoard.vue";
+import Board from "@/components/Board.vue";
 
 export default {
   name: "app",
   components: {
-    SudokuBoard
+    Board
   }
 };
 </script>
@@ -23,13 +23,12 @@ $size: 60rem;
   margin: 0 auto;
   width: $size;
 
-  h1 {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+  > * {
+    margin: 2rem 0;
   }
 
-  .sudoku-board {
-    width: 100%;
+  .board {
+    width: $size;
     height: $size;
   }
 }
