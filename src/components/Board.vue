@@ -1,29 +1,58 @@
 <template>
   <table class="board">
-    <tr class="board-row" v-for="(row, i) in getBoard(board)" v-bind:key="i">
-      <td v-bind:class="{'board-column': !!col}" v-for="(col, j) in row" v-bind:key="j">
-        <Box v-if="!!col" v-bind:size="boxSize"/>
-      </td>
+    <tr class="row" v-for="(row, i) in boardSize" v-bind:key="i">
+      <td
+        class="column"
+        :style="getColumnStyle(i, j)"
+        v-for="(col, j) in boardSize"
+        v-bind:key="j"
+      >{{i + j}}</td>
     </tr>
   </table>
 </template>
 
 <script>
-import Box from "@/components/Box.vue";
+import Helper from "@/helper";
 
 export default {
   name: "Board",
-  components: {
-    Box
-  },
   data() {
     return {
-      boxSize: 3,
-      boardSize: 5,
-      board: "crazy"
+      boardSize: 9,
+      borders: [[0b11010111, 0b11010101, 0b11010101, 0b11010101, 0b11010101]]
     };
   },
   methods: {
+    getPositionStyle(position) {
+      switch (position) {
+        case 0:
+          return "none";
+        case 1:
+          return "1px solid lightgray";
+        case 2:
+          return "2px solid darkgray";
+        case 3:
+          return "3px solid black";
+      }
+      return null;
+    },
+    getColumnStyle(i, j) {
+      let result = {};
+      let border = Helper.getListElement(this.borders, i, j);
+      if (border === null) {
+        return result;
+      }
+
+      let top = (border >> 6) & 0b11;
+      let right = (border >> 4) & 0b11;
+      let bottom = (border >> 2) & 0b11;
+      let left = (border >> 0) & 0b11;
+      result["border-top"] = this.getPositionStyle(top);
+      result["border-right"] = this.getPositionStyle(right);
+      result["border-bottom"] = this.getPositionStyle(bottom);
+      result["border-left"] = this.getPositionStyle(left);
+      return result;
+    },
     getBoard(template) {
       if (template === undefined || template === null) {
         let board = Array(this.boardSize).fill(Array(this.boardSize).fill(1));
@@ -49,9 +78,10 @@ export default {
   border-collapse: collapse;
   table-layout: fixed;
 
-  .board-row {
-    .board-column {
-      border: 2px solid black;
+  .row {
+    .column {
+      vertical-align: middle;
+      text-align: center;
     }
   }
 }
