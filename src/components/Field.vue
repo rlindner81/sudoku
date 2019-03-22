@@ -1,60 +1,57 @@
 <template>
-  <table class="box">
-    <tr class="box-row" v-for="i in size" v-bind:key="i">
-      <td v-for="j in size" v-bind:key="j" :class="getClasses(i, j, size)">{{getValue()}}</td>
-    </tr>
-  </table>
+  <input :class="getFieldClass()" contenteditable="true" :value="value" @input="onInput" @focus="onFocus" @click="onFocus">
 </template>
 
 <script>
 export default {
-  name: "Box",
+  name: "Field",
   props: {
-    size: Number
+    value: Number
   },
   methods: {
-    getValue() {
-      return Math.floor(Math.random() * this.size * this.size) + 1;
-    },
-    getClasses(row, column, size) {
-      return {
-        noTop: row === 1,
-        noRight: column === size,
-        noBottom: row === size,
-        noLeft: column === 1,
-        'box-column': true
+    getFieldClass() {
+      let result = {
+        field: true
+      };
+      if (this.highlight) {
+        result["highlight"] = true;
       }
+      return result;
+    },
+    onFocus(event) {
+      let input = event.target;
+      input.setSelectionRange(0, input.value.length);
+    },
+    onInput(event) {
+      let result = parseInt(event.target.value);
+      this.$emit("input", result - 1);
     }
   }
 };
 </script>
 
 <style lang="scss">
-.box {
-  width: calc(100% + 1px);
-  height: calc(100% + 1px);
-  border-collapse: collapse;
-  table-layout: fixed;
-  vertical-align: middle;
+.field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  // align-items: center;
+  // justify-content: center;
+  border: none;
   text-align: center;
-
-  .box-row {
-    .box-column {
-      border: 1px solid darkgray;
-
-      &.noTop {
-        border-top: none;
-      }
-      &.noRight {
-        border-right: none;
-      }
-      &.noBottom {
-        border-bottom: none;
-      }
-      &.noLeft {
-        border-left: none;
-      }
-    }
+  font-size: 2rem;
+  &:focus {
+    background: lightgoldenrodyellow;
+    // outline: darkorange auto 3px;
+    outline: none;
+    border: 2px solid orange;
   }
+  &::selection {
+    background: none;
+  }
+  
 }
 </style>
