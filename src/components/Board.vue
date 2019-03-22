@@ -19,23 +19,26 @@ export default {
   data() {
     return {
       boardSize: 9,
-      borders: [[0b11010111, 0b11010101, 0b11010101, 0b11010101, 0b11010101]]
+      borderStyles: [
+        "none", 
+        "1px solid lightgray", 
+        "2px solid darkgray", 
+        "3px solid black"
+      ],
+      borders: [
+        [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
+        [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+        [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
+        [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+        [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+        [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
+        [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+        [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+        [0x3131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1133]
+      ]
     };
   },
   methods: {
-    getPositionStyle(position) {
-      switch (position) {
-        case 0:
-          return "none";
-        case 1:
-          return "1px solid lightgray";
-        case 2:
-          return "2px solid darkgray";
-        case 3:
-          return "3px solid black";
-      }
-      return null;
-    },
     getColumnStyle(i, j) {
       let result = {};
       let border = Helper.getListElement(this.borders, i, j);
@@ -43,14 +46,14 @@ export default {
         return result;
       }
 
-      let top = (border >> 6) & 0b11;
-      let right = (border >> 4) & 0b11;
-      let bottom = (border >> 2) & 0b11;
-      let left = (border >> 0) & 0b11;
-      result["border-top"] = this.getPositionStyle(top);
-      result["border-right"] = this.getPositionStyle(right);
-      result["border-bottom"] = this.getPositionStyle(bottom);
-      result["border-left"] = this.getPositionStyle(left);
+      let left = (border >> 12) & 0xf;
+      let top = (border >> 8) & 0xf;
+      let bottom = (border >> 4) & 0xf;
+      let right = (border >> 0) & 0xf;
+      result["border-top"] = this.borderStyles[top];
+      result["border-right"] = this.borderStyles[right];
+      result["border-bottom"] = this.borderStyles[bottom];
+      result["border-left"] = this.borderStyles[left];
       return result;
     },
     getBoard(template) {
