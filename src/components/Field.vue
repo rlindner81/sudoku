@@ -1,5 +1,5 @@
 <template>
-  <input :class="getFieldClass()" contenteditable="true" :value="value" @input="onInput" @focus="onFocus" @click="onFocus">
+  <input class="field" contenteditable="true" :value="value" @input="onInput" @focus="onFocus" @click="onFocus">
 </template>
 
 <script>
@@ -9,22 +9,16 @@ export default {
     value: Number
   },
   methods: {
-    getFieldClass() {
-      let result = {
-        field: true
-      };
-      if (this.highlight) {
-        result["highlight"] = true;
-      }
-      return result;
-    },
     onFocus(event) {
       let input = event.target;
       input.setSelectionRange(0, input.value.length);
     },
     onInput(event) {
       let result = parseInt(event.target.value);
-      this.$emit("input", result - 1);
+      if(isNaN(result)) {
+        this.$emit("input", null);
+      }
+      this.$emit("input", result);
     }
   }
 };
@@ -38,8 +32,6 @@ export default {
   width: 100%;
   height: 100%;
   display: flex;
-  // align-items: center;
-  // justify-content: center;
   border: none;
   text-align: center;
   font-size: 2rem;

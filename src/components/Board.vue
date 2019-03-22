@@ -72,9 +72,6 @@ export default {
       result["border-bottom"] = this.borderStyles[bottom];
       result["border-left"] = this.borderStyles[left];
       return result;
-    },
-    getHighlight() {
-      return Math.random() < 1 / 3;
     }
   }
 };
