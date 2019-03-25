@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { getListElement, shuffle } from "@/helper";
+import { getListElement, shuffle, seedRand, rand } from "@/helper";
 import Field from "@/components/Field.vue";
 
 let borders = [
@@ -84,6 +84,8 @@ export default {
       return result;
     },
     randomize(games) {
+      seedRand("lala");
+      let a = rand();
       let i = Math.floor(Math.random() * games.length);
       let game = games[i];
       this.randomRelabel(game);
