@@ -1,5 +1,5 @@
 <template>
-  <input class="field" contenteditable="true" :value="value" @input="onInput" @focus="onFocus" @click="onFocus">
+  <input class="field" :value="value" @input.prevent="onInput" @focus="onFocus" @click="onFocus">
 </template>
 
 <script>
@@ -14,11 +14,9 @@ export default {
       input.setSelectionRange(0, input.value.length);
     },
     onInput(event) {
-      let result = parseInt(event.target.value);
-      if(isNaN(result)) {
-        this.$emit("input", null);
-      }
-      this.$emit("input", result);
+      let value = event.target.value;
+      let result = parseInt(value.replace(/[^\d]+/g, ""));
+      this.$emit("input", isNaN(result) ? null : result);
     }
   }
 };

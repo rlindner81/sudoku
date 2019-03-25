@@ -40,9 +40,9 @@ export default {
       boardSize: 9,
       borderStyles: [
         "none",
-        "1px solid lightgray",
-        "2px solid darkgray",
-        "3px solid black"
+        "2px solid lightgray",
+        "3px solid darkgray",
+        "5px solid black"
       ],
       borders: borders,
       game: null,
@@ -50,8 +50,7 @@ export default {
     };
   },
   created() {
-    this.game = this.games[0];
-    this.values = this.valuesFromGrid(this.game[0]);
+    this.randomize(this.games);
   },
   methods: {
     valuesFromGrid(grid) {
@@ -84,14 +83,18 @@ export default {
       result["border-left"] = this.borderStyles[left];
       return result;
     },
+    randomize(games) {
+      let i = Math.floor(Math.random() * games.length)
+      this.game = games[i];
+      this.values = this.valuesFromGrid(this.game[0]);
+    },
     solve() {
       this.values = this.valuesFromGrid(this.game[1]);
     }
   },
   watch: { 
     games: function(newVal) {
-      this.game = newVal[0];
-      this.values = this.valuesFromGrid(this.game[0]);
+      this.randomize(newVal)
     }
   }
 };

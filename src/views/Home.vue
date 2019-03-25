@@ -4,8 +4,9 @@
     <select v-model="difficulty">
         <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
     </select>
+    <button @click="$refs.board.randomize(games)">Randomize</button>
     <button @click="$refs.board.solve()">Solve</button>
-    <Board class="board" ref="board" :games="games" :solve="solve" />
+    <Board class="board" ref="board" :games="games" />
   </div>
 </template>
 
