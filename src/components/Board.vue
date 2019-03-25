@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { getListElement } from "@/helper";
+import { getListElement, shuffle } from "@/helper";
 import Field from "@/components/Field.vue";
 
 let borders = [
@@ -84,17 +84,36 @@ export default {
       return result;
     },
     randomize(games) {
-      let i = Math.floor(Math.random() * games.length)
-      this.game = games[i];
+      let i = Math.floor(Math.random() * games.length);
+      let game = games[i];
+      this.randomRelabel(game);
+      this.game = game;
       this.values = this.valuesFromGrid(this.game[0]);
+    },
+    randomRelabel(game) {
+      let labels = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+      for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < this.boardSize; j++) {
+          game[i] = game[i].replace(
+            new RegExp(String.fromCharCode(0x31 + j), "g"),
+            String.fromCharCode(0x41 + j)
+          );
+        }
+        for (let j = 0; j < this.boardSize; j++) {
+          game[i] = game[i].replace(
+            new RegExp(String.fromCharCode(0x41 + j), "g"),
+            String.fromCharCode(0x31 + labels[j])
+          );
+        }
+      }
     },
     solve() {
       this.values = this.valuesFromGrid(this.game[1]);
     }
   },
-  watch: { 
+  watch: {
     games: function(newVal) {
-      this.randomize(newVal)
+      this.randomize(newVal);
     }
   }
 };
