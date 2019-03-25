@@ -4,7 +4,8 @@
     <select v-model="difficulty">
         <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
     </select>
-    <Board class="board" :difficulty="difficulty" />
+    <button @click="$refs.board.solve()">Solve</button>
+    <Board class="board" ref="board" :games="games" :solve="solve" />
   </div>
 </template>
 
@@ -20,12 +21,19 @@ export default {
   data() {
     return {
       difficulties: null,
-      difficulty: null
+      difficulty: null,
+      games: null
     }
   },
   created() {
     this.difficulties = Object.keys(games);
     this.difficulty = this.difficulties[0];
+    this.games = games[this.difficulty];
+  },
+  watch: {
+    difficulty: function(newVal) {
+      this.games = games[newVal];
+    }
   }
 };
 </script>

@@ -11,7 +11,6 @@
 <script>
 import { getListElement } from "@/helper";
 import Field from "@/components/Field.vue";
-import games from "@/games.json";
 
 let borders = [
   [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
@@ -31,8 +30,8 @@ export default {
     Field
   },
   props: {
-    difficulty: {
-      type: String,
+    games: {
+      type: Array,
       required: true
     }
   },
@@ -51,7 +50,7 @@ export default {
     };
   },
   created() {
-    this.game = games[this.difficulty][0];
+    this.game = this.games[0];
     this.values = this.valuesFromGrid(this.game[0]);
   },
   methods: {
@@ -84,15 +83,17 @@ export default {
       result["border-bottom"] = this.borderStyles[bottom];
       result["border-left"] = this.borderStyles[left];
       return result;
+    },
+    solve() {
+      this.values = this.valuesFromGrid(this.game[1]);
     }
   },
   watch: { 
-    difficulty: function(newVal) {
-      this.game = games[newVal][0];
+    games: function(newVal) {
+      this.game = newVal[0];
       this.values = this.valuesFromGrid(this.game[0]);
     }
   }
-
 };
 </script>
 
