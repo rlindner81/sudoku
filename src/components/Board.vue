@@ -2,7 +2,7 @@
   <table class="board">
     <tr class="row" v-for="(row, i) in boardSize" :key="i">
       <td class="column" :style="getColumnStyle(i, j)" v-for="(col, j) in boardSize" :key="j">
-        <Field v-model="values[i][j]" :highlight="getHighlight()"/>
+        <Field v-model="values[i][j]"/>
       </td>
     </tr>
   </table>
@@ -11,6 +11,8 @@
 <script>
 import { getListElement } from "@/helper";
 import Field from "@/components/Field.vue";
+import games from "@/games.json";
+
 let borders = [
   [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
   [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
@@ -28,6 +30,12 @@ export default {
   components: {
     Field
   },
+  props: {
+    difficulty: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       boardSize: 9,
@@ -38,19 +46,23 @@ export default {
         "3px solid black"
       ],
       borders: borders,
+      game: null,
       values: null
     };
   },
   created() {
-    this.values = this.getRandomValues();
+    this.game = games[this.difficulty][0];
+    this.values = this.valuesFromGrid(this.game[0]);
   },
   methods: {
-    getRandomValues() {
+    valuesFromGrid(grid) {
       let rows = [];
+      grid = grid.replace(/\./g, " ");
       for (let i = 0; i < this.boardSize; i++) {
         let columns = [];
         for (let j = 0; j < this.boardSize; j++) {
-          columns.push(1 + Math.floor(Math.random() * this.boardSize));
+          let value = grid[i * this.boardSize + j];
+          columns.push(value === " " ? null : parseInt(value));
         }
         rows.push(columns);
       }
@@ -73,7 +85,14 @@ export default {
       result["border-left"] = this.borderStyles[left];
       return result;
     }
+  },
+  watch: { 
+    difficulty: function(newVal) {
+      this.game = games[newVal][0];
+      this.values = this.valuesFromGrid(this.game[0]);
+    }
   }
+
 };
 </script>
 

@@ -1,17 +1,31 @@
 <template>
   <div class="home">
     <h1>Play Sudoku</h1>
-    <Board class="board"/>
+    <select v-model="difficulty">
+        <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
+    </select>
+    <Board class="board" :difficulty="difficulty" />
   </div>
 </template>
 
 <script>
 import Board from "@/components/Board.vue";
+import games from "@/games.json";
 
 export default {
-  name: "app",
+  name: "Home",
   components: {
     Board
+  },
+  data() {
+    return {
+      difficulties: null,
+      difficulty: null
+    }
+  },
+  created() {
+    this.difficulties = Object.keys(games);
+    this.difficulty = this.difficulties[0];
   }
 };
 </script>
