@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Play {{difficulty}} Sudoku #{{seed}}</h1>
+    <h1>{{difficulty}} Sudoku {{seed}}</h1>
     <div class="input-lane">
       <select v-model="difficulty">
         <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
@@ -25,8 +25,6 @@ import games from "@/data/games.json";
 import { fallback } from "@/helper";
 
 const difficulties = Object.keys(games);
-const defaultDifficulty = difficulties[1];
-const defaultSeed = String(Math.random()).substring(2, 10);
 
 export default {
   name: "Sudoku",
@@ -44,8 +42,8 @@ export default {
   created() {
     let query = Object.assign({}, this.$route.query);
 
-    query.difficulty = fallback(query.difficulty, defaultDifficulty);
-    query.seed = fallback(query.seed, defaultSeed);
+    query.difficulty = fallback(query.difficulty, difficulties[1]);
+    query.seed = fallback(query.seed, this.randomSeed());
     this.$router.replace({ query });
 
     this.difficulty = query.difficulty;
@@ -63,10 +61,13 @@ export default {
   },
   methods: {
     onClickRandomize() {
-      this.seed = String(Math.random()).substring(2, 10);
+      this.seed = this.randomSeed();
       this.$router.push({
         query: { difficulty: this.difficulty, seed: this.seed }
       });
+    },
+    randomSeed() {
+      return Math.random().toString().substring(2, 10);
     }
   }
 };
