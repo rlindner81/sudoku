@@ -27,6 +27,11 @@ export function fallback(value, fallback) {
   return isNull(value) ? fallback : value;
 }
 
+// Flatten subarrays.
+export function flatten(A) {
+  return A.reduce((a, b) => a.concat(b))
+}
+
 /**
  * Returns the element of a nested array if possible, otherwise null.
  *
@@ -46,19 +51,6 @@ export function getListElement() {
     array = array[index];
   }
   return array;
-}
-
-/**
- * Exchange the values of a and b.
- */
-export function exchangeInString(string, i, j) {
-  let chars = Array.from(string);
-  // console.log("before===", i, j, chars.join(''));
-  let c = chars[i];
-  chars[i] = chars[j];
-  chars[j] = c;
-  // console.log("after===", i, j, chars.join(''));
-  return chars.join('');
 }
 
 /**

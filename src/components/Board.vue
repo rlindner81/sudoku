@@ -17,7 +17,7 @@
 <script>
 import {
   fallback,
-  exchangeInString,
+  flatten,
   getListElement,
   shuffle,
   seedRand,
@@ -127,54 +127,72 @@ export default {
       ].forEach(fn => {
         let state = {};
         for (let i = 0; i < game.length; i++) {
-          state.grid = game[i];
+          state.squares = Array.from(game[i]);
           fn(state);
-          game[i] = state.grid;
+          game[i] = state.squares.join("");
         }
       });
-      this.randomRowPermutation(game);
-      this.randomColumnPermutation(game);
       this.game = game;
       this.values = this.valuesFromGrid(this.game[0]);
     },
     randomRelabel(state) {
-      console.log("grid before relabel", state.grid);
       state.labels = fallback(
         state.labels,
-        shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8])
+        shuffle(["1", "2", "3", "4", "5", "6", "7", "8", "9"])
       );
+      console.log("before relabel", state.squares.join(""), state.labels);
+
       for (let i = 0; i < this.boardSize; i++) {
-        state.grid = state.grid.replace(
-          new RegExp(String.fromCharCode(0x31 + i), "g"),
-          String.fromCharCode(0x41 + i)
-        );
+        for (let j = 0; j < this.boardSize; j++) {
+          let x = j + this.boardSize * i;
+          let value = state.squares[x];
+          if (value !== ".") {
+            state.squares[x] = state.labels[parseInt(value) - 1];
+          }
+        }
       }
-      for (let i = 0; i < this.boardSize; i++) {
-        state.grid = state.grid.replace(
-          new RegExp(String.fromCharCode(0x41 + i), "g"),
-          String.fromCharCode(0x31 + state.labels[i])
-        );
-      }
-      console.log("grid after relabel", state.grid);
+
+      console.log(" after relabel", state.squares.join(""));
     },
     randomTranspose(state) {
-      console.log("grid before transpose", state.grid);
       state.transpose = fallback(state.transpose, rand() < 0.5);
+      console.log("before transpose", state.squares.join(""), state.transpose);
+
       if (state.transpose === true) {
         for (let i = 0; i < this.boardSize; i++) {
           for (let j = 0; j < i; j++) {
-            state.grid = exchangeInString(
-              state.grid,
-              i + this.boardSize * j,
-              j + this.boardSize * i
-            );
+            let x = j + this.boardSize * i;
+            let y = i + this.boardSize * j;
+            let value = state.squares[x];
+            state.squares[x] = state.squares[y];
+            state.squares[y] = value;
           }
         }
-        for (let i = 0; i < state.grid.length / 2; i++) {}
       }
-      console.log("grid after transpose", state.grid);
+
+      console.log(" after transpose", state.squares.join(""));
     },
-    randomRowPermutation(state) {},
+    randomRowPermutation(state) {
+      console.log("before row permute", state.squares.join(""));
+
+      state.rows = fallback(
+        state.rows,
+        flatten(
+          shuffle([shuffle([0, 1, 2]), shuffle([3, 4, 5]), shuffle([6, 7, 8])])
+        )
+      );
+      for (let i = 0; i < this.boardSize; i++) {
+        for (let j = 0; j < this.boardSize; j++) {
+          // state.grid = exchangeInString(
+          //   state.grid,
+          //   i + this.boardSize * j,
+          //   i + this.boardSize * j
+          // );
+        }
+      }
+
+      console.log("after row permute", state.squares.join(""));
+    },
     randomColumnPermutation(state) {},
     solve() {
       this.values = this.valuesFromGrid(this.game[1]);
