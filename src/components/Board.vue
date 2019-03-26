@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { getListElement, shuffle, rand } from "@/helper";
+import { isNull, getListElement, shuffle, seedRand, rand } from "@/helper";
 
 let borders = [
   [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
@@ -35,6 +35,10 @@ export default {
     games: {
       type: Array,
       required: true
+    },
+    seed: {
+      type: String,
+      required: true
     }
   },
   data() {
@@ -52,11 +56,14 @@ export default {
     };
   },
   created() {
-    this.randomize(this.games);
+    this.randomize();
   },
   watch: {
     games: function(newVal) {
-      this.randomize(newVal);
+      this.randomize(newVal, null);
+    },
+    seed: function(newVal) {
+      this.randomize(null, newVal);
     }
   },
   methods: {
@@ -97,20 +104,27 @@ export default {
     //
     // === GAME LOGIC ===
     //
-    randomize(games) {
-      if (games === undefined) {
+    randomize(games, seed) {
+      if (isNull(games)) {
         games = this.games;
       }
+      if (isNull(seed)) {
+        seed = this.seed;
+      }
+      console.log("reset seed to ", seed)
+      seedRand(seed);
 
       let i = Math.floor(rand() * games.length);
-      let game = games[i];
+      let game = games[i].slice();
       this.randomRelabel(game);
+      this.randomRowPermutation(game);
+      this.randomColumnPermutation(game);
       this.game = game;
       this.values = this.valuesFromGrid(this.game[0]);
     },
     randomRelabel(game) {
       let labels = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < game.length; i++) {
         for (let j = 0; j < this.boardSize; j++) {
           game[i] = game[i].replace(
             new RegExp(String.fromCharCode(0x31 + j), "g"),
@@ -124,6 +138,16 @@ export default {
           );
         }
       }
+    },
+    randomRowPermutation(game) {
+      for (let i = 0; i < game.length; i++) {
+        let i = 0, j = 0, k = 0;
+      }
+    },
+    randomColumnPermutation(game) {
+      for (let i = 0; i < game.length; i++) {
+      }
+
     },
     solve() {
       this.values = this.valuesFromGrid(this.game[1]);

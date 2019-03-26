@@ -5,14 +5,14 @@
       <select v-model="difficulty">
         <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
       </select>
-      <button @click="onClickRandomize">Randomize</button>
+      <button @click="onClickRandomize()">Randomize</button>
       <button @click="$refs.board.solve()">Solve</button>
       <button @click="$refs.board.reset()">Reset</button>
       <button onclick="window.print();return false;">Print</button>
     </div>
     <div class="square-outer">
       <div class="square-inner">
-        <Board class="board" ref="board" :games="games"/>
+        <Board class="board" ref="board" :games="games" :seed="seed" />
       </div>
     </div>
   </div>
@@ -21,7 +21,6 @@
 <script>
 import Board from "@/components/Board.vue";
 import games from "@/games.json";
-import { seedRand } from "@/helper";
 
 export default {
   name: "Sudoku",
@@ -41,23 +40,19 @@ export default {
 
     this.difficulty = params.difficulty;
     this.seed = params.seed;
-
-    seedRand(this.seed);
     this.difficulties = Object.keys(games);
     this.games = games[this.difficulty];
   },
   watch: {
     difficulty: function(newVal) {
       this.games = games[newVal];
-      this.$router.replace(`/${newVal}/${this.seed}`, { silent: true });
+      this.$router.push(`/${newVal}/${this.seed}`);
     }
   },
   methods: {
     onClickRandomize() {
       this.seed = String(Math.random()).substring(2, 10);
-      seedRand(this.seed);
-      this.$router.replace(`/${this.difficulty}/${this.seed}`, { silent: true });
-      this.$refs.board.randomize();
+      this.$router.push(`/${this.difficulty}/${this.seed}`);
     }
   }
 };

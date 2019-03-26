@@ -16,7 +16,6 @@ export default {
 
     if (isNull(params.difficulty, params.seed)) {
       this.$router.replace(`/${defaultDifficulty}/${defaultSeed}`)
-      return;
     }
   }
 };
