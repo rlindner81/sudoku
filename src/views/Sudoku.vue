@@ -12,7 +12,7 @@
     </div>
     <div class="square-outer">
       <div class="square-inner">
-        <Board class="board" ref="board" :games="games" :seed="seed" />
+        <Board class="board" ref="board" :games="games" :seed="seed"/>
       </div>
     </div>
   </div>
@@ -20,7 +20,11 @@
 
 <script>
 import Board from "@/components/Board.vue";
-import games from "@/games.json";
+import games from "@/data/games.json";
+import { isNull, fallback } from "@/helper";
+
+const defaultDifficulty = "hard";
+const defaultSeed = String(Math.random()).substring(2, 10);
 
 export default {
   name: "Sudoku",
@@ -30,29 +34,37 @@ export default {
   data() {
     return {
       difficulties: null,
-      difficulty: null,
       games: null,
+      difficulty: null,
       seed: null
     };
   },
   created() {
-    let params = this.$route.params;
+    let query = Object.assign({}, this.$route.query);
 
-    this.difficulty = params.difficulty;
-    this.seed = params.seed;
+    query.difficulty = fallback(query.difficulty, defaultDifficulty);
+    query.seed = fallback(query.seed, defaultSeed);
+    this.$router.replace({ query });
+
+    this.difficulty = query.difficulty;
+    this.seed = query.seed;
     this.difficulties = Object.keys(games);
     this.games = games[this.difficulty];
   },
   watch: {
     difficulty: function(newVal) {
       this.games = games[newVal];
-      this.$router.push(`/${newVal}/${this.seed}`);
+      this.$router.push({ 
+        query: { difficulty: newVal, seed: this.seed }
+      });
     }
   },
   methods: {
     onClickRandomize() {
       this.seed = String(Math.random()).substring(2, 10);
-      this.$router.push(`/${this.difficulty}/${this.seed}`);
+      this.$router.push({ 
+        query: { difficulty: this.difficulty, seed: this.seed }
+      });
     }
   }
 };
@@ -71,7 +83,8 @@ $accent-color: lightgoldenrodyellow;
   }
 
   .input-lane {
-    button, select {
+    button,
+    select {
       padding: 0.125rem 1rem;
       background: $accent-color;
       color: black;
