@@ -72,7 +72,8 @@ export default {
 
 <style lang="scss">
 $size: 60rem;
-$accent-color: lightgoldenrodyellow;
+$accent-color: green;
+$accent-font-color: white;
 
 .home {
   margin: 0 auto;
@@ -86,13 +87,13 @@ $accent-color: lightgoldenrodyellow;
     button,
     select {
       padding: 0.125rem 1rem;
-      background: $accent-color;
-      color: black;
+      background: rgba($accent-color, 0.75);
+      color: $accent-font-color;
       box-shadow: none;
-      border: 1px solid gray;
-      border-radius: 5px;
-      font-weight: 400;
-      font-size: 12px;
+      border: 1px solid darken($accent-color, 10%);
+      border-radius: 3px;
+      font-weight: 500;
+      font-size: 16px;
 
       &:not(:first-child) {
         margin-left: 1rem;
