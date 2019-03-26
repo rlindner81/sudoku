@@ -19,6 +19,15 @@ export function hasNull(list) {
 }
 
 /**
+ * Returns fallback value if first argument is null or undefined.
+ *
+ * Usage: let a = fallback(a, "a");
+ */
+export function fallback(value, fallback) {
+  return isNull(value) ? fallback : value;
+}
+
+/**
  * Returns the element of a nested array if possible, otherwise null.
  *
  * Usage: getListElement(array, 1, 2, 3) === array[1][2][3] || null (without acccess exceptions)

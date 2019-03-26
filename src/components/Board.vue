@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { isNull, getListElement, shuffle, seedRand, rand } from "@/helper";
+import { fallback, getListElement, shuffle, seedRand, rand } from "@/helper";
 
 let borders = [
   [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
@@ -105,13 +105,9 @@ export default {
     // === GAME LOGIC ===
     //
     randomize(games, seed) {
-      if (isNull(games)) {
-        games = this.games;
-      }
-      if (isNull(seed)) {
-        seed = this.seed;
-      }
-      console.log("reset seed to ", seed)
+      games = fallback(games, this.games);
+      seed = fallback(seed, this.seed);
+
       seedRand(seed);
 
       let i = Math.floor(rand() * games.length);
