@@ -4,8 +4,7 @@
 </template>
 
 <script>
-import games from "@/games.json";
-import { isNull, seedRand } from "@/helper";
+import { isNull } from "@/helper";
 
 const defaultDifficulty = "easy";
 const defaultSeed = String(Math.random()).substring(2,10);

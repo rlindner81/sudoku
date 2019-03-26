@@ -1,13 +1,15 @@
 <template>
   <div class="home">
     <h1>Play Sudoku</h1>
-    <select v-model="difficulty">
-      <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
-    </select>
-    <button @click="onClickRandomize">Randomize</button>
-    <button @click="$refs.board.solve()">Solve</button>
-    <button @click="$refs.board.reset()">Reset</button>
-    <button onclick="window.print();return false;">Print</button>
+    <div class="input-lane">
+      <select v-model="difficulty">
+        <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
+      </select>
+      <button @click="onClickRandomize">Randomize</button>
+      <button @click="$refs.board.solve()">Solve</button>
+      <button @click="$refs.board.reset()">Reset</button>
+      <button onclick="window.print();return false;">Print</button>
+    </div>
     <div class="square-outer">
       <div class="square-inner">
         <Board class="board" ref="board" :games="games"/>
@@ -19,10 +21,7 @@
 <script>
 import Board from "@/components/Board.vue";
 import games from "@/games.json";
-import { isNull, seedRand } from "@/helper";
-
-const defaultDifficulty = "easy";
-const defaultSeed = String(Math.random()).substring(2, 10);
+import { seedRand } from "@/helper";
 
 export default {
   name: "Sudoku",
@@ -66,7 +65,7 @@ export default {
 
 <style lang="scss">
 $size: 60rem;
-$print-size: 400mm;
+$accent-color: lightgoldenrodyellow;
 
 .home {
   margin: 0 auto;
@@ -74,6 +73,27 @@ $print-size: 400mm;
 
   > * {
     margin: 2rem 0;
+  }
+
+  .input-lane {
+    button, select {
+      padding: 0.125rem 1rem;
+      background: $accent-color;
+      color: black;
+      box-shadow: none;
+      border: 1px solid gray;
+      border-radius: 5px;
+      font-weight: 400;
+      font-size: 12px;
+
+      &:not(:first-child) {
+        margin-left: 1rem;
+      }
+    }
+
+    @media print {
+      display: none;
+    }
   }
 
   .square-outer {
