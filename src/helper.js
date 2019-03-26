@@ -44,7 +44,7 @@ export function getListElement() {
  */
 export function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rand() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
@@ -84,22 +84,19 @@ function sfc32(a, b, c, d) {
   }
 }
 
-let _rand;
-
 /**
  * Seed pseudo-random number generator.
  */
+let _rand;
 export function seedRand(seed) {
   let hash = xmur3(seed);
   _rand = sfc32(hash(), hash(), hash(), hash());
 }
+seedRand(String(Math.PI))
 
 /**
  * Get pseudo-random numbers between 0 and 1.
  */
 export function rand() {
-  if (_rand === undefined) {
-    return null;
-  }
   return _rand();
 }

@@ -2,15 +2,20 @@
   <table class="board">
     <tr class="row" v-for="(row, i) in boardSize" :key="i">
       <td class="column" :style="getColumnStyle(i, j)" v-for="(col, j) in boardSize" :key="j">
-        <Field v-model="values[i][j]"/>
+        <input
+          class="field"
+          v-model="values[i][j]"
+          @input="onInput"
+          @focus="onFocus"
+          @click="onFocus"
+        >
       </td>
     </tr>
   </table>
 </template>
 
 <script>
-import { getListElement, shuffle, seedRand, rand } from "@/helper";
-import Field from "@/components/Field.vue";
+import { getListElement, shuffle, rand } from "@/helper";
 
 let borders = [
   [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
@@ -26,9 +31,6 @@ let borders = [
 
 export default {
   name: "Board",
-  components: {
-    Field
-  },
   props: {
     games: {
       type: Array,
@@ -52,7 +54,15 @@ export default {
   created() {
     this.randomize(this.games);
   },
+  watch: {
+    games: function(newVal) {
+      this.randomize(newVal);
+    }
+  },
   methods: {
+    //
+    // === DISPLAY ===
+    //
     valuesFromGrid(grid) {
       let rows = [];
       grid = grid.replace(/\./g, " ");
@@ -83,10 +93,12 @@ export default {
       result["border-left"] = this.borderStyles[left];
       return result;
     },
+
+    //
+    // === GAME LOGIC ===
+    //
     randomize(games) {
-      seedRand("lala");
-      let a = rand();
-      let i = Math.floor(Math.random() * games.length);
+      let i = Math.floor(rand() * games.length);
       let game = games[i];
       this.randomRelabel(game);
       this.game = game;
@@ -111,11 +123,23 @@ export default {
     },
     solve() {
       this.values = this.valuesFromGrid(this.game[1]);
-    }
-  },
-  watch: {
-    games: function(newVal) {
-      this.randomize(newVal);
+    },
+    reset() {
+      this.values = this.valuesFromGrid(this.game[0]);
+    },
+
+    //
+    // === EVENTS ===
+    //
+    onFocus(event) {
+      let input = event.target;
+      input.setSelectionRange(0, input.value.length);
+    },
+    onInput(event) {
+      let input = event.target;
+      let value = input.value;
+      let result = parseInt(value.replace(/[^\d]+/g, "")); 
+      input.value = isNaN(result) ? null : result;
     }
   }
 };
@@ -132,6 +156,26 @@ export default {
   .row {
     .column {
       position: relative;
+      .field {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        border: none;
+        text-align: center;
+        font-size: 2rem;
+        &:focus {
+          background: lightgoldenrodyellow;
+          // outline: darkorange auto 3px;
+          outline: none;
+          border: 2px solid orange;
+        }
+        &::selection {
+          background: none;
+        }
+      }
     }
   }
 }

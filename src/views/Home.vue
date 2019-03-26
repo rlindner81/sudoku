@@ -6,6 +6,8 @@
     </select>
     <button @click="$refs.board.randomize(games)">Randomize</button>
     <button @click="$refs.board.solve()">Solve</button>
+    <button @click="$refs.board.reset()">Reset</button>
+    <button onclick="window.print();return false;">Print</button>
     <Board class="board" ref="board" :games="games" />
   </div>
 </template>
@@ -13,6 +15,7 @@
 <script>
 import Board from "@/components/Board.vue";
 import games from "@/games.json";
+import { seedRand } from "@/helper";
 
 export default {
   name: "Home",
@@ -27,6 +30,7 @@ export default {
     }
   },
   created() {
+    seedRand("lala");
     this.difficulties = Object.keys(games);
     this.difficulty = this.difficulties[0];
     this.games = games[this.difficulty];
