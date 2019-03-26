@@ -247,7 +247,6 @@ export default {
 
 <style lang="scss">
 .board {
-  box-sizing: content-box;
   border-collapse: collapse;
   table-layout: fixed;
   vertical-align: middle;
@@ -268,7 +267,6 @@ export default {
         font-size: 2rem;
         &:focus {
           background: lightgoldenrodyellow;
-          // outline: darkorange auto 3px;
           outline: none;
           border: 2px solid orange;
         }

@@ -27,7 +27,9 @@ export function fallback(value, fallback) {
   return isNull(value) ? fallback : value;
 }
 
-// Flatten subarrays.
+/**
+ * Flatten subarrays.
+ */
 export function flatten(A) {
   return A.reduce((a, b) => a.concat(b))
 }
