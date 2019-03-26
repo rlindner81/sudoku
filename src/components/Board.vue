@@ -15,7 +15,14 @@
 </template>
 
 <script>
-import { fallback, getListElement, shuffle, seedRand, rand } from "@/helper";
+import {
+  fallback,
+  exchangeInString,
+  getListElement,
+  shuffle,
+  seedRand,
+  rand
+} from "@/helper";
 
 let borders = [
   [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
@@ -112,39 +119,63 @@ export default {
 
       let i = Math.floor(rand() * games.length);
       let game = games[i].slice();
-      this.randomRelabel(game);
+      [
+        this.randomRelabel,
+        this.randomTranspose,
+        this.randomRowPermutation,
+        this.randomColumnPermutation
+      ].forEach(fn => {
+        let state = {};
+        for (let i = 0; i < game.length; i++) {
+          state.grid = game[i];
+          fn(state);
+          game[i] = state.grid;
+        }
+      });
       this.randomRowPermutation(game);
       this.randomColumnPermutation(game);
       this.game = game;
       this.values = this.valuesFromGrid(this.game[0]);
     },
-    randomRelabel(game) {
-      let labels = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-      for (let i = 0; i < game.length; i++) {
-        for (let j = 0; j < this.boardSize; j++) {
-          game[i] = game[i].replace(
-            new RegExp(String.fromCharCode(0x31 + j), "g"),
-            String.fromCharCode(0x41 + j)
-          );
+    randomRelabel(state) {
+      console.log("grid before relabel", state.grid);
+      state.labels = fallback(
+        state.labels,
+        shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8])
+      );
+      for (let i = 0; i < this.boardSize; i++) {
+        state.grid = state.grid.replace(
+          new RegExp(String.fromCharCode(0x31 + i), "g"),
+          String.fromCharCode(0x41 + i)
+        );
+      }
+      for (let i = 0; i < this.boardSize; i++) {
+        state.grid = state.grid.replace(
+          new RegExp(String.fromCharCode(0x41 + i), "g"),
+          String.fromCharCode(0x31 + state.labels[i])
+        );
+      }
+      console.log("grid after relabel", state.grid);
+    },
+    randomTranspose(state) {
+      console.log("grid before transpose", state.grid);
+      state.transpose = fallback(state.transpose, rand() < 0.5);
+      if (state.transpose === true) {
+        for (let i = 0; i < this.boardSize; i++) {
+          for (let j = 0; j < i; j++) {
+            state.grid = exchangeInString(
+              state.grid,
+              i + this.boardSize * j,
+              j + this.boardSize * i
+            );
+          }
         }
-        for (let j = 0; j < this.boardSize; j++) {
-          game[i] = game[i].replace(
-            new RegExp(String.fromCharCode(0x41 + j), "g"),
-            String.fromCharCode(0x31 + labels[j])
-          );
-        }
+        for (let i = 0; i < state.grid.length / 2; i++) {}
       }
+      console.log("grid after transpose", state.grid);
     },
-    randomRowPermutation(game) {
-      for (let i = 0; i < game.length; i++) {
-        let i = 0, j = 0, k = 0;
-      }
-    },
-    randomColumnPermutation(game) {
-      for (let i = 0; i < game.length; i++) {
-      }
-
-    },
+    randomRowPermutation(state) {},
+    randomColumnPermutation(state) {},
     solve() {
       this.values = this.valuesFromGrid(this.game[1]);
     },
@@ -162,7 +193,7 @@ export default {
     onInput(event) {
       let input = event.target;
       let value = input.value;
-      let result = parseInt(value.replace(/[^\d]+/g, "")); 
+      let result = parseInt(value.replace(/[^\d]+/g, ""));
       input.value = isNaN(result) ? null : result;
     }
   }

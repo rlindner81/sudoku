@@ -54,7 +54,7 @@ export default {
   watch: {
     difficulty: function(newVal) {
       this.games = games[newVal];
-      this.$router.push({ 
+      this.$router.push({
         query: { difficulty: newVal, seed: this.seed }
       });
     }
@@ -62,7 +62,7 @@ export default {
   methods: {
     onClickRandomize() {
       this.seed = String(Math.random()).substring(2, 10);
-      this.$router.push({ 
+      this.$router.push({
         query: { difficulty: this.difficulty, seed: this.seed }
       });
     }

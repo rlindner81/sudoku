@@ -49,6 +49,26 @@ export function getListElement() {
 }
 
 /**
+ * Exchange the values of a and b.
+ */
+export function exchangeInString(string, i, j) {
+  let chars = Array.from(string);
+  // console.log("before===", i, j, chars.join(''));
+  let c = chars[i];
+  chars[i] = chars[j];
+  chars[j] = c;
+  // console.log("after===", i, j, chars.join(''));
+  return chars.join('');
+}
+
+/**
+ * Replace all occurrences of string a in b.
+ */
+// TODO
+//export function replaceAll(a, b) {
+//}
+
+/**
  * Shuffle an array in place.
  */
 export function shuffle(a) {
@@ -65,13 +85,13 @@ export function shuffle(a) {
  * https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
  */
 function xmur3(str) {
-  for(var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
-      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-      h = h << 13 | h >>> 19;
-  return function() {
-      h = Math.imul(h ^ h >>> 16, 2246822507);
-      h = Math.imul(h ^ h >>> 13, 3266489909);
-      return (h ^= h >>> 16) >>> 0;
+  for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+  h = h << 13 | h >>> 19;
+  return function () {
+    h = Math.imul(h ^ h >>> 16, 2246822507);
+    h = Math.imul(h ^ h >>> 13, 3266489909);
+    return (h ^= h >>> 16) >>> 0;
   }
 }
 
@@ -80,8 +100,8 @@ function xmur3(str) {
  * https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
  */
 function sfc32(a, b, c, d) {
-  return function() {
-    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; 
+  return function () {
+    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
     var t = (a + b) | 0;
     a = b ^ b >>> 9;
     b = c + (c << 3) | 0;
