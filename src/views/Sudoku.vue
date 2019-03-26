@@ -9,7 +9,7 @@
       <button @click="$refs.board.solve()">Solve</button>
       <button @click="$refs.board.reset()">Reset</button>
       <button onclick="window.print();return false;">Print</button>
-      <button @click="$refs.board.transpose()">Transpose</button>
+      <!-- <button @click="$refs.board.debug()">Debug</button> -->
     </div>
     <div class="square-outer">
       <div class="square-inner">
