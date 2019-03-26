@@ -79,16 +79,19 @@ export default {
     //
     valuesFromGrid(grid) {
       let rows = [];
-      grid = grid.replace(/\./g, " ");
       for (let i = 0; i < this.boardSize; i++) {
         let columns = [];
         for (let j = 0; j < this.boardSize; j++) {
           let value = grid[i * this.boardSize + j];
-          columns.push(value === " " ? null : parseInt(value));
+          columns.push(value === "." ? null : parseInt(value));
         }
         rows.push(columns);
       }
       return rows;
+    },
+    gridFromValues(values) {
+      let squares = flatten(values);
+      return squares.map(value => (!value ? "." : value)).join("");
     },
     getColumnStyle(i, j) {
       let result = {};
@@ -140,7 +143,7 @@ export default {
         state.labels,
         shuffle(["1", "2", "3", "4", "5", "6", "7", "8", "9"])
       );
-      console.log("before relabel", state.squares.join(""), state.labels);
+      // console.log("before relabel", state.squares.join(""), state.labels);
 
       for (let i = 0; i < this.boardSize; i++) {
         for (let j = 0; j < this.boardSize; j++) {
@@ -152,11 +155,11 @@ export default {
         }
       }
 
-      console.log(" after relabel", state.squares.join(""));
+      // console.log(" after relabel", state.squares.join(""));
     },
     randomTranspose(state) {
       state.transpose = fallback(state.transpose, rand() < 0.5);
-      console.log("before transpose", state.squares.join(""), state.transpose);
+      // console.log("before transpose", state.squares.join(""), state.transpose);
 
       if (state.transpose === true) {
         for (let i = 0; i < this.boardSize; i++) {
@@ -170,7 +173,7 @@ export default {
         }
       }
 
-      console.log(" after transpose", state.squares.join(""));
+      // console.log(" after transpose", state.squares.join(""));
     },
     randomRowPermutation(state) {
       console.log("before row permute", state.squares.join(""));
@@ -194,6 +197,12 @@ export default {
       console.log("after row permute", state.squares.join(""));
     },
     randomColumnPermutation(state) {},
+    transpose() {
+      let grid = this.gridFromValues(this.values);
+      let state = { squares: Array.from(grid), transpose: true };
+      this.randomTranspose(state);
+      this.values = this.valuesFromGrid(state.squares.join(""));
+    },
     solve() {
       this.values = this.valuesFromGrid(this.game[1]);
     },
