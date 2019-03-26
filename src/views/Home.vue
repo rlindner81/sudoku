@@ -8,7 +8,11 @@
     <button @click="$refs.board.solve()">Solve</button>
     <button @click="$refs.board.reset()">Reset</button>
     <button onclick="window.print();return false;">Print</button>
-    <Board class="board" ref="board" :games="games" />
+    <div class="square-outer">
+      <div class="square-inner">
+        <Board class="board" ref="board" :games="games" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -45,18 +49,35 @@ export default {
 
 <style lang="scss">
 $size: 60rem;
+$print-size: 400mm;
 
 .home {
   margin: 0 auto;
-  width: $size;
+  max-width: $size;
 
   > * {
     margin: 2rem 0;
   }
 
-  .board {
-    width: $size;
-    height: $size;
+  .square-outer {
+    max-width: $size;
+    width: 100%;
+    padding-top: 100%;
+    position: relative;
+
+    .square-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+
+      .board {
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
+
 }
 </style>

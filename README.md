@@ -10,7 +10,6 @@
 
 ## todo
 
-* printer
 * seeded randomness
 * url params
   * seed
