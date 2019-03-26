@@ -21,7 +21,7 @@
 <script>
 import Board from "@/components/Board.vue";
 import games from "@/data/games.json";
-import { isNull, fallback } from "@/helper";
+import { fallback } from "@/helper";
 
 const defaultDifficulty = "hard";
 const defaultSeed = String(Math.random()).substring(2, 10);
