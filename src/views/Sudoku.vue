@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Play Sudoku</h1>
+    <h1>Play {{difficulty}} Sudoku #{{seed}}</h1>
     <div class="input-lane">
       <select v-model="difficulty">
         <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
@@ -24,7 +24,8 @@ import Board from "@/components/Board.vue";
 import games from "@/data/games.json";
 import { fallback } from "@/helper";
 
-const defaultDifficulty = "hard";
+const difficulties = Object.keys(games);
+const defaultDifficulty = difficulties[1];
 const defaultSeed = String(Math.random()).substring(2, 10);
 
 export default {
@@ -49,7 +50,7 @@ export default {
 
     this.difficulty = query.difficulty;
     this.seed = query.seed;
-    this.difficulties = Object.keys(games);
+    this.difficulties = difficulties;
     this.games = games[this.difficulty];
   },
   watch: {
@@ -84,6 +85,11 @@ $accent-font-color: white;
     margin: 2rem 0;
   }
 
+  h1,
+  select {
+    text-transform: capitalize;
+  }
+
   .input-lane {
     margin: -0.5rem;
     button,
@@ -100,7 +106,7 @@ $accent-font-color: white;
       font-size: 3vw;
 
       @media screen and (min-width: 600px) {
-        font-size: calc(3*6px);
+        font-size: calc(3 * 6px);
       }
     }
 
