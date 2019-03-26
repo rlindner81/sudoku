@@ -98,6 +98,10 @@ export default {
     // === GAME LOGIC ===
     //
     randomize(games) {
+      if (games === undefined) {
+        games = this.games;
+      }
+
       let i = Math.floor(rand() * games.length);
       let game = games[i];
       this.randomRelabel(game);

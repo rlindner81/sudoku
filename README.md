@@ -9,8 +9,3 @@
 * http://www.afjarvis.staff.shef.ac.uk/sudoku/
 
 ## todo
-
-* seeded randomness
-* url params
-  * seed
-  * difficulty
