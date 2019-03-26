@@ -85,19 +85,22 @@ $accent-font-color: white;
   }
 
   .input-lane {
+    margin: -0.5rem;
     button,
     select {
+      margin: 0.5rem;
       padding: 0.125rem 1rem;
       background: rgba($accent-color, 0.75);
+      width: 8rem;
       color: $accent-font-color;
       box-shadow: none;
       border: 1px solid darken($accent-color, 10%);
       border-radius: 3px;
       font-weight: 500;
-      font-size: 16px;
+      font-size: 3vw;
 
-      &:not(:first-child) {
-        margin-left: 1rem;
+      @media screen and (min-width: 600px) {
+        font-size: calc(3*6px);
       }
     }
 

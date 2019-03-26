@@ -261,10 +261,15 @@ export default {
         left: 0;
         width: 100%;
         height: 100%;
+        // line-height: 100%;
         display: flex;
         border: none;
         text-align: center;
-        font-size: 2rem;
+        font-size: 5vw;
+
+        @media screen and (min-width: 1000px) {
+          font-size: calc(5*10px);
+        }
         &:focus {
           background: lightgoldenrodyellow;
           outline: none;
