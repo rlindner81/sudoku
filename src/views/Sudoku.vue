@@ -25,7 +25,7 @@
           class="board"
           :games="games"
           :seed="seed"
-          :symbols="symbolpacks[symbols]"
+          :symbols="Array.from(symbolpacks[symbols])"
         />
       </div>
     </div>

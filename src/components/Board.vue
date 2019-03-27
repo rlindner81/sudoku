@@ -8,7 +8,7 @@
         :style="getColumnStyle(i, j)"
       >
         <input
-          v-model="values[i][j]"
+          :value="displayValue(values[i][j])"
           class="field"
           @input="onInput"
           @focus="onFocus"
@@ -21,6 +21,7 @@
 
 <script>
 import {
+  isNull,
   fallback,
   flatten,
   getListElement,
@@ -53,8 +54,8 @@ export default {
       required: true
     },
     symbols: {
-      type: String,
-      default: "123456789"
+      type: Array,
+      default: Array.from("123456789")
     }
   },
   data() {
@@ -67,7 +68,6 @@ export default {
         "5px solid black"
       ],
       borders: borders,
-      glyphs: "",
       game: null,
       values: null
     };
@@ -93,9 +93,7 @@ export default {
         let columns = [];
         for (let j = 0; j < this.boardSize; j++) {
           let value = grid[i * this.boardSize + j];
-          columns.push(
-            value === "." ? null : this.symbols[parseInt(value) - 1]
-          );
+          columns.push(value === "." ? null : parseInt(value) - 1);
         }
         rows.push(columns);
       }
@@ -121,6 +119,9 @@ export default {
       result["border-bottom"] = this.borderStyles[bottom];
       result["border-left"] = this.borderStyles[left];
       return result;
+    },
+    displayValue(value) {
+      return isNull(value) ? "" : this.symbols[value];
     },
 
     //
