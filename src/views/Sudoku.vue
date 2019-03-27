@@ -2,28 +2,31 @@
   <div class="home">
     <h1>{{ difficulty }} Sudoku {{ seed }}</h1>
     <div class="input-lane">
+      <button @click="onClickNew()">New</button>
       <select v-model="difficulty">
-        <option v-for="(d, i) in difficulties" :key="i" :value="d">
-          {{ d }}
-        </option>
+        <option v-for="(d, i) in difficulties" :key="i" :value="d">{{
+          d
+        }}</option>
       </select>
-      <button @click="onClickNew()">
-        New
-      </button>
-      <button @click="$refs.board.solve()">
-        Solve
-      </button>
-      <button @click="$refs.board.reset()">
-        Reset
-      </button>
-      <button onclick="window.print();return false;">
-        Print
-      </button>
+      <select v-model="symbols">
+        <option v-for="(s, i) in symbolpacknames" :key="i" :value="s">{{
+          s
+        }}</option>
+      </select>
+      <button @click="$refs.board.solve()">Solve</button>
+      <button @click="$refs.board.reset()">Reset</button>
+      <button onclick="window.print();return false;">Print</button>
       <!-- <button @click="$refs.board.debug()">Debug</button> -->
     </div>
     <div class="square-outer">
       <div class="square-inner">
-        <Board ref="board" class="board" :games="games" :seed="seed" />
+        <Board
+          ref="board"
+          class="board"
+          :games="games"
+          :seed="seed"
+          :symbols="symbolpacks[symbols]"
+        />
       </div>
     </div>
   </div>
@@ -31,10 +34,10 @@
 
 <script>
 import Board from "@/components/Board.vue";
-import games from "@/data/games.json";
+import gamepacks from "@/data/gamepacks.json";
+// https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
+import symbolpacks from "@/data/symbolpacks.json";
 import { fallback } from "@/helper";
-
-const difficulties = Object.keys(games);
 
 export default {
   name: "Sudoku",
@@ -43,38 +46,53 @@ export default {
   },
   data() {
     return {
-      difficulties: null,
-      games: null,
+      symbolpacks: symbolpacks,
       difficulty: null,
-      seed: null
+      symbols: null,
+      seed: null,
+      games: null
     };
+  },
+  computed: {
+    difficulties: () => Object.keys(gamepacks),
+    symbolpacknames: () => Object.keys(symbolpacks)
   },
   watch: {
     difficulty: function(newVal) {
-      this.games = games[newVal];
-      this.$router.push({
-        query: { difficulty: newVal, seed: this.seed }
-      });
+      this.games = gamepacks[newVal];
+      this.updateQuery({ difficulty: newVal });
+    },
+    symbols: function(newVal) {
+      this.updateQuery({ symbols: newVal });
     }
   },
   created() {
     let query = Object.assign({}, this.$route.query);
 
-    query.difficulty = fallback(query.difficulty, difficulties[1]);
+    query.difficulty = fallback(query.difficulty, this.difficulties[1]);
+    query.symbols = fallback(query.symbols, this.symbolpacknames[0]);
     query.seed = fallback(query.seed, this.randomSeed());
     this.$router.replace({ query });
 
     this.difficulty = query.difficulty;
+    this.symbols = query.symbols;
     this.seed = query.seed;
-    this.difficulties = difficulties;
-    this.games = games[this.difficulty];
+    this.games = gamepacks[this.difficulty];
   },
   methods: {
+    updateQuery(options) {
+      options = fallback(options, {});
+      this.$router.push({
+        query: {
+          difficulty: fallback(options.difficulty, this.difficulty),
+          symbols: fallback(options.symbols, this.symbols),
+          seed: fallback(options.seed, this.seed)
+        }
+      });
+    },
     onClickNew() {
       this.seed = this.randomSeed();
-      this.$router.push({
-        query: { difficulty: this.difficulty, seed: this.seed }
-      });
+      this.updateQuery();
     },
     randomSeed() {
       return Math.random()

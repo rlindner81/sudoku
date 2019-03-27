@@ -29,7 +29,7 @@ import {
   rand
 } from "@/helper";
 
-let borders = [
+const borders = [
   [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
   [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
   [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
@@ -51,6 +51,10 @@ export default {
     seed: {
       type: String,
       required: true
+    },
+    symbols: {
+      type: String,
+      default: "123456789"
     }
   },
   data() {
@@ -63,20 +67,21 @@ export default {
         "5px solid black"
       ],
       borders: borders,
+      glyphs: "",
       game: null,
       values: null
     };
   },
   watch: {
     games: function(newVal) {
-      this.randomize(newVal, null);
+      this.generate({ games: newVal });
     },
     seed: function(newVal) {
-      this.randomize(null, newVal);
+      this.generate({ seed: newVal });
     }
   },
   created() {
-    this.randomize();
+    this.generate();
   },
   methods: {
     //
@@ -88,7 +93,9 @@ export default {
         let columns = [];
         for (let j = 0; j < this.boardSize; j++) {
           let value = grid[i * this.boardSize + j];
-          columns.push(value === "." ? null : parseInt(value));
+          columns.push(
+            value === "." ? null : this.symbols[parseInt(value) - 1]
+          );
         }
         rows.push(columns);
       }
@@ -119,9 +126,10 @@ export default {
     //
     // === GAME LOGIC ===
     //
-    randomize(games, seed) {
-      games = fallback(games, this.games);
-      seed = fallback(seed, this.seed);
+    generate(options) {
+      options = fallback(options, {});
+      let games = fallback(options.games, this.games);
+      let seed = fallback(options.seed, this.seed);
 
       seedRand(seed);
 
