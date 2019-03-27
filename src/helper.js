@@ -115,7 +115,7 @@ export function seedRand(seed) {
   let hash = xmur3(seed);
   _rand = sfc32(hash(), hash(), hash(), hash());
 }
-seedRand(String(Math.PI))
+seedRand(Math.random().toString());
 
 /**
  * Get pseudo-random numbers between 0 and 1.
