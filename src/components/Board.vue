@@ -1,12 +1,7 @@
 <template>
   <table class="board">
-    <tr v-for="(row, i) in size" :key="i" class="row">
-      <td
-        v-for="(col, j) in size"
-        :key="j"
-        class="column"
-        :style="getColumnStyle(i, j)"
-      >
+    <tr v-for="(row, i) in size" :key="i" :class="getRowClasses(i)">
+      <td v-for="(col, j) in size" :key="j" :class="getColumnClasses(i, j)">
         {{ displayValue(values[i][j]) }}
         <!--
         <input
@@ -23,35 +18,7 @@
 </template>
 
 <script>
-import {
-  isNull,
-  fallback,
-  flatten,
-  getListElement,
-  shuffle,
-  seedRand,
-  rand
-} from "@/helper";
-
-const borders = {
-  styles: [
-    "none",
-    "2px solid lightgray",
-    "3px solid darkgray",
-    "5px solid black"
-  ],
-  grid: [
-    [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
-    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-    [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
-    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-    [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
-    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-    [0x3131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1133]
-  ]
-};
+import { isNull, fallback, flatten, shuffle, seedRand, rand } from "@/helper";
 
 export default {
   name: "Board",
@@ -72,7 +39,7 @@ export default {
   data() {
     return {
       size: 9,
-      borders: borders,
+      boxSize: 3,
       game: null,
       values: null
     };
@@ -108,22 +75,21 @@ export default {
       let squares = flatten(values);
       return squares.map(value => (!value ? "." : value)).join("");
     },
-    getColumnStyle(i, j) {
-      let result = {};
-      let border = getListElement(this.borders.grid, i, j);
-      if (border === null) {
-        return result;
-      }
-
-      let left = (border >> 12) & 0xf;
-      let top = (border >> 8) & 0xf;
-      let bottom = (border >> 4) & 0xf;
-      let right = (border >> 0) & 0xf;
-      result["border-top"] = this.borders.styles[top];
-      result["border-right"] = this.borders.styles[right];
-      result["border-bottom"] = this.borders.styles[bottom];
-      result["border-left"] = this.borders.styles[left];
-      return result;
+    getRowClasses(i) {
+      return i % this.boxSize !== 0
+        ? { row: true }
+        : {
+            row: true,
+            "border-top": true
+          };
+    },
+    getColumnClasses(i, j) {
+      return j % this.boxSize !== 0
+        ? { column: true }
+        : {
+            column: true,
+            "border-left": true
+          };
     },
     displayValue(value) {
       return isNull(value) ? " " : this.symbols[value];
@@ -269,15 +235,28 @@ export default {
 </script>
 
 <style lang="scss">
+$border-board: 5px solid black;
+$border-box: 3px solid darkgray;
+$border-square: 2px solid lightgray;
+
 .board {
   border-collapse: collapse;
   table-layout: fixed;
   vertical-align: middle;
   text-align: center;
+  border: $border-board;
 
   .row {
+    &.border-top {
+      border-top: $border-box;
+    }
     .column {
       font-size: 5vw;
+      border: $border-square;
+
+      &.border-left {
+        border-left: $border-box;
+      }
 
       @media screen and (min-width: 1000px) {
         font-size: calc(5 * 10px);
