@@ -7,13 +7,16 @@
         class="column"
         :style="getColumnStyle(i, j)"
       >
+        {{ displayValue(values[i][j]) }}
+        <!--
         <input
-          :value="displayValue(values[i][j])"
+          :value=""
           class="field"
           @input="onInput"
           @focus="onFocus"
           @click="onFocus"
         />
+        -->
       </td>
     </tr>
   </table>
@@ -121,7 +124,7 @@ export default {
       return result;
     },
     displayValue(value) {
-      return isNull(value) ? "" : this.symbols[value];
+      return isNull(value) ? " " : this.symbols[value];
     },
 
     //
@@ -268,31 +271,31 @@ export default {
 
   .row {
     .column {
-      position: relative;
-      .field {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        // line-height: 100%;
-        display: flex;
-        border: none;
-        text-align: center;
-        font-size: 5vw;
+      font-size: 5vw;
 
-        @media screen and (min-width: 1000px) {
-          font-size: calc(5 * 10px);
-        }
-        &:focus {
-          background: lightgoldenrodyellow;
-          outline: none;
-          border: 2px solid orange;
-        }
-        &::selection {
-          background: none;
-        }
+      @media screen and (min-width: 1000px) {
+        font-size: calc(5 * 10px);
       }
+      //  position: relative;
+      // .field {
+      //   position: absolute;
+      //   top: 0;
+      //   left: 0;
+      //   width: 100%;
+      //   height: 100%;
+      //   // line-height: 100%;
+      //   display: flex;
+      //   border: none;
+      //   text-align: center;
+      //   &:focus {
+      //     background: lightgoldenrodyellow;
+      //     outline: none;
+      //     border: 2px solid orange;
+      //   }
+      //   &::selection {
+      //     background: none;
+      //   }
+      // }
     }
   }
 }
