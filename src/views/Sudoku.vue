@@ -1,19 +1,38 @@
 <template>
   <div class="home">
-    <h1>{{difficulty}} Sudoku {{seed}}</h1>
+    <h1>{{ difficulty }} Sudoku {{ seed }}</h1>
     <div class="input-lane">
       <select v-model="difficulty">
-        <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
+        <option
+          v-for="(d, i) in difficulties"
+          :key="i"
+          :value="d"
+        >
+          {{ d }}
+        </option>
       </select>
-      <button @click="onClickNew()">New</button>
-      <button @click="$refs.board.solve()">Solve</button>
-      <button @click="$refs.board.reset()">Reset</button>
-      <button onclick="window.print();return false;">Print</button>
+      <button @click="onClickNew()">
+        New
+      </button>
+      <button @click="$refs.board.solve()">
+        Solve
+      </button>
+      <button @click="$refs.board.reset()">
+        Reset
+      </button>
+      <button onclick="window.print();return false;">
+        Print
+      </button>
       <!-- <button @click="$refs.board.debug()">Debug</button> -->
     </div>
     <div class="square-outer">
       <div class="square-inner">
-        <Board class="board" ref="board" :games="games" :seed="seed"/>
+        <Board
+          ref="board"
+          class="board"
+          :games="games"
+          :seed="seed"
+        />
       </div>
     </div>
   </div>
@@ -39,6 +58,14 @@ export default {
       seed: null
     };
   },
+  watch: {
+    difficulty: function(newVal) {
+      this.games = games[newVal];
+      this.$router.push({
+        query: { difficulty: newVal, seed: this.seed }
+      });
+    }
+  },
   created() {
     let query = Object.assign({}, this.$route.query);
 
@@ -50,14 +77,6 @@ export default {
     this.seed = query.seed;
     this.difficulties = difficulties;
     this.games = games[this.difficulty];
-  },
-  watch: {
-    difficulty: function(newVal) {
-      this.games = games[newVal];
-      this.$router.push({
-        query: { difficulty: newVal, seed: this.seed }
-      });
-    }
   },
   methods: {
     onClickNew() {

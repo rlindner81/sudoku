@@ -1,10 +1,19 @@
 <template>
   <table class="board">
-    <tr class="row" v-for="(row, i) in boardSize" :key="i">
-      <td class="column" :style="getColumnStyle(i, j)" v-for="(col, j) in boardSize" :key="j">
+    <tr
+      v-for="(row, i) in boardSize"
+      :key="i"
+      class="row"
+    >
+      <td
+        v-for="(col, j) in boardSize"
+        :key="j"
+        class="column"
+        :style="getColumnStyle(i, j)"
+      >
         <input
-          class="field"
           v-model="values[i][j]"
+          class="field"
           @input="onInput"
           @focus="onFocus"
           @click="onFocus"
@@ -62,9 +71,6 @@ export default {
       values: null
     };
   },
-  created() {
-    this.randomize();
-  },
   watch: {
     games: function(newVal) {
       this.randomize(newVal, null);
@@ -72,6 +78,9 @@ export default {
     seed: function(newVal) {
       this.randomize(null, newVal);
     }
+  },
+  created() {
+    this.randomize();
   },
   methods: {
     //
