@@ -3,11 +3,7 @@
     <h1>{{ difficulty }} Sudoku {{ seed }}</h1>
     <div class="input-lane">
       <select v-model="difficulty">
-        <option
-          v-for="(d, i) in difficulties"
-          :key="i"
-          :value="d"
-        >
+        <option v-for="(d, i) in difficulties" :key="i" :value="d">
           {{ d }}
         </option>
       </select>
@@ -27,12 +23,7 @@
     </div>
     <div class="square-outer">
       <div class="square-inner">
-        <Board
-          ref="board"
-          class="board"
-          :games="games"
-          :seed="seed"
-        />
+        <Board ref="board" class="board" :games="games" :seed="seed" />
       </div>
     </div>
   </div>
@@ -86,7 +77,9 @@ export default {
       });
     },
     randomSeed() {
-      return Math.random().toString().substring(2, 10);
+      return Math.random()
+        .toString()
+        .substring(2, 10);
     }
   }
 };

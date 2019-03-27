@@ -1,10 +1,6 @@
 <template>
   <table class="board">
-    <tr
-      v-for="(row, i) in boardSize"
-      :key="i"
-      class="row"
-    >
+    <tr v-for="(row, i) in boardSize" :key="i" class="row">
       <td
         v-for="(col, j) in boardSize"
         :key="j"
@@ -17,7 +13,7 @@
           @input="onInput"
           @focus="onFocus"
           @click="onFocus"
-        >
+        />
       </td>
     </tr>
   </table>
@@ -196,9 +192,9 @@ export default {
       let oldSquares = state.squares.slice();
       for (let i = 0; i < this.boardSize; i++) {
         for (let j = 0; j < this.boardSize; j++) {
-            let x = j + this.boardSize * i;
-            let y = j + this.boardSize * state.rows[i];
-          state.squares[x] = oldSquares[y]
+          let x = j + this.boardSize * i;
+          let y = j + this.boardSize * state.rows[i];
+          state.squares[x] = oldSquares[y];
         }
       }
 
@@ -216,13 +212,13 @@ export default {
       let oldSquares = state.squares.slice();
       for (let i = 0; i < this.boardSize; i++) {
         for (let j = 0; j < this.boardSize; j++) {
-            let x = j + this.boardSize * i;
-            let y = state.cols[j] + this.boardSize * i;
-          state.squares[x] = oldSquares[y]
+          let x = j + this.boardSize * i;
+          let y = state.cols[j] + this.boardSize * i;
+          state.squares[x] = oldSquares[y];
         }
       }
 
-      // console.log("after col permute", state.squares.join(""));      
+      // console.log("after col permute", state.squares.join(""));
     },
     // debug() {
     //   let grid = this.gridFromValues(this.values);
@@ -277,7 +273,7 @@ export default {
         font-size: 5vw;
 
         @media screen and (min-width: 1000px) {
-          font-size: calc(5*10px);
+          font-size: calc(5 * 10px);
         }
         &:focus {
           background: lightgoldenrodyellow;
