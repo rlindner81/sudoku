@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 script="$0"
 script_dir=`pwd`/`dirname "$script"`
 
