@@ -5,7 +5,7 @@
       <select v-model="difficulty">
         <option v-for="(d, i) in difficulties" :value="d" :key="i">{{d}}</option>
       </select>
-      <button @click="onClickRandomize()">Randomize</button>
+      <button @click="onClickNew()">New</button>
       <button @click="$refs.board.solve()">Solve</button>
       <button @click="$refs.board.reset()">Reset</button>
       <button onclick="window.print();return false;">Print</button>
@@ -60,7 +60,7 @@ export default {
     }
   },
   methods: {
-    onClickRandomize() {
+    onClickNew() {
       this.seed = this.randomSeed();
       this.$router.push({
         query: { difficulty: this.difficulty, seed: this.seed }
