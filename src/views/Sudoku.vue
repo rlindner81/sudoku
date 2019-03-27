@@ -25,7 +25,7 @@
           class="board"
           :games="games"
           :seed="seed"
-          :symbols="Array.from(symbolpacks[symbols])"
+          :symbols="symbolspack[symbols]"
         />
       </div>
     </div>
@@ -34,10 +34,11 @@
 
 <script>
 import Board from "@/components/Board.vue";
-import gamepacks from "@/data/gamepacks.json";
-// https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
-import symbolpacks from "@/data/symbolpacks.json";
 import { fallback } from "@/helper";
+
+import gamespack from "@/data/gamespack.json";
+// https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
+import symbolspack from "@/data/symbolspack.json";
 
 export default {
   name: "Sudoku",
@@ -46,7 +47,7 @@ export default {
   },
   data() {
     return {
-      symbolpacks: symbolpacks,
+      symbolspack: symbolspack,
       difficulty: null,
       symbols: null,
       seed: null,
@@ -54,12 +55,12 @@ export default {
     };
   },
   computed: {
-    difficulties: () => Object.keys(gamepacks),
-    symbolpacknames: () => Object.keys(symbolpacks)
+    difficulties: () => Object.keys(gamespack),
+    symbolpacknames: () => Object.keys(symbolspack)
   },
   watch: {
     difficulty: function(newVal) {
-      this.games = gamepacks[newVal];
+      this.games = gamespack[newVal];
       this.updateQuery({ difficulty: newVal });
     },
     symbols: function(newVal) {
@@ -77,7 +78,7 @@ export default {
     this.difficulty = query.difficulty;
     this.symbols = query.symbols;
     this.seed = query.seed;
-    this.games = gamepacks[this.difficulty];
+    this.games = gamespack[this.difficulty];
   },
   methods: {
     updateQuery(options) {
