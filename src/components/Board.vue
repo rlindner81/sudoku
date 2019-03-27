@@ -1,8 +1,8 @@
 <template>
   <table class="board">
-    <tr v-for="(row, i) in boardSize" :key="i" class="row">
+    <tr v-for="(row, i) in size" :key="i" class="row">
       <td
-        v-for="(col, j) in boardSize"
+        v-for="(col, j) in size"
         :key="j"
         class="column"
         :style="getColumnStyle(i, j)"
@@ -33,17 +33,25 @@ import {
   rand
 } from "@/helper";
 
-const borders = [
-  [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
-  [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-  [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
-  [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-  [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-  [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
-  [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-  [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
-  [0x3131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1133]
-];
+const borders = {
+  styles: [
+    "none",
+    "2px solid lightgray",
+    "3px solid darkgray",
+    "5px solid black"
+  ],
+  grid: [
+    [0x3311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1312, 0x1311, 0x1311, 0x1313],
+    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+    [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
+    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+    [0x3121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1122, 0x1121, 0x1121, 0x1123],
+    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+    [0x3111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1112, 0x1111, 0x1111, 0x1113],
+    [0x3131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1132, 0x1131, 0x1131, 0x1133]
+  ]
+};
 
 export default {
   name: "Board",
@@ -58,18 +66,12 @@ export default {
     },
     symbols: {
       type: Array,
-      default: Array.from("123456789")
+      required: true
     }
   },
   data() {
     return {
-      boardSize: 9,
-      borderStyles: [
-        "none",
-        "2px solid lightgray",
-        "3px solid darkgray",
-        "5px solid black"
-      ],
+      size: 9,
       borders: borders,
       game: null,
       values: null
@@ -92,10 +94,10 @@ export default {
     //
     valuesFromGrid(grid) {
       let rows = [];
-      for (let i = 0; i < this.boardSize; i++) {
+      for (let i = 0; i < this.size; i++) {
         let columns = [];
-        for (let j = 0; j < this.boardSize; j++) {
-          let value = grid[i * this.boardSize + j];
+        for (let j = 0; j < this.size; j++) {
+          let value = grid[i * this.size + j];
           columns.push(value === "." ? null : parseInt(value) - 1);
         }
         rows.push(columns);
@@ -108,7 +110,7 @@ export default {
     },
     getColumnStyle(i, j) {
       let result = {};
-      let border = getListElement(this.borders, i, j);
+      let border = getListElement(this.borders.grid, i, j);
       if (border === null) {
         return result;
       }
@@ -117,10 +119,10 @@ export default {
       let top = (border >> 8) & 0xf;
       let bottom = (border >> 4) & 0xf;
       let right = (border >> 0) & 0xf;
-      result["border-top"] = this.borderStyles[top];
-      result["border-right"] = this.borderStyles[right];
-      result["border-bottom"] = this.borderStyles[bottom];
-      result["border-left"] = this.borderStyles[left];
+      result["border-top"] = this.borders.styles[top];
+      result["border-right"] = this.borders.styles[right];
+      result["border-bottom"] = this.borders.styles[bottom];
+      result["border-left"] = this.borders.styles[left];
       return result;
     },
     displayValue(value) {
@@ -162,9 +164,9 @@ export default {
       );
       // console.log("before relabel", state.squares.join(""), state.labels);
 
-      for (let i = 0; i < this.boardSize; i++) {
-        for (let j = 0; j < this.boardSize; j++) {
-          let x = j + this.boardSize * i;
+      for (let i = 0; i < this.size; i++) {
+        for (let j = 0; j < this.size; j++) {
+          let x = j + this.size * i;
           let value = state.squares[x];
           if (value !== ".") {
             state.squares[x] = state.labels[parseInt(value) - 1];
@@ -179,10 +181,10 @@ export default {
       // console.log("before transpose", state.squares.join(""), state.transpose);
 
       if (state.transpose === true) {
-        for (let i = 0; i < this.boardSize; i++) {
+        for (let i = 0; i < this.size; i++) {
           for (let j = 0; j < i; j++) {
-            let x = j + this.boardSize * i;
-            let y = i + this.boardSize * j;
+            let x = j + this.size * i;
+            let y = i + this.size * j;
             let value = state.squares[x];
             state.squares[x] = state.squares[y];
             state.squares[y] = value;
@@ -202,10 +204,10 @@ export default {
       // console.log("before row permute", state.squares.join(""), state.rows);
 
       let oldSquares = state.squares.slice();
-      for (let i = 0; i < this.boardSize; i++) {
-        for (let j = 0; j < this.boardSize; j++) {
-          let x = j + this.boardSize * i;
-          let y = j + this.boardSize * state.rows[i];
+      for (let i = 0; i < this.size; i++) {
+        for (let j = 0; j < this.size; j++) {
+          let x = j + this.size * i;
+          let y = j + this.size * state.rows[i];
           state.squares[x] = oldSquares[y];
         }
       }
@@ -222,10 +224,10 @@ export default {
       // console.log("before col permute", state.squares.join(""), state.cols);
 
       let oldSquares = state.squares.slice();
-      for (let i = 0; i < this.boardSize; i++) {
-        for (let j = 0; j < this.boardSize; j++) {
-          let x = j + this.boardSize * i;
-          let y = state.cols[j] + this.boardSize * i;
+      for (let i = 0; i < this.size; i++) {
+        for (let j = 0; j < this.size; j++) {
+          let x = j + this.size * i;
+          let y = state.cols[j] + this.size * i;
           state.squares[x] = oldSquares[y];
         }
       }
