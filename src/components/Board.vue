@@ -132,6 +132,7 @@ export default {
     //
     // === GAME LOGIC ===
     //
+    // 1 => 9! * 2 * 6^4 * 6^4 = 1218998108160 ~= 10^12
     generate(options) {
       options = fallback(options, {});
       let games = fallback(options.games, this.games);
@@ -141,6 +142,9 @@ export default {
 
       let i = Math.floor(rand() * games.length);
       let game = games[i].slice();
+      let startSquares = Array.from(game[0]);
+      let endSquares = Array.from(game[1]);
+
       [
         this.randomRelabel,
         this.randomTranspose,
@@ -148,13 +152,13 @@ export default {
         this.randomColumnPermutation
       ].forEach(fn => {
         let state = {};
-        for (let i = 0; i < game.length; i++) {
-          state.squares = Array.from(game[i]);
+        [startSquares, endSquares].forEach(squares => {
+          state.squares = squares;
           fn(state);
-          game[i] = state.squares.join("");
-        }
+          squares = state.squares;
+        });
       });
-      this.game = game;
+      this.game = [startSquares.join(""), endSquares.join("")];
       this.values = this.valuesFromGrid(this.game[0]);
     },
     randomRelabel(state) {
