@@ -23,9 +23,9 @@
         <Board
           ref="board"
           class="board"
-          :games="games"
-          :seed="seed"
+          :difficulty="difficulty"
           :symbols="symbolspack[symbols]"
+          :seed="seed"
         />
       </div>
     </div>
@@ -50,17 +50,15 @@ export default {
       symbolspack: symbolspack,
       difficulty: null,
       symbols: null,
-      seed: null,
-      games: null
+      seed: null
     };
   },
   computed: {
-    difficulties: () => Object.keys(gamespack),
+    difficulties: () => Object.keys(gamespack.difficulties),
     symbolpacknames: () => Object.keys(symbolspack)
   },
   watch: {
     difficulty: function(newVal) {
-      this.games = gamespack[newVal];
       this.updateQuery({ difficulty: newVal });
     },
     symbols: function(newVal) {
@@ -78,7 +76,6 @@ export default {
     this.difficulty = query.difficulty;
     this.symbols = query.symbols;
     this.seed = query.seed;
-    this.games = gamespack[this.difficulty];
   },
   methods: {
     updateQuery(options) {

@@ -10,4 +10,7 @@
 
 ## todo
 
+* boxsize=2,3,4 cases
+* Input popup
 * Confetti for solving
+* Helper => get function

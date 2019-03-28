@@ -39,11 +39,28 @@ export function flatten(A) {
 }
 
 /**
- * Returns the element of a nested array if possible, otherwise null.
+ * Returns array of numbers from start with a given length.
  *
- * Usage: getListElement(array, 1, 2, 3) === array[1][2][3] || null (without acccess exceptions)
+ * Usage: numbers(0, 3) === [0, 1, 2]
+ *        numbers(1, 3) === [1, 2, 3]
  */
-export function getListElement() {
+export function numbers(start, length) {
+  let result = [];
+  let end = start + length;
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  return result;
+}
+
+/**
+ * Returns the element of a nested array or object if possible, otherwise null.
+ *
+ * Usage: get(array, 1, 2, 3) === array[1][2][3] || null      (without acccess exceptions)
+ *        get(object, "a", "b") === object["a"]["b"] || null  (without acccess exceptions)
+ */
+// TODO implement with exception handling and object case
+export function get() {
   if (hasNull(arguments) || arguments.length < 2) {
     return null;
   }

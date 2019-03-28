@@ -1,30 +1,38 @@
 <template>
   <table class="board">
-    <tr v-for="(row, i) in size" :key="i" :class="getRowClasses(i)">
-      <td v-for="(col, j) in size" :key="j" :class="getColumnClasses(i, j)">
-        {{ displayValue(values[i][j]) }}
-        <!--
-        <input
-          :value=""
-          class="field"
-          @input="onInput"
-          @focus="onFocus"
-          @click="onFocus"
-        />
-        -->
+    <tr v-for="(row, i) in boardSize" :key="i" :class="getRowClasses(i)">
+      <td
+        v-for="(col, j) in boardSize"
+        :key="j"
+        :class="getColumnClasses(i, j)"
+      >
+        {{ displaySquare(squares[j + boardSize * i]) }}
       </td>
     </tr>
   </table>
 </template>
 
 <script>
-import { isNull, fallback, flatten, shuffle, seedRand, rand } from "@/helper";
+import {
+  isNull,
+  fallback,
+  flatten,
+  numbers,
+  shuffle,
+  seedRand,
+  rand
+} from "@/helper";
+import gamespack from "@/data/gamespack.json";
 
 export default {
   name: "Board",
   props: {
-    games: {
-      type: Array,
+    boxSize: {
+      type: Number,
+      default: 3
+    },
+    difficulty: {
+      type: String,
       required: true
     },
     seed: {
@@ -38,41 +46,39 @@ export default {
   },
   data() {
     return {
-      size: 9,
-      boxSize: 3,
-      game: null,
-      values: null
+      boardSize: null,
+      squareSize: null,
+      startSquares: null,
+      endSquares: null,
+      squares: null
     };
   },
   watch: {
-    games: function(newVal) {
-      this.generate({ games: newVal });
+    difficulty: function(newVal) {
+      this.generate({ difficulty: newVal });
     },
     seed: function(newVal) {
       this.generate({ seed: newVal });
     }
   },
   created() {
+    this.boardSize = this.boxSize * this.boxSize;
+    this.squareSize = this.boardSize * this.boardSize;
     this.generate();
   },
   methods: {
     //
     // === DISPLAY ===
     //
-    valuesFromGrid(grid) {
-      let rows = [];
-      for (let i = 0; i < this.size; i++) {
-        let columns = [];
-        for (let j = 0; j < this.size; j++) {
-          let value = grid[i * this.size + j];
-          columns.push(value === "." ? null : parseInt(value) - 1);
-        }
-        rows.push(columns);
+    squaresFromGrid(grid) {
+      let squares = [];
+      for (let i = 0; i < this.squareSize; i++) {
+        let value = grid[i];
+        squares.push(value === "." ? null : parseInt(value) - 1);
       }
-      return rows;
+      return squares;
     },
-    gridFromValues(values) {
-      let squares = flatten(values);
+    gridFromSquares(squares) {
       return squares.map(value => (!value ? "." : value)).join("");
     },
     getRowClasses(i) {
@@ -91,7 +97,7 @@ export default {
             "border-left": true
           };
     },
-    displayValue(value) {
+    displaySquare(value) {
       return isNull(value) ? "" : this.symbols[value];
     },
 
@@ -101,15 +107,17 @@ export default {
     // 1 => 9! * 2 * 6^4 * 6^4 = 1218998108160 ~= 10^12
     generate(options) {
       options = fallback(options, {});
-      let games = fallback(options.games, this.games);
+      let difficulty = fallback(options.difficulty, this.difficulty);
       let seed = fallback(options.seed, this.seed);
 
-      seedRand(seed);
+      seedRand(difficulty + seed);
 
-      let i = Math.floor(rand() * games.length);
-      let game = games[i].slice();
-      let startSquares = Array.from(game[0]);
-      let endSquares = Array.from(game[1]);
+      let games = gamespack.games;
+      let game = games[Math.floor(rand() * games.length)];
+      let startSquares = this.squaresFromGrid(game[0]);
+      let endSquares = this.squaresFromGrid(game[1]);
+
+      this.scaleDifficulty(difficulty, startSquares, endSquares);
 
       [
         this.randomRelabel,
@@ -124,8 +132,26 @@ export default {
           squares = state.squares;
         });
       });
-      this.game = [startSquares.join(""), endSquares.join("")];
-      this.values = this.valuesFromGrid(this.game[0]);
+
+      this.startSquares = startSquares;
+      this.endSquares = endSquares;
+      this.squares = startSquares.slice();
+    },
+    scaleDifficulty(difficulty, startSquares, endSquares) {
+      let hintPositions = shuffle(numbers(0, this.squareSize));
+      let hints = startSquares.filter(s => s !== null).length;
+      let missingHints = gamespack.difficulties[difficulty] - hints;
+
+      for (let i = 0; i < this.squareSize; i++) {
+        let x = hintPositions[i];
+        if (startSquares[x] !== null) {
+          continue;
+        }
+        startSquares[x] = endSquares[x];
+        if (--missingHints <= 0) {
+          break;
+        }
+      }
     },
     randomRelabel(state) {
       state.labels = fallback(
@@ -134,9 +160,9 @@ export default {
       );
       // console.log("before relabel", state.squares.join(""), state.labels);
 
-      for (let i = 0; i < this.size; i++) {
-        for (let j = 0; j < this.size; j++) {
-          let x = j + this.size * i;
+      for (let i = 0; i < this.boardSize; i++) {
+        for (let j = 0; j < this.boardSize; j++) {
+          let x = j + this.boardSize * i;
           let value = state.squares[x];
           if (value !== ".") {
             state.squares[x] = state.labels[parseInt(value) - 1];
@@ -151,10 +177,10 @@ export default {
       // console.log("before transpose", state.squares.join(""), state.transpose);
 
       if (state.transpose === true) {
-        for (let i = 0; i < this.size; i++) {
+        for (let i = 0; i < this.boardSize; i++) {
           for (let j = 0; j < i; j++) {
-            let x = j + this.size * i;
-            let y = i + this.size * j;
+            let x = j + this.boardSize * i;
+            let y = i + this.boardSize * j;
             let value = state.squares[x];
             state.squares[x] = state.squares[y];
             state.squares[y] = value;
@@ -174,10 +200,10 @@ export default {
       // console.log("before row permute", state.squares.join(""), state.rows);
 
       let oldSquares = state.squares.slice();
-      for (let i = 0; i < this.size; i++) {
-        for (let j = 0; j < this.size; j++) {
-          let x = j + this.size * i;
-          let y = j + this.size * state.rows[i];
+      for (let i = 0; i < this.boardSize; i++) {
+        for (let j = 0; j < this.boardSize; j++) {
+          let x = j + this.boardSize * i;
+          let y = j + this.boardSize * state.rows[i];
           state.squares[x] = oldSquares[y];
         }
       }
@@ -194,10 +220,10 @@ export default {
       // console.log("before col permute", state.squares.join(""), state.cols);
 
       let oldSquares = state.squares.slice();
-      for (let i = 0; i < this.size; i++) {
-        for (let j = 0; j < this.size; j++) {
-          let x = j + this.size * i;
-          let y = state.cols[j] + this.size * i;
+      for (let i = 0; i < this.boardSize; i++) {
+        for (let j = 0; j < this.boardSize; j++) {
+          let x = j + this.boardSize * i;
+          let y = state.cols[j] + this.boardSize * i;
           state.squares[x] = oldSquares[y];
         }
       }
@@ -205,16 +231,16 @@ export default {
       // console.log("after col permute", state.squares.join(""));
     },
     // debug() {
-    //   let grid = this.gridFromValues(this.values);
+    //   let grid = this.gridFromSquares(this.squares);
     //   let state = { squares: Array.from(grid), cols: [1,0,3,2,4,5,6,7,8] };
     //   this.randomColumnPermutation(state);
-    //   this.values = this.valuesFromGrid(state.squares.join(""));
+    //   this.squares = this.squaresFromGrid(state.squares.join(""));
     // },
     solve() {
-      this.values = this.valuesFromGrid(this.game[1]);
+      this.squares = this.endSquares.slice();
     },
     reset() {
-      this.values = this.valuesFromGrid(this.game[0]);
+      this.squares = this.startSquares.slice();
     },
 
     //
