@@ -92,7 +92,7 @@ export default {
           };
     },
     displayValue(value) {
-      return isNull(value) ? " " : this.symbols[value];
+      return isNull(value) ? "" : this.symbols[value];
     },
 
     //
@@ -253,6 +253,7 @@ $border-square: 2px solid lightgray;
     .column {
       font-size: 5vw;
       border: $border-square;
+      line-height: 0;
 
       &.border-left {
         border-left: $border-box;
