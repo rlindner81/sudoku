@@ -9,17 +9,20 @@ target_dir="$script_dir"/../public/img/icons
 
 # PNG
 gen_png() {
-  $inkscape -z -e "$target_dir"/"$1".png -w "$2" -h "$2" "$source"
+  $inkscape --without-gui --export-png "$target_dir"/"$1".png --export-width "$2" --export-height "$2" "$source"
+}
+gen_png_white_bg() {
+  $inkscape --without-gui --export-png "$target_dir"/"$1".png --export-width "$2" --export-height "$2" --export-background 'ffffff' --export-background-opacity '1.0' "$source"
 }
 
 gen_png android-chrome-192x192 192
 gen_png android-chrome-512x512 512
-gen_png apple-touch-icon-60x60 60
-gen_png apple-touch-icon-76x76 76
-gen_png apple-touch-icon-120x120 120
-gen_png apple-touch-icon-152x152 152
-gen_png apple-touch-icon-180x180 180
-gen_png apple-touch-icon 180
+gen_png_white_bg apple-touch-icon-60x60 60
+gen_png_white_bg apple-touch-icon-76x76 76
+gen_png_white_bg apple-touch-icon-120x120 120
+gen_png_white_bg apple-touch-icon-152x152 152
+gen_png_white_bg apple-touch-icon-180x180 180
+gen_png_white_bg apple-touch-icon 180
 gen_png favicon-16x16 16
 gen_png favicon-32x32 32
 gen_png msapplication-icon-144x144 144
