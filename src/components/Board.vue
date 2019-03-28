@@ -1,18 +1,30 @@
 <template>
-  <table class="board">
-    <tr v-for="(row, i) in boardSize" :key="i" :class="getRowClasses(i)">
-      <td
-        v-for="(col, j) in boardSize"
-        :key="j"
-        :class="getColumnClasses(i, j)"
-      >
-        {{ displaySquare(squares[j + boardSize * i]) }}
-      </td>
-    </tr>
-  </table>
+  <div>
+    <table class="board">
+      <tr v-for="(row, i) in boardSize" :key="i" :class="getRowClasses(i)">
+        <td
+          v-for="(col, j) in boardSize"
+          :key="j"
+          :class="getColumnClasses(i, j)"
+          @click="onClick($event, j + boardSize * i)"
+        >
+          {{ displaySquare(squares[j + boardSize * i]) }}
+        </td>
+      </tr>
+    </table>
+
+    <Keypad
+      v-show="showKeypad"
+      :value="selectedSquare"
+      @close="closeKeypad"
+      @change="updateSquareValue"
+    />
+  </div>
 </template>
 
 <script>
+import Keypad from "@/components/Keypad.vue";
+
 import {
   isNull,
   fallback,
@@ -26,6 +38,9 @@ import gamespack from "@/data/gamespack.json";
 
 export default {
   name: "Board",
+  components: {
+    Keypad
+  },
   props: {
     boxSize: {
       type: Number,
@@ -50,8 +65,17 @@ export default {
       squareSize: null,
       startSquares: null,
       endSquares: null,
-      squares: null
+      squares: null,
+      showKeypad: false,
+      selectedPosition: null
     };
+  },
+  computed: {
+    selectedSquare() {
+      return this.selectedPosition !== null
+        ? this.squares[this.selectedPosition]
+        : null;
+    }
   },
   watch: {
     difficulty: function(newVal) {
@@ -79,7 +103,7 @@ export default {
       return squares;
     },
     gridFromSquares(squares) {
-      return squares.map(value => (!value ? "." : value)).join("");
+      return squares.map(value => (value === null ? "." : value + 1)).join("");
     },
     getRowClasses(i) {
       return i % this.boxSize !== 0
@@ -156,25 +180,22 @@ export default {
     randomRelabel(state) {
       state.labels = fallback(
         state.labels,
-        shuffle(["1", "2", "3", "4", "5", "6", "7", "8", "9"])
+        shuffle(numbers(0, this.boardSize))
       );
-      // console.log("before relabel", state.squares.join(""), state.labels);
+      // console.log("before relabel", this.gridFromSquares(state.squares), state.labels);
 
-      for (let i = 0; i < this.boardSize; i++) {
-        for (let j = 0; j < this.boardSize; j++) {
-          let x = j + this.boardSize * i;
-          let value = state.squares[x];
-          if (value !== ".") {
-            state.squares[x] = state.labels[parseInt(value) - 1];
-          }
+      for (let i = 0; i < this.squareSize; i++) {
+        let value = state.squares[i];
+        if (value !== null) {
+          state.squares[i] = state.labels[value];
         }
       }
 
-      // console.log(" after relabel", state.squares.join(""));
+      // console.log(" after relabel", this.gridFromSquares(state.squares));
     },
     randomTranspose(state) {
       state.transpose = fallback(state.transpose, rand() < 0.5);
-      // console.log("before transpose", state.squares.join(""), state.transpose);
+      // console.log("before transpose", this.gridFromSquares(state.squares), state.transpose);
 
       if (state.transpose === true) {
         for (let i = 0; i < this.boardSize; i++) {
@@ -188,7 +209,7 @@ export default {
         }
       }
 
-      // console.log(" after transpose", state.squares.join(""));
+      // console.log(" after transpose", this.gridFromSquares(state.squares));
     },
     randomRowPermutation(state) {
       state.rows = fallback(
@@ -197,7 +218,7 @@ export default {
           shuffle([shuffle([0, 1, 2]), shuffle([3, 4, 5]), shuffle([6, 7, 8])])
         )
       );
-      // console.log("before row permute", state.squares.join(""), state.rows);
+      // console.log("before row permute", this.gridFromSquares(state.squares), state.rows);
 
       let oldSquares = state.squares.slice();
       for (let i = 0; i < this.boardSize; i++) {
@@ -208,7 +229,7 @@ export default {
         }
       }
 
-      // console.log("after row permute", state.squares.join(""));
+      // console.log("after row permute", this.gridFromSquares(state.squares));
     },
     randomColumnPermutation(state) {
       state.cols = fallback(
@@ -217,7 +238,7 @@ export default {
           shuffle([shuffle([0, 1, 2]), shuffle([3, 4, 5]), shuffle([6, 7, 8])])
         )
       );
-      // console.log("before col permute", state.squares.join(""), state.cols);
+      // console.log("before col permute", this.gridFromSquares(state.squares), state.cols);
 
       let oldSquares = state.squares.slice();
       for (let i = 0; i < this.boardSize; i++) {
@@ -228,13 +249,13 @@ export default {
         }
       }
 
-      // console.log("after col permute", state.squares.join(""));
+      // console.log("after col permute", this.gridFromSquares(state.squares));
     },
     // debug() {
     //   let grid = this.gridFromSquares(this.squares);
     //   let state = { squares: Array.from(grid), cols: [1,0,3,2,4,5,6,7,8] };
     //   this.randomColumnPermutation(state);
-    //   this.squares = this.squaresFromGrid(state.squares.join(""));
+    //   this.squares = this.squaresFromGrid(this.gridFromSquares(state.squares));
     // },
     solve() {
       this.squares = this.endSquares.slice();
@@ -250,11 +271,15 @@ export default {
       let input = event.target;
       input.setSelectionRange(0, input.value.length);
     },
-    onInput(event) {
-      let input = event.target;
-      let value = input.value;
-      let result = parseInt(value.replace(/[^\d]+/g, ""));
-      input.value = isNaN(result) ? null : result;
+    onClick(event, position) {
+      this.selectedPosition = position;
+      this.showKeypad = true;
+    },
+    closeKeypad() {
+      this.showKeypad = false;
+    },
+    updateSquareValue(value) {
+      this.squares[this.selectedPosition] = value;
     }
   }
 };
@@ -277,6 +302,7 @@ $border-square: 2px solid lightgray;
       border-top: $border-box;
     }
     .column {
+      user-select: none;
       font-size: 5vw;
       border: $border-square;
       line-height: 0;
