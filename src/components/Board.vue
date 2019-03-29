@@ -16,6 +16,8 @@
     <Keypad
       v-show="showKeypad"
       :value="selectedSquare"
+      :symbols="symbols"
+      :box-size="boxSize"
       @close="closeKeypad"
       @change="updateSquareValue"
     />
@@ -106,19 +108,19 @@ export default {
       return squares.map(value => (value === null ? "." : value + 1)).join("");
     },
     getRowClasses(i) {
-      return i % this.boxSize !== 0
+      return i === 0 || i % this.boxSize !== 0
         ? { row: true }
         : {
             row: true,
-            "border-top": true
+            "border-box-top": true
           };
     },
     getColumnClasses(i, j) {
-      return j % this.boxSize !== 0
+      return j === 0 || j % this.boxSize !== 0
         ? { column: true }
         : {
             column: true,
-            "border-left": true
+            "border-box-left": true
           };
     },
     displaySquare(value) {
@@ -286,7 +288,7 @@ export default {
 </script>
 
 <style lang="scss">
-$border-board: 5px solid black;
+$border-board: 4px solid black;
 $border-box: 3px solid darkgray;
 $border-square: 2px solid lightgray;
 
@@ -295,21 +297,32 @@ $border-square: 2px solid lightgray;
   table-layout: fixed;
   vertical-align: middle;
   text-align: center;
-  border: $border-board;
+
+  .row:first-child .column {
+    border-top: $border-board;
+  }
+  .row .column:first-child {
+    border-left: $border-board;
+  }
+  .row:last-child .column {
+    border-bottom: $border-board;
+  }
+  .row .column:last-child {
+    border-right: $border-board;
+  }
+  .row.border-box-top {
+      border-top: $border-box;
+  } 
+  .row .column.border-box-left {
+    border-left: $border-box;
+  }
 
   .row {
-    &.border-top {
-      border-top: $border-box;
-    }
     .column {
       user-select: none;
       font-size: 5vw;
       border: $border-square;
       line-height: 0;
-
-      &.border-left {
-        border-left: $border-box;
-      }
 
       @media screen and (min-width: 1000px) {
         font-size: calc(5 * 10px);

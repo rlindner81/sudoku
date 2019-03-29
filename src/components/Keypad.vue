@@ -1,53 +1,48 @@
 <template>
   <transition name="modal-fade">
     <div class="modal-backdrop" @click="close">
-      <div
-        class="modal"
-        role="dialog"
-        aria-labelledby="modalTitle"
-        aria-describedby="modalDescription"
-        @click.stop
-      >
-            <button
-              type="button"
-              @click="updateValue"
-            >
-              updateValue
-              {{ value }}
-            </button>
-          </slot>
-        </header>
-        <section id="modalDescription" class="modal-body">
-          <slot name="body">
-            I'm the default body!
-          </slot>
+      <div class="modal" role="dialog" @click.stop>
+        <section class="modal-body">
+          <table class="keypad">
+            <tr v-for="(row, i) in boxSize" :key="i">
+              <td
+                v-for="(col, j) in boxSize"
+                :key="j"
+                @click="updateValue($event, j + boardSize * i)"
+              >
+                {{ displaySquare(j + boardSize * i) }}
+              </td>
+            </tr>
+          </table>
         </section>
-        <footer class="modal-footer">
-          <slot name="footer">
-            I'm the default footer!
-
-            <button
-              type="button"
-              class="btn-green"
-              aria-label="Close modal"
-              @click="close"
-            >
-              Close me!
-            </button>
-          </slot>
-        </footer>
       </div>
     </div>
   </transition>
 </template>
 
 <script>
+import { isNull } from "@/helper";
+
 export default {
-  name: "Modal",
+  name: "Keypad",
   props: {
-    value: Number
+    value: {
+      type: Number,
+      required: true
+    },
+    symbols: {
+      type: Array,
+      required: true
+    },
+    boxSize: {
+      type: Number,
+      required: true
+    }
   },
   methods: {
+    displaySquare(value) {
+      return isNull(value) ? "" : this.symbols[value];
+    },
     updateValue() {
       this.$emit("change", 3);
       this.$emit("close");
@@ -59,7 +54,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+.board {
+  border-collapse: collapse;
+  table-layout: fixed;
+  vertical-align: middle;
+  text-align: center;
+}
+
 .modal-backdrop {
   position: fixed;
   top: 0;
