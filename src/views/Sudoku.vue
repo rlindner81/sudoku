@@ -61,9 +61,17 @@ export default {
     };
   },
   computed: {
-    difficulties: () => Object.keys(gamespack.difficulties),
-    symbolpacknames: () => Object.keys(symbolspack),
-    sizes: () => [2, 3, 4]
+    difficulties() {
+      return this.size === null
+        ? null
+        : Object.keys(gamespack[`size-${this.size}`].difficulties);
+    },
+    symbolpacknames() {
+      return Object.keys(symbolspack);
+    },
+    sizes() {
+      return [2, 3, 4];
+    }
   },
   watch: {
     difficulty: function(newVal) {
@@ -77,15 +85,18 @@ export default {
     let query = Object.assign({}, this.$route.query);
 
     query.size = fallback(query.size, this.sizes[1]);
-    query.difficulty = fallback(query.difficulty, this.difficulties[1]);
-    query.symbols = fallback(query.symbols, this.symbolpacknames[0]);
-    query.seed = fallback(query.seed, this.randomSeed());
-    this.$router.replace({ query });
+    this.size = parseInt(query.size);
 
-    this.size = query.size;
+    query.difficulty = fallback(query.difficulty, this.difficulties[1]);
     this.difficulty = query.difficulty;
+
+    query.symbols = fallback(query.symbols, this.symbolpacknames[0]);
     this.symbols = query.symbols;
+
+    query.seed = fallback(query.seed, this.randomSeed());
     this.seed = query.seed;
+
+    this.$router.replace({ query });
   },
   methods: {
     updateQuery(options) {

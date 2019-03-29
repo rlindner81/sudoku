@@ -84,6 +84,9 @@ export default {
     }
   },
   watch: {
+    boxSize: function(newVal) {
+      this.generate({ boxSize: newVal });
+    },
     difficulty: function(newVal) {
       this.generate({ difficulty: newVal });
     },
@@ -143,15 +146,16 @@ export default {
       options = fallback(options, {});
       let difficulty = fallback(options.difficulty, this.difficulty);
       let seed = fallback(options.seed, this.seed);
+      let boxSize = fallback(options.boxSize, this.boxSize);
 
       seedRand(difficulty + seed);
 
-      let games = gamespack.games;
+      let games = gamespack[`size-${boxSize}`].games;
       let game = games[Math.floor(rand() * games.length)];
       let startSquares = this.squaresFromGrid(game[0]);
       let endSquares = this.squaresFromGrid(game[1]);
 
-      this.scaleDifficulty(difficulty, startSquares, endSquares);
+      this.scaleDifficulty(boxSize, difficulty, startSquares, endSquares);
 
       [
         this.randomRelabel,
@@ -171,10 +175,11 @@ export default {
       this.endSquares = endSquares;
       this.squares = startSquares.slice();
     },
-    scaleDifficulty(difficulty, startSquares, endSquares) {
+    scaleDifficulty(boxSize, difficulty, startSquares, endSquares) {
       let hintPositions = shuffle(numbers(0, this.squareSize));
       let hints = startSquares.filter(s => s !== null).length;
-      let missingHints = gamespack.difficulties[difficulty] - hints;
+      let missingHints =
+        gamespack[`size-${boxSize}`].difficulties[difficulty] - hints;
 
       for (let i = 0; i < this.squareSize; i++) {
         let x = hintPositions[i];
@@ -221,13 +226,17 @@ export default {
 
       // console.log(" after transpose", this.gridFromSquares(state.squares));
     },
+    getPermutationIndices() {
+      let indices = [];
+      for (let i = 0; i < this.boxSize; i++) {
+        indices.push(shuffle(numbers(i * this.boxSize, this.boxSize)));
+      }
+      return flatten(shuffle(indices));
+    },
     randomRowPermutation(state) {
-      state.rows = fallback(
-        state.rows,
-        flatten(
-          shuffle([shuffle([0, 1, 2]), shuffle([3, 4, 5]), shuffle([6, 7, 8])])
-        )
-      );
+      if (isNull(state.rows)) {
+        state.rows = this.getPermutationIndices();
+      }
       // console.log("before row permute", this.gridFromSquares(state.squares), state.rows);
 
       let oldSquares = state.squares.slice();
@@ -242,12 +251,9 @@ export default {
       // console.log("after row permute", this.gridFromSquares(state.squares));
     },
     randomColumnPermutation(state) {
-      state.cols = fallback(
-        state.cols,
-        flatten(
-          shuffle([shuffle([0, 1, 2]), shuffle([3, 4, 5]), shuffle([6, 7, 8])])
-        )
-      );
+      if (isNull(state.cols)) {
+        state.cols = this.getPermutationIndices();
+      }
       // console.log("before col permute", this.gridFromSquares(state.squares), state.cols);
 
       let oldSquares = state.squares.slice();
