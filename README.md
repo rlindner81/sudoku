@@ -10,7 +10,8 @@
 
 ## todo
 
-* boxsize=2,3,4 cases
+* boxsize 2,4 generation
 * Input popup
+* Input with hover for Desktop
 * Confetti for solving
-* Helper => get function
+* Helper get function codeing

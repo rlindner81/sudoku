@@ -3,15 +3,20 @@
     <h1>{{ difficulty }} Sudoku {{ seed }}</h1>
     <div class="input-lane">
       <button @click="onClickNew()">New</button>
+      <select v-model="size">
+        <option v-for="(s, i) in sizes" :key="i" :value="s"
+          >Size {{ s }}</option
+        >
+      </select>
       <select v-model="difficulty">
         <option v-for="(d, i) in difficulties" :key="i" :value="d">{{
           d
         }}</option>
       </select>
       <select v-model="symbols">
-        <option v-for="(s, i) in symbolpacknames" :key="i" :value="s">{{
-          s
-        }}</option>
+        <option v-for="(s, i) in symbolpacknames" :key="i" :value="s">
+          {{ s }}</option
+        >
       </select>
       <button @click="$refs.board.solve()">Solve</button>
       <button @click="$refs.board.reset()">Reset</button>
@@ -26,6 +31,7 @@
           :difficulty="difficulty"
           :symbols="symbolspack[symbols]"
           :seed="seed"
+          :box-size="size"
         />
       </div>
     </div>
@@ -48,6 +54,7 @@ export default {
   data() {
     return {
       symbolspack: symbolspack,
+      size: null,
       difficulty: null,
       symbols: null,
       seed: null
@@ -55,7 +62,8 @@ export default {
   },
   computed: {
     difficulties: () => Object.keys(gamespack.difficulties),
-    symbolpacknames: () => Object.keys(symbolspack)
+    symbolpacknames: () => Object.keys(symbolspack),
+    sizes: () => [2, 3, 4]
   },
   watch: {
     difficulty: function(newVal) {
@@ -68,11 +76,13 @@ export default {
   created() {
     let query = Object.assign({}, this.$route.query);
 
+    query.size = fallback(query.size, this.sizes[1]);
     query.difficulty = fallback(query.difficulty, this.difficulties[1]);
     query.symbols = fallback(query.symbols, this.symbolpacknames[0]);
     query.seed = fallback(query.seed, this.randomSeed());
     this.$router.replace({ query });
 
+    this.size = query.size;
     this.difficulty = query.difficulty;
     this.symbols = query.symbols;
     this.seed = query.seed;
@@ -82,6 +92,7 @@ export default {
       options = fallback(options, {});
       this.$router.push({
         query: {
+          size: fallback(options.size, this.size),
           difficulty: fallback(options.difficulty, this.difficulty),
           symbols: fallback(options.symbols, this.symbols),
           seed: fallback(options.seed, this.seed)

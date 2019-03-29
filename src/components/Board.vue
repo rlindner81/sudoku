@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table class="board">
+    <table :class="getBoardClasses()">
       <tr v-for="(row, i) in boardSize" :key="i" :class="getRowClasses(i)">
         <td
           v-for="(col, j) in boardSize"
@@ -13,19 +13,19 @@
       </tr>
     </table>
 
-    <Keypad
+    <!-- <Keypad
       v-show="showKeypad"
       :value="selectedSquare"
       :symbols="symbols"
       :box-size="boxSize"
       @close="closeKeypad"
       @change="updateSquareValue"
-    />
+    /> -->
   </div>
 </template>
 
 <script>
-import Keypad from "@/components/Keypad.vue";
+// import Keypad from "@/components/Keypad.vue";
 
 import {
   isNull,
@@ -41,7 +41,7 @@ import gamespack from "@/data/gamespack.json";
 export default {
   name: "Board",
   components: {
-    Keypad
+    // Keypad
   },
   props: {
     boxSize: {
@@ -63,8 +63,6 @@ export default {
   },
   data() {
     return {
-      boardSize: null,
-      squareSize: null,
       startSquares: null,
       endSquares: null,
       squares: null,
@@ -73,6 +71,12 @@ export default {
     };
   },
   computed: {
+    boardSize() {
+      return this.boxSize * this.boxSize;
+    },
+    squareSize() {
+      return this.boxSize * this.boxSize * this.boxSize * this.boxSize;
+    },
     selectedSquare() {
       return this.selectedPosition !== null
         ? this.squares[this.selectedPosition]
@@ -88,8 +92,6 @@ export default {
     }
   },
   created() {
-    this.boardSize = this.boxSize * this.boxSize;
-    this.squareSize = this.boardSize * this.boardSize;
     this.generate();
   },
   methods: {
@@ -106,6 +108,12 @@ export default {
     },
     gridFromSquares(squares) {
       return squares.map(value => (value === null ? "." : value + 1)).join("");
+    },
+    getBoardClasses() {
+      return {
+        board: true,
+        [`size-${this.boxSize}`]: true
+      };
     },
     getRowClasses(i) {
       return i === 0 || i % this.boxSize !== 0
@@ -297,6 +305,24 @@ $border-square: 2px solid lightgray;
   table-layout: fixed;
   vertical-align: middle;
   text-align: center;
+  user-select: none;
+
+  font-size: 5vw;
+  @media screen and (min-width: 1000px) {
+    font-size: calc(5 * 10px);
+  }
+  &.size-2 {
+    font-size: 10vw;
+    @media screen and (min-width: 1000px) {
+      font-size: calc(10 * 10px);
+    }
+  }
+  &.size-4 {
+    font-size: 3.5vw;
+    @media screen and (min-width: 1000px) {
+      font-size: calc(3.5 * 10px);
+    }
+  }
 
   .row:first-child .column {
     border-top: $border-board;
@@ -319,34 +345,8 @@ $border-square: 2px solid lightgray;
 
   .row {
     .column {
-      user-select: none;
-      font-size: 5vw;
       border: $border-square;
       line-height: 0;
-
-      @media screen and (min-width: 1000px) {
-        font-size: calc(5 * 10px);
-      }
-      //  position: relative;
-      // .field {
-      //   position: absolute;
-      //   top: 0;
-      //   left: 0;
-      //   width: 100%;
-      //   height: 100%;
-      //   // line-height: 100%;
-      //   display: flex;
-      //   border: none;
-      //   text-align: center;
-      //   &:focus {
-      //     background: lightgoldenrodyellow;
-      //     outline: none;
-      //     border: 2px solid orange;
-      //   }
-      //   &::selection {
-      //     background: none;
-      //   }
-      // }
     }
   }
 }

@@ -77,6 +77,18 @@ export function get() {
 }
 
 /**
+ * Returns the capitalized version of a given string.
+ *
+ * Usage: capitalize("hello") === "Hello"
+ *        capitalize("hello world") === "Hello world"
+ */
+export function capitalize(s) {
+  return typeof s === "string" && s.length > 0
+    ? s.charAt(0).toUpperCase() + s.slice(1)
+    : null;
+}
+
+/**
  * Replace all occurrences of string a in b.
  */
 // TODO
