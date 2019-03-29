@@ -311,8 +311,8 @@ $border-square: 2px solid lightgray;
     border-right: $border-board;
   }
   .row.border-box-top {
-      border-top: $border-box;
-  } 
+    border-top: $border-box;
+  }
   .row .column.border-box-left {
     border-left: $border-box;
   }
