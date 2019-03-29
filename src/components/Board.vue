@@ -38,6 +38,25 @@ import {
 } from "@/helper";
 import gamespack from "@/data/gamespack.json";
 
+const squareMap = {
+  "1": 0,
+  "2": 1,
+  "3": 2,
+  "4": 3,
+  "5": 4,
+  "6": 5,
+  "7": 6,
+  "8": 7,
+  "9": 8,
+  a: 9,
+  b: 10,
+  c: 11,
+  d: 12,
+  e: 13,
+  f: 14,
+  g: 15
+};
+
 export default {
   name: "Board",
   components: {
@@ -105,7 +124,7 @@ export default {
       let squares = [];
       for (let i = 0; i < this.squareSize; i++) {
         let value = grid[i];
-        squares.push(value === "." ? null : parseInt(value) - 1);
+        squares.push(value === "." ? null : squareMap[value]);
       }
       return squares;
     },
@@ -324,9 +343,9 @@ $border-square: 2px solid lightgray;
     }
   }
   &.size-4 {
-    font-size: 3.5vw;
+    font-size: 3.2vw;
     @media screen and (min-width: 1000px) {
-      font-size: calc(3.5 * 10px);
+      font-size: calc(3.2 * 10px);
     }
   }
 

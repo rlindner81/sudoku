@@ -74,6 +74,9 @@ export default {
     }
   },
   watch: {
+    size: function(newVal) {
+      this.updateQuery({ size: newVal });
+    },
     difficulty: function(newVal) {
       this.updateQuery({ difficulty: newVal });
     },
