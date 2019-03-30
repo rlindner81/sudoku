@@ -39,6 +39,17 @@ export function flatten(A) {
 }
 
 /**
+ * Repeat value n times in an array.
+ */
+export function repeat(v, n) {
+  let result = [];
+  for (let i = 0; i < n; i++) {
+    result.push(v);
+  }
+  return result;
+}
+
+/**
  * Returns array of numbers from start with a given length.
  *
  * Usage: numbers(0, 3) === [0, 1, 2]
