@@ -105,13 +105,6 @@ export function capitalize(s) {
 }
 
 /**
- * Replace all occurrences of string a in b.
- */
-// TODO
-//export function replaceAll(a, b) {
-//}
-
-/**
  * Shuffle an array in place.
  */
 export function shuffle(a) {
