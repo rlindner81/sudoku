@@ -1,8 +1,8 @@
 /* eslint-disable */
 /**
  * Note:
- * The `boardSize = boxWidth * boxHeight` are the main variables. Prime boardsizes lead
- * to boring/easy boards, so we will ignore this case for now.
+ * The `boardSize = boxWidth * boxHeight` are the main variables. Prime boardsizes lead to boring/easy boards, so we
+ * will ignore this case for now.
  * 
  * For example: `boardSize = 6 = 3 * 2 = boxWidth * boxHeight` looks as follows.
  *
@@ -17,7 +17,7 @@
  *   | 6 4 5 | 3 1 2 |
  *   -----------------
  *
- * A `grid` is the internal representation where all fields are numbered from top left to bottom right. It's an array with 
+ * A `grid` is the internal representation where all fields are numbered from top left to bottom right.
  * 
  */
 import { flatten, numbers, shuffle, repeat } from "@/helper";
@@ -57,7 +57,7 @@ function generateNewGrid(info, hintSize) {
 }
 
 
-function assign()
+function assign() {}
 
 function valuesFromGrid(info, grid) {
   let values = {};
@@ -77,14 +77,40 @@ function charFromDigit(i) {
   return i === 0 ? '.' : i < 10 ? String.fromCharCode(i + 48) : String.fromCharCode(i + 55)
 }
 
+function boxIndices(boxWidth, boxHeight, offsetX, offsetY) {
+  let indices = [];
+  let boardSize = boxWidth * boxHeight;
+  for (let y = 0; y < boxHeight; y++) {
+    for (let x = 0; x < boxWidth; x++) {
+      indices.push((x + offsetX * boxWidth) + (y + offsetY * boxHeight) * boardSize);
+    }
+  }
+  return indices;
+}
+
 function generateInfo(boxWidth, boxHeight) {
+  boxWidth = 3;
+  boxHeight = 2;
   let boardSize = boxWidth * boxHeight;
   let chars = numbers(1, boardSize).map(charFromDigit).join("");
   let cellNum = boardSize * boardSize;
+  let peers = [];
+  for (let y = 0; y < boardSize; y++) {
+    for (let x = 0; x < boardSize; x++) {
+      let index = x + y * boardSize;
+      let row  = numbers(y * boardSize, boardSize).filter(i => i !== index);
+      let column = numbers(x, boardSize, boardSize).filter(i => i !== index);
+      let box = boxIndices(boxWidth, boxHeight, Math.floor(x/boxWidth), Math.floor(y/boxHeight)).filter(i => i !== index);
+      let uniqueIndices = new Set(flatten([row, column, box]));
+      let sortedIndices = [...uniqueIndices].sort((a,b) => a - b);
+      peers.push(sortedIndices);
+    }
+  }
   return {
     boardSize,
     cellNum,
-    chars
+    chars,
+    peers
   }
 }
 
@@ -92,9 +118,5 @@ export function generate(boxWidth, boxHeight, hintSize) {
   let info = generateInfo(boxWidth, boxHeight);
   let grid = generateNewGrid(info, hintSize);
   console.log("grid", gridToString(grid));
-  // console.log("new grid", gridToString(generateNewGrid(info, hintSize)));
-  // console.log("new grid", gridToString(generateNewGrid(info, hintSize)));
-  // console.log("new grid", gridToString(generateNewGrid(info, hintSize)));
-
   console.log("values", valuesFromGrid(info, grid));
 }

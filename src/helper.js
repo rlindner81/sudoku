@@ -50,16 +50,21 @@ export function repeat(v, n) {
 }
 
 /**
- * Returns array of numbers from start with a given length.
+ * Returns array of numbers from start with a given length. Increments are by 1 or a given step.
  *
  * Usage: numbers(0, 3) === [0, 1, 2]
  *        numbers(1, 3) === [1, 2, 3]
+ *        numbers(1, 3, 2) === [1, 3, 5]
  */
-export function numbers(start, length) {
+export function numbers(start, length, step) {
+  if (step === undefined) {
+    step = 1;
+  }
   let result = [];
-  let end = start + length;
-  for (let i = start; i < end; i++) {
-    result.push(i);
+  let entry = start;
+  for (let i = 0; i < length; i++) {
+    result.push(entry);
+    entry += step;
   }
   return result;
 }

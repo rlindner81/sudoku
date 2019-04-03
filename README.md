@@ -5,6 +5,7 @@
 * https://en.wikipedia.org/wiki/Mathematics_of_Sudoku
 * https://codepen.io/pavlovsk/pen/XmjPOE
 * http://www.norvig.com/sudoku.html
+* https://github.com/norvig/pytudes/blob/master/py/sudoku.py
 * http://www.sudokuwiki.org/sudoku.htm
 * http://www.afjarvis.staff.shef.ac.uk/sudoku/
 
