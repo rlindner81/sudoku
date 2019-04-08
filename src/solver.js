@@ -186,7 +186,8 @@ function generateInfo(boxWidth, boxHeight) {
 export function generate(boxWidth, boxHeight, hintSize) {
   seedRand("42");
   let info = generateInfo(boxWidth, boxHeight);
-  while (true) {
+  let tries = 10;
+  for (let i = 0; i < tries; i++) {
     let grid = generateGrid(info, hintSize);
     let values = valuesFromGrid(info, grid);
     if (values === null) {
