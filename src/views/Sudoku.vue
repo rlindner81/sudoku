@@ -100,7 +100,7 @@ export default {
     query.seed = fallback(query.seed, this.randomSeed());
     this.seed = query.seed;
 
-    generate(3, 3, 22);
+    generate(3, 3, 6 * 2);
     this.$router.replace({ query });
   },
   methods: {

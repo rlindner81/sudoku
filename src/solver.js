@@ -89,6 +89,8 @@ function eleminate(info, values, pos, c) {
   if (values[pos].indexOf(c) === -1) {
     return values;
   }
+  values[pos] = values[pos].replace(c, "");
+
   // Nothing remaining not solvable
   if (values[pos].length === 0) {
     return null;
@@ -130,7 +132,6 @@ function valuesFromGrid(info, grid) {
   for (let i = 0; i < info.cellNum; i++) {
     if (grid[i] !== ".") {
       values = assign(info, values, i, grid[i]);
-      debugger;
       if (values === null) {
         return null;
       }
@@ -188,6 +189,9 @@ export function generate(boxWidth, boxHeight, hintSize) {
   while (true) {
     let grid = generateGrid(info, hintSize);
     let values = valuesFromGrid(info, grid);
+    if (values === null) {
+      debugger;
+    }
     console.log("grid", gridToString(grid));
     console.log("values", values);
     if (values !== null) {
