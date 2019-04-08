@@ -26,6 +26,7 @@ import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
  * Print a grid in sequence, where an empty cell is marked with a dot.
  */
 function gridToString(grid) {
+  // TODO: should probably have grid be just strings
   return grid
     .map(charFromDigit)
     .join("");
@@ -116,8 +117,8 @@ function eliminate(info, values, pos, c) {
 
 
 function valuesFromGrid(info, grid) {
+  // console.log("valuesFromGrid", gridToString(grid));
   grid = gridToString(grid);
-  console.log("valuesFromGrid", grid);
   let values = {};
   for (let i = 0; i < info.cellNum; i++) {
     values[i] = info.chars;
@@ -145,9 +146,6 @@ function boxIndices(boxWidth, boxHeight, offsetX, offsetY) {
 }
 
 function generateInfo(boxWidth, boxHeight) {
-  boxWidth = 3;
-  boxHeight = 2;
-
   let boardSize = boxWidth * boxHeight;
   let chars = numbers(1, boardSize).map(charFromDigit).join("");
   let cellNum = boardSize * boardSize;
@@ -177,19 +175,27 @@ function generateInfo(boxWidth, boxHeight) {
 }
 
 export function generate(boxWidth, boxHeight, hintSize) {
-  seedRand("42");
+  //TODO: remove
+  boxWidth = 3;
+  boxHeight = 2;
+  hintSize = 9;
+  seedRand("43");
+
   let info = generateInfo(boxWidth, boxHeight);
-  let tries = 10;
+  let tries = 100;
+  let values;
   for (let i = 0; i < tries; i++) {
     let grid = generateGrid(info, hintSize);
-    let values = valuesFromGrid(info, grid);
-    if (values === null) {
-      debugger;
-    }
+    values = valuesFromGrid(info, grid);
     console.log("grid", gridToString(grid));
     console.log("values", values);
     if (values !== null) {
       break;
     }
+  }
+  if (values !== null) {
+    console.log("success after", tries, "tries");
+  } else {
+    console.log("exhausted", tries, "tries and failed");
   }
 }
