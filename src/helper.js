@@ -154,6 +154,8 @@ function sfc32(a, b, c, d) {
 /**
  * Seed pseudo-random number generator.
  */
+//TODO rewrite so that helper.js holds no state and instead returns a rand from an optional seed. This rand can be
+//     passed into convenience functions like shuffle.
 let _rand;
 export function seedRand(seed) {
   let hash = xmur3(seed);
