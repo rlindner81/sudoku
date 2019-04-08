@@ -22,13 +22,6 @@
  */
 import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 
-// function gridToValues(grid) {
-//   let values = {};
-// }
-
-// function valuesToGrid(values) {
-// }
-
 /**
  * Print a grid in sequence, where an empty cell is marked with a dot.
  */
@@ -67,13 +60,13 @@ function generateGrid(info, hintSize) {
 
 
 /**
- * Assign char c to values[pos] and eliminate it for all peers.
+ * Assign char c to values[pos] by eliminating all remaining alternatives.
  */
 function assign(info, values, pos, c) {
-  console.log("assign", pos, c);
+  // console.log("assign", pos, c);
   let remainingValues = values[pos].replace(c, "");
   for (let i = 0; i < remainingValues.length; i++) {
-    values = eleminate(info, values, pos, remainingValues[i]);
+    values = eliminate(info, values, pos, remainingValues[i]);
     if (values === null) {
       return null;
     }
@@ -82,10 +75,10 @@ function assign(info, values, pos, c) {
 }
 
 /**
- * Elmininate char c from values[pos] and trigger an assign, if only one value remains.
+ * Eliminate char c from values[pos] and trigger an assign, if only one value remains.
  */
-function eleminate(info, values, pos, c) {
-  console.log("eliminate", pos, c);
+function eliminate(info, values, pos, c) {
+  // console.log("eliminate", pos, c);
   if (values[pos].indexOf(c) === -1) {
     return values;
   }
@@ -98,16 +91,16 @@ function eleminate(info, values, pos, c) {
   // Only one value remaining can remove this for all peers
   if (values[pos].length === 1) {
     let c2 = values[pos];
-    let peers = info.peers[pos];
+    let peers = info.peersForPosition[pos];
     for (let i = 0; i < peers.length; i++) {
-      values = eleminate(info, values, peers[i], c2);
+      values = eliminate(info, values, peers[i], c2);
       if (values === null) {
         return null;
       }
     }
   }
   // Check if c is the only remaining option in any of the units (row, column, or box)
-  let units = info.units[pos];
+  let units = info.unitsForPosition[pos];
   for (let i = 0; i < units.length; i++) {
     let unit = units[i];
     let cPositions = unit.filter(p => values[p].indexOf(c) !== -1);
@@ -159,8 +152,8 @@ function generateInfo(boxWidth, boxHeight) {
   let chars = numbers(1, boardSize).map(charFromDigit).join("");
   let cellNum = boardSize * boardSize;
 
-  let peers = [];
-  let units = [];
+  let peersForPosition = [];
+  let unitsForPosition = [];
   for (let y = 0; y < boardSize; y++) {
     for (let x = 0; x < boardSize; x++) {
       let index = x + y * boardSize;
@@ -169,8 +162,8 @@ function generateInfo(boxWidth, boxHeight) {
       let box = boxIndices(boxWidth, boxHeight, Math.floor(x/boxWidth), Math.floor(y/boxHeight)).filter(i => i !== index);
       let uniqueIndices = new Set(flatten([row, column, box]));
       let sortedIndices = [...uniqueIndices].sort((a,b) => a - b);
-      units.push([row, column, box]);
-      peers.push(sortedIndices);
+      unitsForPosition.push([row, column, box]);
+      peersForPosition.push(sortedIndices);
     }
   }
 
@@ -178,8 +171,8 @@ function generateInfo(boxWidth, boxHeight) {
     boardSize,
     cellNum,
     chars,
-    units,
-    peers
+    unitsForPosition,
+    peersForPosition
   }
 }
 
