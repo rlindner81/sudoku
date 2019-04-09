@@ -59,6 +59,48 @@ function generateGrid(info, hintSize) {
   return shuffle(grid);
 }
 
+/**
+ * Search.
+ */
+function search(info, values) {
+  // console.log("search", values);
+
+  if (values === null) {
+    return null;
+  }
+
+  let minValuesLength = 0;
+  let maxValuesLength = info.boardSize;
+  let searchValuesLength = info.boardSize;
+  let searchPos = null;
+  for (let i = 0; i < info.cellNum; i++) {
+    let valueLength = values[i].length;
+    if (valueLength < minValuesLength) {
+      minValuesLength = valueLength;
+    }
+    if (maxValuesLength < valueLength) {
+      maxValuesLength = valueLength;
+    }
+    if (1 < valueLength && valueLength < searchValuesLength) {
+      searchValuesLength = valueLength;
+      searchPos = i;
+    }
+  }
+
+  // Solved
+  if (minValuesLength === 1 && maxValuesLength === 1) {
+    return values;
+  }
+
+  let searchValues = values[searchPos];
+  for (let i = 0; i < searchValues.length; i++) {
+    values = search(assign(info, values.copy(), searchPos, searchValues[i]));
+    if (values === null) {
+      return null;
+    }
+  }
+  return values;
+}
 
 /**
  * Assign char c to values[pos] by eliminating all remaining alternatives.
@@ -134,6 +176,14 @@ function valuesFromGrid(info, grid) {
   return values;
 }
 
+function gridFromValues(info, values) {
+  let grid = new Array(info.cellNum);
+  for (let i = 0; i < info.cellNum; i++) {
+    grid[i] = valueLength === 1 ? values[i] : ".";
+  }
+  return grid.join("");
+}
+
 function boxIndices(boxWidth, boxHeight, offsetX, offsetY) {
   let indices = [];
   let boardSize = boxWidth * boxHeight;
@@ -182,9 +232,9 @@ export function generate(boxWidth, boxHeight, hintSize) {
   seedRand("43");
 
   let info = generateInfo(boxWidth, boxHeight);
-  let tries = 100;
-  let values;
-  for (let i = 0; i < tries; i++) {
+  let triesMax = 200;
+  let tries, values;
+  for (tries = 0; tries < triesMax; tries++) {
     let grid = generateGrid(info, hintSize);
     values = valuesFromGrid(info, grid);
     console.log("grid", gridToString(grid));
@@ -195,6 +245,7 @@ export function generate(boxWidth, boxHeight, hintSize) {
   }
   if (values !== null) {
     console.log("success after", tries, "tries");
+    console.log("grid after", gridFromValues(info, values));
   } else {
     console.log("exhausted", tries, "tries and failed");
   }
