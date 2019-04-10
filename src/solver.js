@@ -76,11 +76,13 @@ function search(info, listOfValues) {
 
   // Check if each values is solved and if find the appropriate searchpos if not
   let listOfLengths = new Array(listOfValues.length);
+  let allSolved = true;
   for (let i = 0; i < listOfValues.length; i++) {
     let minValuesLength = 0;
     let maxValuesLength = info.boardSize;
     let searchValuesLength = info.boardSize;
     let searchPos = null;
+    let solved;
     for (let j = 0; j < info.cellNum; j++) {
       let valueLength = listOfValues[j].length;
       if (valueLength < minValuesLength) {
@@ -94,29 +96,39 @@ function search(info, listOfValues) {
         searchPos = j;
       }
     }
+    solved = minValuesLength !== 1 || maxValuesLength !== 1;
+    allSolved = allSolved && solved;
     listOfLengths.push({
-      solved: minValuesLength !== 1 || maxValuesLength !== 1,
+      solved,
       searchValuesLength,
       searchPos
     });
   }
 
+  // Quit recursion if all values are solved
+  if (allSolved) {
+    return listOfValues;
+  }
+
+  // Create a newListOfValues where each potential value for the searchPos is considered
+  let newListOfValues = new Array(listOfValues.length);
   for (let i = 0; i < listOfLengths.length; i++) {
     if (listOfLengths[i].solved) {
+      newListOfValues.push(listOfValues[i]);
       continue;
     }
+
     let values = listOfValues[i];
-    
-    // TOOO much
     let searchValues = values[searchPos];
     for (let i = 0; i < searchValues.length; i++) {
-      values = search(assign(info, values.copy(), searchPos, searchValues[i]));
+      values = assign(info, values.copy(), searchPos, searchValues[i]);
       if (values === null) {
         return null;
       }
+      newListOfValues.push(values);
     }
   }
-  return listOfValues;
+  return search(info, newListOfValues);
 }
 
 /**
