@@ -62,44 +62,61 @@ function generateGrid(info, hintSize) {
 /**
  * Search.
  */
-function search(info, values) {
+function search(info, listOfValues) {
   // console.log("search", values);
 
-  if (values === null) {
+  // Check fail conditions and filter out all null values
+  if (listOfValues === null) {
+    return null;
+  }
+  listOfValues = listOfValues.filter(values => values !== null);
+  if (listOfValues.length = 0) {
     return null;
   }
 
-  let minValuesLength = 0;
-  let maxValuesLength = info.boardSize;
-  let searchValuesLength = info.boardSize;
-  let searchPos = null;
-  for (let i = 0; i < info.cellNum; i++) {
-    let valueLength = values[i].length;
-    if (valueLength < minValuesLength) {
-      minValuesLength = valueLength;
+  // Check if each values is solved and if find the appropriate searchpos if not
+  let listOfLengths = new Array(listOfValues.length);
+  for (let i = 0; i < listOfValues.length; i++) {
+    let minValuesLength = 0;
+    let maxValuesLength = info.boardSize;
+    let searchValuesLength = info.boardSize;
+    let searchPos = null;
+    for (let j = 0; j < info.cellNum; j++) {
+      let valueLength = listOfValues[j].length;
+      if (valueLength < minValuesLength) {
+        minValuesLength = valueLength;
+      }
+      if (maxValuesLength < valueLength) {
+        maxValuesLength = valueLength;
+      }
+      if (1 < valueLength && valueLength < searchValuesLength) {
+        searchValuesLength = valueLength;
+        searchPos = j;
+      }
     }
-    if (maxValuesLength < valueLength) {
-      maxValuesLength = valueLength;
-    }
-    if (1 < valueLength && valueLength < searchValuesLength) {
-      searchValuesLength = valueLength;
-      searchPos = i;
-    }
+    listOfLengths.push({
+      solved: minValuesLength !== 1 || maxValuesLength !== 1,
+      searchValuesLength,
+      searchPos
+    });
   }
 
-  // Solved
-  if (minValuesLength === 1 && maxValuesLength === 1) {
-    return values;
-  }
-
-  let searchValues = values[searchPos];
-  for (let i = 0; i < searchValues.length; i++) {
-    values = search(assign(info, values.copy(), searchPos, searchValues[i]));
-    if (values === null) {
-      return null;
+  for (let i = 0; i < listOfLengths.length; i++) {
+    if (listOfLengths[i].solved) {
+      continue;
+    }
+    let values = listOfValues[i];
+    
+    // TOOO much
+    let searchValues = values[searchPos];
+    for (let i = 0; i < searchValues.length; i++) {
+      values = search(assign(info, values.copy(), searchPos, searchValues[i]));
+      if (values === null) {
+        return null;
+      }
     }
   }
-  return values;
+  return listOfValues;
 }
 
 /**
