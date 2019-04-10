@@ -121,7 +121,7 @@ function search(info, listOfValues) {
     let values = listOfValues[i];
     let searchValues = values[searchPos];
     for (let i = 0; i < searchValues.length; i++) {
-      values = assign(info, values.copy(), searchPos, searchValues[i]);
+      values = assign(info, Object.assign({}, values), searchPos, searchValues[i]);
       if (values === null) {
         return null;
       }
