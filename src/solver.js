@@ -25,8 +25,12 @@ import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 /**
  * List of valid Sudoku board sizes.
  */
-export let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25];
+let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25];
 let MAX_VALUES = 50000;
+
+export function isValidSize(size) {
+  return VALID_SIZES.indexOf(size) !== -1;
+}
 
 /**
  * The appropriate box width for a given board size. Should be the smallest number bigger than the square root of the
@@ -92,8 +96,11 @@ function search(info, listOfValues) {
     return null;
   }
   listOfValues = listOfValues.filter(values => values !== null);
-  if (listOfValues.length === 0 ||
-    (MAX_VALUES && listOfValues.length > MAX_VALUES)) {
+  if (listOfValues.length === 0) {
+    return null;
+  }
+  if (MAX_VALUES && listOfValues.length > MAX_VALUES) {
+    log.warn("Hit maximal values, quitting search");
     return null;
   }
 
@@ -287,7 +294,7 @@ function generateInfo(boxWidth, boxHeight) {
 }
 
 export function generate(size, attempts) {
-  if (VALID_SIZES.indexOf(size) === -1) {
+  if (!isValidSize(size)) {
     return null;
   }
 
@@ -302,14 +309,11 @@ export function generate(size, attempts) {
     let values = valuesFromGrid(info, grid);
     let solutions = search(info, [values]);
     if (solutions !== null) {
-      console.log("attempt", attempt, "grid", grid, "found", solutions.length, "solutions");
-      if (solutions.length === 1) {
-        return {
-          attempt,
-          grid,
-          solutions
-        };
-      }
+      return {
+        attempt,
+        grid,
+        solutions
+      };
     }
   }
   return {
@@ -319,14 +323,20 @@ export function generate(size, attempts) {
 
 export function run() {
   seedRand("42");
-  let attempts = 100;
-  for (let size = 1; size < 25; size++) {
+  let attempts = 10000;
+  for (let size = 1; size < 9; size++) {
+    if (!isValidSize(size)) {
+      continue;
+    }
+
+    console.log("size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
     let generateInfo = generate(size, attempts);
     if (generateInfo !== null) {
       if ("grid" in generateInfo) {
-        console.log("size", size, "success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
+        console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
+        // size++;
       } else {
-        console.log("size", size, "exhausted", generateInfo.attempt, "tries and failed");
+        console.log("exhausted", generateInfo.attempt, "tries and failed");
       }
     }
   }
