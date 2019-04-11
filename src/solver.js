@@ -22,13 +22,40 @@
  */
 import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 
+/**
+ * List of valid Sudoku board sizes.
+ */
+export let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25]
+
+/**
+ * The appropriate box width for a given board size. Should be the smallest number bigger than the square root of the
+ * size that is also divisor.
+ */
+function widthForSize(size) {
+  for (let i = Math.ceil(Math.sqrt(size)); i < size; i++) {
+    if (size % i === 0) {
+      return i;
+    }
+  }
+  return size;
+}
+
+/**
+ * The appropriate minimal number of hints for a given board size. This is just guess work. Known minimals are:
+ * Size: 4 => Hints: 4
+ * Size: 9 => Hints: 17
+ */
+function hintsForSize(size) {
+  return Math.ceil(size * size / 4.5);
+}
+
 function charFromDigit(i) {
   return i === 0 ? "." : i < 10 ? String.fromCharCode(i + 48) : String.fromCharCode(i + 55)
 }
 
 function digitFromChar(c) {
   let i = c.charCodeAt(0);
-  return c === "." ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i  ? i - 55 : null;
+  return c === "." ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i ? i - 55 : null;
 }
 
 /**
@@ -49,8 +76,8 @@ function generateGrid(info, hintSize) {
   grid = shuffle(grid);
 
   return grid
-      .map(charFromDigit)
-      .join("");
+    .map(charFromDigit)
+    .join("");
 }
 
 /**
@@ -64,7 +91,7 @@ function search(info, listOfValues) {
     return null;
   }
   listOfValues = listOfValues.filter(values => values !== null);
-  if (listOfValues.length === 0 || listOfValues > 50000) {
+  if (listOfValues.length === 0 || listOfValues > 50000) {
     return null;
   }
 
@@ -238,11 +265,11 @@ function generateInfo(boxWidth, boxHeight) {
   for (let y = 0; y < boardSize; y++) {
     for (let x = 0; x < boardSize; x++) {
       let index = x + y * boardSize;
-      let row  = numbers(y * boardSize, boardSize).filter(i => i !== index);
+      let row = numbers(y * boardSize, boardSize).filter(i => i !== index);
       let column = numbers(x, boardSize, boardSize).filter(i => i !== index);
-      let box = boxIndices(boxWidth, boxHeight, Math.floor(x/boxWidth), Math.floor(y/boxHeight)).filter(i => i !== index);
+      let box = boxIndices(boxWidth, boxHeight, Math.floor(x / boxWidth), Math.floor(y / boxHeight)).filter(i => i !== index);
       let uniqueIndices = new Set(flatten([row, column, box]));
-      let sortedIndices = [...uniqueIndices].sort((a,b) => a - b);
+      let sortedIndices = [...uniqueIndices].sort((a, b) => a - b);
       unitsForPosition.push([row, column, box]);
       peersForPosition.push(sortedIndices);
     }
@@ -257,40 +284,17 @@ function generateInfo(boxWidth, boxHeight) {
   }
 }
 
-function hintsForSize(size) {
-  return Math.ceil(size * size/4.5);
-}
-
-export let SIZES = {
-  4: { width: 2, height: 2 },
-  6: { width: 3, height: 2 },
-  8: { width: 4, height: 2 },
-  9: { width: 3, height: 3 },
-  10: { width: 5, height: 2 },
-  12: { width: 6, height: 2 },
-  14: { width: 7, height: 2 },
-  15: { width: 5, height: 3 },
-  16: { width: 4, height: 4 },
-  18: { width: 6, height: 3 },
-  20: { width: 5, height: 4 },
-  21: { width: 7, height: 3 },
-  22: { width: 11, height: 2 },
-  24: { width: 6, height: 4 },
-  25: { width: 5, height: 5 }
-}
-
-
 export function generate(size) {
-  if (Object.keys(SIZES).indexOf(size) === -1) {
+  if (VALID_SIZES.indexOf(size) === -1) {
     size = 9;
   }
 
-  let width = SIZES[size].width;
-  let height = SIZES[size].height;
+  let width = widthForSize(size);
+  let height = size/width;
   let hints = hintsForSize(size);
 
   let info = generateInfo(width, height);
-  let attemptMax = 1000;
+  let attemptMax = 500;
   let attempt, solutions;
   for (attempt = 0; attempt < attemptMax; attempt++) {
     let grid = generateGrid(info, hints);
@@ -310,4 +314,8 @@ export function generate(size) {
   } else {
     console.log("exhausted", attempt, "tries and failed");
   }
+}
+
+export function run() {
+  generate(6);
 }

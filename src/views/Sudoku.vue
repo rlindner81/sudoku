@@ -41,7 +41,7 @@
 <script>
 import Board from "@/components/Board.vue";
 import { fallback } from "@/helper";
-import { generate } from "@/solver";
+import { run } from "@/solver";
 
 import gamespack from "@/data/gamespack.json";
 // https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
@@ -100,7 +100,7 @@ export default {
     query.seed = fallback(query.seed, this.randomSeed());
     this.seed = query.seed;
 
-    generate(3, 3, 6);
+    run();
     this.$router.replace({ query });
   },
   methods: {
