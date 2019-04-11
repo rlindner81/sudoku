@@ -64,28 +64,6 @@ function digitFromChar(c) {
   return c === "." ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i ? i - 55 : null;
 }
 
-/**
- * Generates a list of hints to be spread randomly across the board.
- * The leading hints will always be 1..(boardSize - 1).
- */
-function generateGrid(info, hintSize) {
-  let hints = [];
-  for (let i = 0; i < info.boardSize - 1; i++) {
-    hints.push(numbers(1, info.boardSize));
-  }
-  hints.push([info.boardSize]);
-  hints = numbers(1, info.boardSize - 1).concat(shuffle(flatten(hints)));
-
-  let grid = hints
-    .slice(0, hintSize)
-    .concat(repeat(0, info.cellNum - hintSize));
-  grid = shuffle(grid);
-
-  return grid
-    .map(charFromDigit)
-    .join("");
-}
-
 function searchInfoFromBoard(info, board) {
   let minValuesLength = info.boardSize;
   let maxValuesLength = 0;
@@ -310,20 +288,25 @@ export function generate(size, attempts) {
     return null;
   }
 
+  console.log("size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
   let width = widthForSize(size);
   let height = size / width;
   let hints = hintsForSize(size);
 
   let info = generateInfo(width, height);
+  let fullGrid = generateFullGrid(info);
+  console.log("fullGrid", fullGrid);
   let attempt = 0;
+
   for (; attempt < attempts; attempt++) {
-    let grid = generateGrid(info, hints);
+    let grid = generateHintGrid(info, fullGrid, hints);
+    console.log("hintGrid", grid);
     // grid = ".......13...2............8....76.2....8...4...1.......2.....75.6..34.........8...";
     // if (attempt % 1000 === 0) {
     //   console.log("attempt", attempt, "grid", grid);
     // }
-    let values = boardFromGrid(info, grid);
-    let solutions = search(info, true, [values]);
+    let board = boardFromGrid(info, grid);
+    let solutions = search(info, [board]);
     if (solutions !== null) {
       return {
         attempt,
@@ -337,7 +320,22 @@ export function generate(size, attempts) {
   };
 }
 
+/**
+ * Given a full grid, take out values so that only hints many remain.
+ */
+function generateHintGrid(info, fullGrid, hints) {
+  let grid = fullGrid.split("");
+  let positions = shuffle(numbers(0, info.cellNum));
+  for (let i = info.cellNum - hints - 1; i >= 0; i--) {
+    grid[positions[i]] = ".";
+  }
+  return grid.join("");
+}
 
+
+/**
+ * Starting form a given board, find any valid solution.
+ */
 function searchAnySolution(info, board) {
   if (board === null) {
     return null;
@@ -371,47 +369,20 @@ function generateFullGrid(info) {
 
 export function run() {
   seedRand("42");
-  let size = 24;
-  let width = widthForSize(size);
-  let height = size / width;
-  let info = generateInfo(width, height);
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
-  console.log("fullgrid", generateFullGrid(info));
+  let attempts = 10;
+  for (let size = 1; size <= 9; size++) {
+    if (!isValidSize(size)) {
+      continue;
+    }
 
-
-  // let attempts = 100000;
-  // for (let size = 1; size <= 9; size++) {
-  //   if (!isValidSize(size)) {
-  //     continue;
-  //   }
-
-  //   console.log("size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
-  //   let generateInfo = generate(size, attempts);
-  //   if (generateInfo !== null) {
-  //     if ("grid" in generateInfo) {
-  //       console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
-  //       // size++;
-  //     } else {
-  //       console.log("exhausted", generateInfo.attempt, "tries and failed");
-  //     }
-  //   }
-  // }
+    let generateInfo = generate(size, attempts);
+    if (generateInfo !== null) {
+      if ("grid" in generateInfo) {
+        console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
+        // size++;
+      } else {
+        console.log("exhausted", generateInfo.attempt, "tries and failed");
+      }
+    }
+  }
 }
