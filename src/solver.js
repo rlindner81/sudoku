@@ -70,7 +70,7 @@ function search(info, listOfValues) {
     return null;
   }
   listOfValues = listOfValues.filter(values => values !== null);
-  if (listOfValues.length = 0) {
+  if (listOfValues.length === 0) {
     return null;
   }
 
@@ -78,13 +78,14 @@ function search(info, listOfValues) {
   let listOfLengths = new Array(listOfValues.length);
   let allSolved = true;
   for (let i = 0; i < listOfValues.length; i++) {
-    let minValuesLength = 0;
-    let maxValuesLength = info.boardSize;
+    let values = listOfValues[i];
+    let minValuesLength = info.boardSize;
+    let maxValuesLength = 0;
     let searchValuesLength = info.boardSize;
     let searchPos = null;
     let solved;
     for (let j = 0; j < info.cellNum; j++) {
-      let valueLength = listOfValues[j].length;
+      let valueLength = values[j].length;
       if (valueLength < minValuesLength) {
         minValuesLength = valueLength;
       }
@@ -96,13 +97,13 @@ function search(info, listOfValues) {
         searchPos = j;
       }
     }
-    solved = minValuesLength !== 1 || maxValuesLength !== 1;
+    solved = minValuesLength === 1 && maxValuesLength === 1;
     allSolved = allSolved && solved;
-    listOfLengths.push({
+    listOfLengths[i] = {
       solved,
       searchValuesLength,
       searchPos
-    });
+    };
   }
 
   // Quit recursion if all values are solved
@@ -111,7 +112,7 @@ function search(info, listOfValues) {
   }
 
   // Create a newListOfValues where each potential value for the searchPos is considered
-  let newListOfValues = new Array(listOfValues.length);
+  let newListOfValues = [];
   for (let i = 0; i < listOfLengths.length; i++) {
     if (listOfLengths[i].solved) {
       newListOfValues.push(listOfValues[i]);
@@ -119,13 +120,17 @@ function search(info, listOfValues) {
     }
 
     let values = listOfValues[i];
+    let searchPos = listOfLengths[i].searchPos;
     let searchValues = values[searchPos];
     for (let i = 0; i < searchValues.length; i++) {
-      values = assign(info, Object.assign({}, values), searchPos, searchValues[i]);
-      if (values === null) {
+      let newValues = Object.assign({}, values);
+      // console.log("before", gridFromValues(info, newValues));
+      newValues = assign(info, newValues, searchPos, searchValues[i]);
+      // console.log("after", gridFromValues(info, newValues));
+      if (newValues === null) {
         return null;
       }
-      newListOfValues.push(values);
+      newListOfValues.push(newValues);
     }
   }
   return search(info, newListOfValues);
@@ -208,7 +213,7 @@ function valuesFromGrid(info, grid) {
 function gridFromValues(info, values) {
   let grid = new Array(info.cellNum);
   for (let i = 0; i < info.cellNum; i++) {
-    grid[i] = valueLength === 1 ? values[i] : ".";
+    grid[i] = values[i].length === 1 ? values[i] : ".";
   }
   return grid.join("");
 }
@@ -269,6 +274,8 @@ export function generate(boxWidth, boxHeight, hintSize) {
     console.log("grid", gridToString(grid));
     console.log("values", values);
     if (values !== null) {
+      let solutions = search(info, [values]);
+      debugger;
       break;
     }
   }
