@@ -52,7 +52,8 @@ function widthForSize(size) {
  * Size: 9 => Hints: 17
  */
 function hintsForSize(size) {
-  return Math.ceil(size * size / 4.5);
+  return Math.ceil(size * size / 2);
+  // return Math.ceil(size * size / 4.5);
 }
 
 function charFromDigit(i) {
@@ -295,12 +296,12 @@ export function generate(size, attempts) {
 
   let info = generateInfo(width, height);
   let fullGrid = generateFullGrid(info);
-  console.log("fullGrid", fullGrid);
+  // console.log("fullGrid", fullGrid);
   let attempt = 0;
 
   for (; attempt < attempts; attempt++) {
     let grid = generateHintGrid(info, fullGrid, hints);
-    console.log("hintGrid", grid);
+    // console.log("hintGrid", grid);
     // grid = ".......13...2............8....76.2....8...4...1.......2.....75.6..34.........8...";
     // if (attempt % 1000 === 0) {
     //   console.log("attempt", attempt, "grid", grid);
@@ -368,9 +369,9 @@ function generateFullGrid(info) {
 }
 
 export function run() {
-  seedRand("42");
-  let attempts = 10;
-  for (let size = 1; size <= 9; size++) {
+  seedRand("43");
+  let attempts = 1000;
+  for (let size = 1; size <= 25; size++) {
     if (!isValidSize(size)) {
       continue;
     }
