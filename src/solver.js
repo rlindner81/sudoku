@@ -26,7 +26,8 @@ import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
  * List of valid Sudoku board sizes.
  */
 let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25];
-let MAX_VALUES = 50000;
+let MAX_SEARCH_SPREAD = 2;
+let MAX_BOARDS = 5;
 
 export function isValidSize(size) {
   return VALID_SIZES.indexOf(size) !== -1;
@@ -85,6 +86,32 @@ function generateGrid(info, hintSize) {
     .join("");
 }
 
+function searchInfoFromBoard(info, board) {
+  let minValuesLength = info.boardSize;
+  let maxValuesLength = 0;
+  let searchSpread = info.boardSize + 1;
+  let searchPos = null;
+  let solved;
+  for (let j = 0; j < info.cellNum; j++) {
+    let valueLength = board[j].length;
+    if (valueLength < minValuesLength) {
+      minValuesLength = valueLength;
+    }
+    if (maxValuesLength < valueLength) {
+      maxValuesLength = valueLength;
+    }
+    if (1 < valueLength && valueLength < searchSpread) {
+      searchSpread = valueLength;
+      searchPos = j;
+    }
+  }
+  solved = minValuesLength === 1 && maxValuesLength === 1;
+  return {
+    solved,
+    searchPos
+  };
+}
+
 /**
  * Search.
  */
@@ -99,41 +126,23 @@ function search(info, listOfValues) {
   if (listOfValues.length === 0) {
     return null;
   }
-  if (MAX_VALUES && listOfValues.length > MAX_VALUES) {
-    log.warn("Hit maximal values, quitting search");
-    return null;
-  }
 
   // Check if each values is solved and if find the appropriate searchpos if not
   let listOfLengths = new Array(listOfValues.length);
   let solvedCount = 0;
   for (let i = 0; i < listOfValues.length; i++) {
-    let values = listOfValues[i];
-    let minValuesLength = info.boardSize;
-    let maxValuesLength = 0;
-    let searchValuesLength = info.boardSize;
-    let searchPos = null;
-    let solved;
-    for (let j = 0; j < info.cellNum; j++) {
-      let valueLength = values[j].length;
-      if (valueLength < minValuesLength) {
-        minValuesLength = valueLength;
-      }
-      if (maxValuesLength < valueLength) {
-        maxValuesLength = valueLength;
-      }
-      if (1 < valueLength && valueLength < searchValuesLength) {
-        searchValuesLength = valueLength;
-        searchPos = j;
-      }
+    let board = listOfValues[i];
+    let searchInfo = searchInfoFromBoard(info, board);
+    if (searchInfo.solved) {
+      solvedCount++;
     }
-    solved = minValuesLength === 1 && maxValuesLength === 1;
-    solved && solvedCount++;
-    listOfLengths[i] = {
-      solved,
-      searchValuesLength,
-      searchPos
-    };
+
+    // avoid boards with too much spread
+    if (!searchInfo.solved && board[searchInfo.searchPos].length > MAX_SEARCH_SPREAD) {
+      return null;
+    }
+
+    listOfLengths[i] = searchInfo;
   }
 
   // Too many solutions already
@@ -148,6 +157,7 @@ function search(info, listOfValues) {
 
   // Create a newListOfValues where each potential value for the searchPos is considered
   let newListOfValues = [];
+  let newListLength = 0;
   for (let i = 0; i < listOfLengths.length; i++) {
     if (listOfLengths[i].solved) {
       newListOfValues.push(listOfValues[i]);
@@ -157,15 +167,17 @@ function search(info, listOfValues) {
     let values = listOfValues[i];
     let searchPos = listOfLengths[i].searchPos;
     let searchValues = values[searchPos];
+    // console.log("searchValues", searchValues.length);
     for (let i = 0; i < searchValues.length; i++) {
       let newValues = Object.assign({}, values);
-      // console.log("before", gridFromValues(info, newValues));
       newValues = assign(info, newValues, searchPos, searchValues[i]);
-      // console.log("after", gridFromValues(info, newValues));
       if (newValues === null) {
         continue;
       }
       newListOfValues.push(newValues);
+      if (newListLength++ > MAX_BOARDS) {
+        return null;
+      }
     }
   }
 
@@ -228,27 +240,27 @@ function eliminate(info, values, pos, c) {
 }
 
 
-function valuesFromGrid(info, grid) {
+function boardFromGrid(info, grid) {
   // console.log("valuesFromGrid", grid);
-  let values = {};
+  let board = {};
   for (let i = 0; i < info.cellNum; i++) {
-    values[i] = info.chars;
+    board[i] = info.chars;
   }
   for (let i = 0; i < info.cellNum; i++) {
     if (grid[i] !== ".") {
-      values = assign(info, values, i, grid[i]);
-      if (values === null) {
+      board = assign(info, board, i, grid[i]);
+      if (board === null) {
         return null;
       }
     }
   }
-  return values;
+  return board;
 }
 
-function gridFromValues(info, values) {
+function gridFromBoard(info, board) {
   let grid = new Array(info.cellNum);
   for (let i = 0; i < info.cellNum; i++) {
-    grid[i] = values[i].length === 1 ? values[i] : ".";
+    grid[i] = board[i].length === 1 ? board[i] : ".";
   }
   return grid.join("");
 }
@@ -306,8 +318,12 @@ export function generate(size, attempts) {
   let attempt = 0;
   for (; attempt < attempts; attempt++) {
     let grid = generateGrid(info, hints);
-    let values = valuesFromGrid(info, grid);
-    let solutions = search(info, [values]);
+    // grid = ".......13...2............8....76.2....8...4...1.......2.....75.6..34.........8...";
+    // if (attempt % 1000 === 0) {
+    //   console.log("attempt", attempt, "grid", grid);
+    // }
+    let values = boardFromGrid(info, grid);
+    let solutions = search(info, true, [values]);
     if (solutions !== null) {
       return {
         attempt,
@@ -321,23 +337,81 @@ export function generate(size, attempts) {
   };
 }
 
-export function run() {
-  seedRand("42");
-  let attempts = 10000;
-  for (let size = 1; size < 9; size++) {
-    if (!isValidSize(size)) {
+
+function searchAnySolution(info, board) {
+  if (board === null) {
+    return null;
+  }
+  let searchInfo = searchInfoFromBoard(info, board);
+  if (searchInfo.solved) {
+    return board;
+  }
+  let searchValues = shuffle(board[searchInfo.searchPos].split(""));
+  for (let i = 0; i < searchValues.length; i++) {
+    let newBoard = Object.assign({}, board);
+    newBoard = assign(info, newBoard, searchInfo.searchPos, searchValues[i]);
+    if (newBoard === null) {
       continue;
     }
-
-    console.log("size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
-    let generateInfo = generate(size, attempts);
-    if (generateInfo !== null) {
-      if ("grid" in generateInfo) {
-        console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
-        // size++;
-      } else {
-        console.log("exhausted", generateInfo.attempt, "tries and failed");
-      }
+    // console.log("grid", gridFromBoard(info, newBoard));
+    newBoard = searchAnySolution(info, newBoard);
+    if (newBoard !== null) {
+      return newBoard;
     }
   }
+  return null;
+}
+
+function generateFullGrid(info) {
+  let baseGrid = shuffle(numbers(1, info.boardSize).map(charFromDigit)).join("") + ".".repeat(info.cellNum - info.boardSize);
+  let baseBoard = boardFromGrid(info, baseGrid);
+  let solution = searchAnySolution(info, baseBoard)
+  return gridFromBoard(info, solution);
+}
+
+export function run() {
+  seedRand("42");
+  let size = 24;
+  let width = widthForSize(size);
+  let height = size / width;
+  let info = generateInfo(width, height);
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+  console.log("fullgrid", generateFullGrid(info));
+
+
+  // let attempts = 100000;
+  // for (let size = 1; size <= 9; size++) {
+  //   if (!isValidSize(size)) {
+  //     continue;
+  //   }
+
+  //   console.log("size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
+  //   let generateInfo = generate(size, attempts);
+  //   if (generateInfo !== null) {
+  //     if ("grid" in generateInfo) {
+  //       console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
+  //       // size++;
+  //     } else {
+  //       console.log("exhausted", generateInfo.attempt, "tries and failed");
+  //     }
+  //   }
+  // }
 }
