@@ -25,7 +25,8 @@ import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 /**
  * List of valid Sudoku board sizes.
  */
-export let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25]
+export let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25];
+let MAX_VALUES = 50000;
 
 /**
  * The appropriate box width for a given board size. Should be the smallest number bigger than the square root of the
@@ -84,14 +85,15 @@ function generateGrid(info, hintSize) {
  * Search.
  */
 function search(info, listOfValues) {
-  console.log("search", listOfValues.length);
+  // console.log("search", listOfValues.length);
 
   // Check fail conditions and filter out all null values
   if (listOfValues === null) {
     return null;
   }
   listOfValues = listOfValues.filter(values => values !== null);
-  if (listOfValues.length === 0 || listOfValues > 50000) {
+  if (listOfValues.length === 0 ||
+    (MAX_VALUES && listOfValues.length > MAX_VALUES)) {
     return null;
   }
 
@@ -284,38 +286,48 @@ function generateInfo(boxWidth, boxHeight) {
   }
 }
 
-export function generate(size) {
+export function generate(size, attempts) {
   if (VALID_SIZES.indexOf(size) === -1) {
-    size = 9;
+    return null;
   }
 
   let width = widthForSize(size);
-  let height = size/width;
+  let height = size / width;
   let hints = hintsForSize(size);
 
   let info = generateInfo(width, height);
-  let attemptMax = 500;
-  let attempt, solutions;
-  for (attempt = 0; attempt < attemptMax; attempt++) {
+  let attempt = 0;
+  for (; attempt < attempts; attempt++) {
     let grid = generateGrid(info, hints);
     let values = valuesFromGrid(info, grid);
-    solutions = search(info, [values]);
+    let solutions = search(info, [values]);
     if (solutions !== null) {
-      console.log("attempt", attempt, "grid", grid);
-      console.log("found", solutions.length, "solutions");
+      console.log("attempt", attempt, "grid", grid, "found", solutions.length, "solutions");
       if (solutions.length === 1) {
-        break;
+        return {
+          attempt,
+          grid,
+          solutions
+        };
       }
     }
   }
-  if (solutions !== null && solutions.length === 1) {
-    console.log("success after", attempt, "tries");
-    console.log("grid after", gridFromValues(info, solutions[0]));
-  } else {
-    console.log("exhausted", attempt, "tries and failed");
-  }
+  return {
+    attempt
+  };
 }
 
 export function run() {
-  generate(6);
+  seedRand("42");
+  let attempts = 100;
+  for (let size = 1; size < 25; size++) {
+    let generateInfo = generate(size, attempts);
+    if (generateInfo !== null) {
+      if ("grid" in generateInfo) {
+        console.log("size", size, "success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
+      } else {
+        console.log("size", size, "exhausted", generateInfo.attempt, "tries and failed");
+      }
+    }
+  }
 }
