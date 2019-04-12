@@ -105,10 +105,6 @@ function search(info, listOfValues) {
   if (listOfValues.length === 0) {
     return null;
   }
-  if (MAX_VALUES && listOfValues.length > MAX_VALUES) {
-    console.warn("Hit maximal values, quitting search");
-    return null;
-  }
 
   // Check if each values is solved and if find the appropriate searchpos if not
   let listOfLengths = new Array(listOfValues.length);
