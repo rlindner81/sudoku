@@ -25,7 +25,7 @@ import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
 const MAX_SEARCH_BOARDS = 5;
-const HINT_QUOTIENT = 1/3;
+const HINT_QUOTIENT = 1/4;
 // const HINT_QUOTIENT = 1/4.5;
 
 /**
@@ -288,7 +288,7 @@ function generateFullGrid(info) {
 }
 
 /**
- * Search.
+ * Search. AKA the monster.
  */
 function search(info, listOfValues) {
   // console.log("search", listOfValues.length);
@@ -359,6 +359,9 @@ function search(info, listOfValues) {
   return search(info, newListOfValues);
 }
 
+/**
+ * Old school generate. Not really where it's at.
+ */
 export function generate(info, attempts) {
   let fullGrid = generateFullGrid(info);
   // console.log("fullGrid", fullGrid);
@@ -390,8 +393,20 @@ function hasUniqueSolution(info, searchInfo, board, fullgrid) {
   if (searchInfo.solved) {
     return true;
   }
-
-  return false;
+  let remainingValues = board[searchInfo.position].replace(fullgrid[searchInfo.position], "");
+  for (let i = 0; i < remainingValues.length; i++) {
+    let c = remainingValues[i];
+    let newBoard = Object.assign({}, board);
+    newBoard[searchInfo.position] = c;
+    let solution = searchAnySolution(info, newBoard);
+    if (solution !== null) {
+      // console.log("       real solution", fullgrid);
+      // console.log("conflicting solution", gridFromBoard(info, solution), "differs in position", searchInfo.position);
+      // debugger;
+      return false;
+    }
+  }
+  return true;
 }
 
 function _emptyAtPos(grid, pos) {
@@ -435,10 +450,10 @@ function nextGenerate(info, attempts) {
 
 export function run() {
   seedRand("43");
-  let size = 8;
-  let attempts = 10000;
-  let info = generateBoardInfo(8);
-  let grid = nextGenerate(info, 10);
+  let size = 9;
+  let attempts = 1000;
+  let info = generateBoardInfo(size);
+  let grid = nextGenerate(info, attempts);
   if (grid !== null) {
     console.log("happy face", grid);
   } else {
