@@ -25,15 +25,13 @@ import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
 const MAX_SEARCH_BOARDS = 5;
-const HINT_QUOTIENT = 1/4;
+const HINT_QUOTIENT = 1/5;
 // const HINT_QUOTIENT = 1/4.5;
 
 /**
  * Generate all static information about a Sudoku board given its size.
  */
 function generateBoardInfo(size) {
-  console.log("info", "size", size, "=", _widthForSize(size), "x", size / _widthForSize(size), "hints", _hintsForSize(size));
-
   let width = _widthForSize(size);
   let height = size / width;
   let cells = size * size;
@@ -44,6 +42,7 @@ function generateBoardInfo(size) {
   if (width === size) {
     return null;
   }
+  console.log("info", "size", size, "=", width, "x", height, "hints", hints);
 
   let chars = numbers(1, size).map(charFromNum).join("");
 
@@ -450,30 +449,18 @@ function nextGenerate(info, attempts) {
 
 export function run() {
   seedRand("43");
-  let size = 9;
   let attempts = 1000;
-  let info = generateBoardInfo(size);
-  let grid = nextGenerate(info, attempts);
-  if (grid !== null) {
-    console.log("happy face", grid);
-  } else {
-    console.log("sad face after", attempts, "attempts");
-  }
-  // let generateInfo = generate(info, attempts);
-  // let attempts = 1000;
-  // for (let size = 4; size <= 16; size++) {
-  //   let info = generateBoardInfo(size);
-  //   if (info === null) {
-  //     continue;
-  //   }
+  for (let size = 4; size <= 16; size++) {
+    let info = generateBoardInfo(size);
+    if (info === null) {
+      continue;
+    }
 
-  //   let generateInfo = generate(info, attempts);
-  //   if ("grid" in generateInfo) {
-  //     console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
-  //     // console.log("solution", gridFromBoard(info, searchAnySolution(info, boardFromGrid(info, generateInfo.grid))));
-  //     // size++;
-  //   } else {
-  //     console.log("exhausted", generateInfo.attempt, "tries and failed");
-  //   }
-  // }
+    let grid = nextGenerate(info, attempts);
+    if (grid !== null) {
+      console.log("happy face", grid);
+    } else {
+      console.log("sad face after", attempts, "attempts");
+    }
+  }
 }

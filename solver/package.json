@@ -1,0 +1,13 @@
+{
+  "name": "solver",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node src/solver.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^5.16.0"
+  }
+}
