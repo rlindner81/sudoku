@@ -216,8 +216,8 @@ function eliminate(info, board, position, c) {
 function searchInfoFromBoard(info, board) {
   let minValuesLength = info.size;
   let maxValuesLength = 0;
-  let searchSpread = info.size + 1;
-  let searchPos = null;
+  let spread = info.size + 1;
+  let position = null;
   let solved;
   for (let j = 0; j < info.cells; j++) {
     let valueLength = board[j].length;
@@ -227,15 +227,15 @@ function searchInfoFromBoard(info, board) {
     if (maxValuesLength < valueLength) {
       maxValuesLength = valueLength;
     }
-    if (1 < valueLength && valueLength < searchSpread) {
-      searchSpread = valueLength;
-      searchPos = j;
+    if (1 < valueLength && valueLength < spread) {
+      spread = valueLength;
+      position = j;
     }
   }
   solved = minValuesLength === 1 && maxValuesLength === 1;
   return {
     solved,
-    searchPos
+    position
   };
 }
 
@@ -264,10 +264,10 @@ function searchAnySolution(info, board) {
   if (searchInfo.solved) {
     return board;
   }
-  let searchValues = shuffle(board[searchInfo.searchPos].split(""));
+  let searchValues = shuffle(board[searchInfo.position].split(""));
   for (let i = 0; i < searchValues.length; i++) {
     let newBoard = Object.assign({}, board);
-    newBoard = assign(info, newBoard, searchInfo.searchPos, searchValues[i]);
+    newBoard = assign(info, newBoard, searchInfo.position, searchValues[i]);
     if (newBoard === null) {
       continue;
     }
@@ -303,7 +303,7 @@ function search(info, listOfValues) {
   }
 
   // Check if each values is solved and if find the appropriate searchpos if not
-  let listOfLengths = new Array(listOfValues.length);
+  let listOfSearchInfos = new Array(listOfValues.length);
   let solvedCount = 0;
   for (let i = 0; i < listOfValues.length; i++) {
     let board = listOfValues[i];
@@ -313,11 +313,11 @@ function search(info, listOfValues) {
     }
 
     // avoid boards with too much spread
-    if (!searchInfo.solved && board[searchInfo.searchPos].length > MAX_SEARCH_SPREAD) {
+    if (!searchInfo.solved && board[searchInfo.position].length > MAX_SEARCH_SPREAD) {
       return null;
     }
 
-    listOfLengths[i] = searchInfo;
+    listOfSearchInfos[i] = searchInfo;
   }
 
   // Too many solutions already
@@ -333,14 +333,14 @@ function search(info, listOfValues) {
   // Create a newListOfValues where each potential value for the searchPos is considered
   let newListOfValues = [];
   let newListLength = 0;
-  for (let i = 0; i < listOfLengths.length; i++) {
-    if (listOfLengths[i].solved) {
+  for (let i = 0; i < listOfSearchInfos.length; i++) {
+    if (listOfSearchInfos[i].solved) {
       newListOfValues.push(listOfValues[i]);
       continue;
     }
 
     let values = listOfValues[i];
-    let searchPos = listOfLengths[i].searchPos;
+    let searchPos = listOfSearchInfos[i].position;
     let searchValues = values[searchPos];
     // console.log("searchValues", searchValues.length);
     for (let i = 0; i < searchValues.length; i++) {
@@ -386,7 +386,11 @@ export function generate(info, attempts) {
   };
 }
 
-function hasUniqueSolution(info, board, solution) {
+function hasUniqueSolution(info, searchInfo, board, fullgrid) {
+  if (searchInfo.solved) {
+    return true;
+  }
+
   return false;
 }
 
@@ -396,7 +400,6 @@ function _emptyAtPos(grid, pos) {
 
 function nextGenerate(info, attempts) {
   let fullgrid = generateFullGrid(info);
-  let solution = boardFromGrid(info, fullgrid);
   let positions = shuffle(numbers(0, info.cells));
   let grid = fullgrid;
   let success = false;
@@ -411,7 +414,7 @@ function nextGenerate(info, attempts) {
     let newGrid = _emptyAtPos(grid, positions[0]);
     let board = boardFromGrid(info, newGrid);
     let searchInfo = searchInfoFromBoard(info, board);
-    if (searchInfo.solved || hasUniqueSolution(info, board, solution)) {
+    if (hasUniqueSolution(info, searchInfo, board, fullgrid)) {
       grid = newGrid;
       positions = positions.slice(1);
       continue;
