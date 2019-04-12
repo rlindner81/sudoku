@@ -20,7 +20,12 @@
  * A `grid` is the internal representation where all fields are numbered from top left to bottom right.
  * 
  */
-import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
+const helper = require("./helper");
+const flatten = helper.flatten;
+const numbers = helper.numbers;
+const shuffle = helper.shuffle;
+const repeat = helper.repeat;
+const seedRand = helper.seedRand;
 
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
@@ -361,7 +366,7 @@ function search(info, listOfValues) {
 /**
  * Old school generate. Not really where it's at.
  */
-export function generate(info, attempts) {
+function generate(info, attempts) {
   let fullGrid = generateFullGrid(info);
   // console.log("fullGrid", fullGrid);
   let attempt = 1;
@@ -447,7 +452,7 @@ function nextGenerate(info, attempts) {
 }
 
 
-export function run() {
+function run() {
   seedRand("43");
   let attempts = 1000;
   for (let size = 4; size <= 16; size++) {
@@ -464,3 +469,5 @@ export function run() {
     }
   }
 }
+
+run();
