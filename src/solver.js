@@ -29,8 +29,58 @@ let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25];
 let MAX_SEARCH_SPREAD = 2;
 let MAX_BOARDS = 5;
 
+
 export function isValidSize(size) {
   return VALID_SIZES.indexOf(size) !== -1;
+}
+
+function boxIndices(width, height, offsetX, offsetY) {
+  let indices = [];
+  let size = width * height;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      indices.push((x + offsetX * width) + (y + offsetY * height) * size);
+    }
+  }
+  return indices;
+}
+
+function generateInfo(size) {
+  console.log("generateInfo", "size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
+
+  let size = size;
+  let width = widthForSize(size);
+  let height = size / width;
+  let hints = hintsForSize(size);
+
+  let chars = numbers(1, size).map(charFromDigit).join("");
+  let cellNum = size * size;
+
+  let peersForPosition = [];
+  let unitsForPosition = [];
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let index = x + y * size;
+      let row = numbers(y * size, size).filter(i => i !== index);
+      let column = numbers(x, size, size).filter(i => i !== index);
+      let box = boxIndices(width, height, Math.floor(x / width), Math.floor(y / height)).filter(i => i !== index);
+      let uniqueIndices = new Set(flatten([row, column, box]));
+      let sortedIndices = [...uniqueIndices].sort((a, b) => a - b);
+      unitsForPosition.push([row, column, box]);
+      peersForPosition.push(sortedIndices);
+    }
+  }
+
+  return {
+    size,
+    width,
+    height,
+    hints,
+    cellNum,
+    chars,
+    unitsForPosition,
+    peersForPosition
+  }
 }
 
 /**
@@ -66,9 +116,9 @@ function digitFromChar(c) {
 }
 
 function searchInfoFromBoard(info, board) {
-  let minValuesLength = info.boardSize;
+  let minValuesLength = info.size;
   let maxValuesLength = 0;
-  let searchSpread = info.boardSize + 1;
+  let searchSpread = info.size + 1;
   let searchPos = null;
   let solved;
   for (let j = 0; j < info.cellNum; j++) {
@@ -244,63 +294,18 @@ function gridFromBoard(info, board) {
   return grid.join("");
 }
 
-function boxIndices(boxWidth, boxHeight, offsetX, offsetY) {
-  let indices = [];
-  let boardSize = boxWidth * boxHeight;
-  for (let y = 0; y < boxHeight; y++) {
-    for (let x = 0; x < boxWidth; x++) {
-      indices.push((x + offsetX * boxWidth) + (y + offsetY * boxHeight) * boardSize);
-    }
-  }
-  return indices;
-}
-
-function generateInfo(boxWidth, boxHeight) {
-  let boardSize = boxWidth * boxHeight;
-  let chars = numbers(1, boardSize).map(charFromDigit).join("");
-  let cellNum = boardSize * boardSize;
-
-  let peersForPosition = [];
-  let unitsForPosition = [];
-  for (let y = 0; y < boardSize; y++) {
-    for (let x = 0; x < boardSize; x++) {
-      let index = x + y * boardSize;
-      let row = numbers(y * boardSize, boardSize).filter(i => i !== index);
-      let column = numbers(x, boardSize, boardSize).filter(i => i !== index);
-      let box = boxIndices(boxWidth, boxHeight, Math.floor(x / boxWidth), Math.floor(y / boxHeight)).filter(i => i !== index);
-      let uniqueIndices = new Set(flatten([row, column, box]));
-      let sortedIndices = [...uniqueIndices].sort((a, b) => a - b);
-      unitsForPosition.push([row, column, box]);
-      peersForPosition.push(sortedIndices);
-    }
-  }
-
-  return {
-    boardSize,
-    cellNum,
-    chars,
-    unitsForPosition,
-    peersForPosition
-  }
-}
-
 export function generate(size, attempts) {
   if (!isValidSize(size)) {
     return null;
   }
 
-  console.log("size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
-  let width = widthForSize(size);
-  let height = size / width;
-  let hints = hintsForSize(size);
-
-  let info = generateInfo(width, height);
+  let info = generateInfo(size);
   let fullGrid = generateFullGrid(info);
   // console.log("fullGrid", fullGrid);
   let attempt = 0;
 
   for (; attempt < attempts; attempt++) {
-    let grid = generateHintGrid(info, fullGrid, hints);
+    let grid = generateHintGrid(info, fullGrid);
     // console.log("hintGrid", grid);
     // grid = ".......13...2............8....76.2....8...4...1.......2.....75.6..34.........8...";
     // if (attempt % 1000 === 0) {
@@ -324,10 +329,10 @@ export function generate(size, attempts) {
 /**
  * Given a full grid, take out values so that only hints many remain.
  */
-function generateHintGrid(info, fullGrid, hints) {
+function generateHintGrid(info, fullGrid) {
   let grid = fullGrid.split("");
   let positions = shuffle(numbers(0, info.cellNum));
-  for (let i = info.cellNum - hints - 1; i >= 0; i--) {
+  for (let i = info.cellNum - info.hints - 1; i >= 0; i--) {
     grid[positions[i]] = ".";
   }
   return grid.join("");
@@ -362,7 +367,7 @@ function searchAnySolution(info, board) {
 }
 
 function generateFullGrid(info) {
-  let baseGrid = shuffle(numbers(1, info.boardSize).map(charFromDigit)).join("") + ".".repeat(info.cellNum - info.boardSize);
+  let baseGrid = shuffle(numbers(1, info.size).map(charFromDigit)).join("") + ".".repeat(info.cellNum - info.size);
   let baseBoard = boardFromGrid(info, baseGrid);
   let solution = searchAnySolution(info, baseBoard)
   return gridFromBoard(info, solution);
