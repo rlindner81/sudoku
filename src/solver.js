@@ -22,11 +22,11 @@
  */
 import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 
-const MAX_SEARCH_SPREAD = 2;
-const MAX_BOARDS = 5;
-const HINT_STEP = 10;
 const EMPTY_CHAR = ".";
-
+const MAX_SEARCH_SPREAD = 2;
+const MAX_SEARCH_BOARDS = 5;
+const HINT_QUOTIENT = 1/3;
+// const HINT_QUOTIENT = 1/4.5;
 
 /**
  * Generate all static information about a Sudoku board given its size.
@@ -94,8 +94,7 @@ function _widthForSize(size) {
  * Size: 9 => Hints: 17
  */
 function _hintsForSize(size) {
-  return Math.ceil(size * size / 3);
-  // return Math.ceil(size * size / 4.5);
+  return Math.ceil(size * size * HINT_QUOTIENT);
 }
 
 function _boxPositions(width, height, offsetX, offsetY) {
@@ -351,7 +350,7 @@ function search(info, listOfValues) {
         continue;
       }
       newListOfValues.push(newValues);
-      if (newListLength++ > MAX_BOARDS) {
+      if (newListLength++ > MAX_SEARCH_BOARDS) {
         return null;
       }
     }
@@ -419,7 +418,7 @@ function nextGenerate(info, attempts) {
     } else {
       if (positions.length < lastLenght) {
         lastLenght = positions.length;
-        console.log("reached", lastLenght, "hints")
+        console.log("reached", lastLenght, "hints at", attempt + 1, "attempt");
       }
       positions = shuffle(positions);
       attempt++;
@@ -433,8 +432,9 @@ function nextGenerate(info, attempts) {
 
 export function run() {
   seedRand("43");
+  let size = 8;
   let attempts = 10000;
-  let info = generateBoardInfo(9);
+  let info = generateBoardInfo(8);
   let grid = nextGenerate(info, 10);
   if (grid !== null) {
     console.log("happy face", grid);
