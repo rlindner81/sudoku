@@ -391,12 +391,17 @@ function hasUniqueSolution(info, board, solution) {
   return false;
 }
 
+function _emptyAtPos(grid, pos) {
+  return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
+}
+
 function nextGenerate(info, attempts) {
   let fullgrid = generateFullGrid(info);
   let solution = boardFromGrid(info, fullgrid);
-  let positions = numbers(0, info.cells);
+  let positions = shuffle(numbers(0, info.cells));
   let grid = fullgrid;
   let success = false;
+  let lastLenght = positions.length;
 
   for (let attempt = 0; attempt < attempts;) {
     if (positions.length <= info.hints) {
@@ -404,9 +409,7 @@ function nextGenerate(info, attempts) {
       console.log("success on attempt", attempt + 1);
       break;
     }
-    positions = shuffle(positions);
-    let newGrid = grid.slice();
-    newGrid[positions[0]] = EMPTY_CHAR;
+    let newGrid = _emptyAtPos(grid, positions[0]);
     let board = boardFromGrid(info, newGrid);
     let searchInfo = searchInfoFromBoard(info, board);
     if (searchInfo.solved || hasUniqueSolution(info, board, solution)) {
@@ -414,6 +417,11 @@ function nextGenerate(info, attempts) {
       positions = positions.slice(1);
       continue;
     } else {
+      if (positions.length < lastLenght) {
+        lastLenght = positions.length;
+        console.log("reached", lastLenght, "hints")
+      }
+      positions = shuffle(positions);
       attempt++;
       continue;
     }
@@ -425,9 +433,14 @@ function nextGenerate(info, attempts) {
 
 export function run() {
   seedRand("43");
-  let attempts = 10;
+  let attempts = 10000;
   let info = generateBoardInfo(9);
   let grid = nextGenerate(info, 10);
+  if (grid !== null) {
+    console.log("happy face", grid);
+  } else {
+    console.log("sad face after", attempts, "attempts");
+  }
   // let generateInfo = generate(info, attempts);
   // let attempts = 1000;
   // for (let size = 4; size <= 16; size++) {
