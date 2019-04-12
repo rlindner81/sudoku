@@ -25,13 +25,14 @@ import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 const MAX_SEARCH_SPREAD = 2;
 const MAX_BOARDS = 5;
 const HINT_STEP = 10;
+const EMPTY_CHAR = ".";
 
 
 /**
  * Generate all static information about a Sudoku board given its size.
  */
 function generateBoardInfo(size) {
-  console.log("BoardInfo", "size", size, "=", _widthForSize(size), "x", size / _widthForSize(size), "hints", _hintsForSize(size));
+  console.log("info", "size", size, "=", _widthForSize(size), "x", size / _widthForSize(size), "hints", _hintsForSize(size));
 
   let width = _widthForSize(size);
   let height = size / width;
@@ -112,7 +113,7 @@ function _boxPositions(width, height, offsetX, offsetY) {
  * Given a number 0,1,..,[size] return the appropriate char '.','1',...,'9','A',... for the grid notation.
  */
 function charFromNum(i) {
-  return i === 0 ? "." : i < 10 ? String.fromCharCode(i + 48) : String.fromCharCode(i + 55)
+  return i === 0 ? EMPTY_CHAR : i < 10 ? String.fromCharCode(i + 48) : String.fromCharCode(i + 55)
 }
 
 /**
@@ -120,7 +121,7 @@ function charFromNum(i) {
  */
 function numFromChar(c) {
   let i = c.charCodeAt(0);
-  return c === "." ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i ? i - 55 : null;
+  return c === EMPTY_CHAR ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i ? i - 55 : null;
 }
 
 /**
@@ -132,7 +133,7 @@ function boardFromGrid(info, grid) {
     board[i] = info.chars;
   }
   for (let i = 0; i < info.cells; i++) {
-    if (grid[i] !== ".") {
+    if (grid[i] !== EMPTY_CHAR) {
       board = assign(info, board, i, grid[i]);
       if (board === null) {
         return null;
@@ -148,7 +149,7 @@ function boardFromGrid(info, grid) {
 function gridFromBoard(info, board) {
   let grid = new Array(info.cells);
   for (let i = 0; i < info.cells; i++) {
-    grid[i] = board[i].length === 1 ? board[i] : ".";
+    grid[i] = board[i].length === 1 ? board[i] : EMPTY_CHAR;
   }
   return grid.join("");
 }
@@ -247,7 +248,7 @@ function generateHintGrid(info, fullGrid) {
   let grid = fullGrid.split("");
   let positions = shuffle(numbers(0, info.cells));
   for (let i = 0; i < info.empties; i++) {
-    grid[positions[i]] = ".";
+    grid[positions[i]] = EMPTY_CHAR;
   }
   return grid.join("");
 }
@@ -281,7 +282,7 @@ function searchAnySolution(info, board) {
 }
 
 function generateFullGrid(info) {
-  let baseGrid = shuffle(numbers(1, info.size).map(charFromNum)).join("") + ".".repeat(info.cells - info.size);
+  let baseGrid = shuffle(numbers(1, info.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(info.cells - info.size);
   let baseBoard = boardFromGrid(info, baseGrid);
   let solution = searchAnySolution(info, baseBoard)
   return gridFromBoard(info, solution);
@@ -386,23 +387,62 @@ export function generate(info, attempts) {
   };
 }
 
+function hasUniqueSolution(info, board, solution) {
+  return false;
+}
+
+function nextGenerate(info, attempts) {
+  let fullgrid = generateFullGrid(info);
+  let solution = boardFromGrid(info, fullgrid);
+  let positions = numbers(0, info.cells);
+  let grid = fullgrid;
+  let success = false;
+
+  for (let attempt = 0; attempt < attempts;) {
+    if (positions.length <= info.hints) {
+      success = true;
+      console.log("success on attempt", attempt + 1);
+      break;
+    }
+    positions = shuffle(positions);
+    let newGrid = grid.slice();
+    newGrid[positions[0]] = EMPTY_CHAR;
+    let board = boardFromGrid(info, newGrid);
+    let searchInfo = searchInfoFromBoard(info, board);
+    if (searchInfo.solved || hasUniqueSolution(info, board, solution)) {
+      grid = newGrid;
+      positions = positions.slice(1);
+      continue;
+    } else {
+      attempt++;
+      continue;
+    }
+  }
+
+  return success ? grid : null;
+}
+
 
 export function run() {
   seedRand("43");
-  let attempts = 1000;
-  for (let size = 4; size <= 16; size++) {
-    let info = generateBoardInfo(size);
-    if (info === null) {
-      continue;
-    }
+  let attempts = 10;
+  let info = generateBoardInfo(9);
+  let grid = nextGenerate(info, 10);
+  // let generateInfo = generate(info, attempts);
+  // let attempts = 1000;
+  // for (let size = 4; size <= 16; size++) {
+  //   let info = generateBoardInfo(size);
+  //   if (info === null) {
+  //     continue;
+  //   }
 
-    let generateInfo = generate(info, attempts);
-    if ("grid" in generateInfo) {
-      console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
-      console.log("solution", gridFromBoard(info, searchAnySolution(info, boardFromGrid(info, generateInfo.grid))));
-      // size++;
-    } else {
-      console.log("exhausted", generateInfo.attempt, "tries and failed");
-    }
-  }
+  //   let generateInfo = generate(info, attempts);
+  //   if ("grid" in generateInfo) {
+  //     console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
+  //     // console.log("solution", gridFromBoard(info, searchAnySolution(info, boardFromGrid(info, generateInfo.grid))));
+  //     // size++;
+  //   } else {
+  //     console.log("exhausted", generateInfo.attempt, "tries and failed");
+  //   }
+  // }
 }
