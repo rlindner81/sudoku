@@ -30,7 +30,7 @@ const seedRand = helper.seedRand;
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
 const MAX_SEARCH_BOARDS = 5;
-const HINT_QUOTIENT = 1/5;
+const HINT_QUOTIENT = 1 / 5;
 // const HINT_QUOTIENT = 1/4.5;
 
 /**
@@ -203,7 +203,12 @@ function eliminate(info, board, position, c) {
   let units = info.unitsForPosition[position];
   for (let i = 0; i < units.length; i++) {
     let unit = units[i];
-    let cPositions = unit.filter(position => board[position].indexOf(c) !== -1);
+    let cPositions = unit.filter(p => {
+      if (board[p] === undefined) {
+        debugger;
+      }
+      return board[p].indexOf(c) !== -1
+    });
     if (cPositions.length === 0) {
       return null;
     }
@@ -417,18 +422,15 @@ function _emptyAtPos(grid, pos) {
   return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
 }
 
-function nextGenerate(info, attempts) {
-  let fullgrid = generateFullGrid(info);
+function _generateHintGridFromFullGrid(info, attempt, attempts, fullgrid) {
   let positions = shuffle(numbers(0, info.cells));
   let grid = fullgrid;
-  let success = false;
   let lastLenght = positions.length;
 
-  for (let attempt = 0; attempt < attempts;) {
+  while (attempt < attempts) {
     if (positions.length <= info.hints) {
-      success = true;
       console.log("success on attempt", attempt + 1);
-      break;
+      return grid;
     }
     let newGrid = _emptyAtPos(grid, positions[0]);
     let board = boardFromGrid(info, newGrid);
@@ -440,21 +442,32 @@ function nextGenerate(info, attempts) {
     } else {
       if (positions.length < lastLenght) {
         lastLenght = positions.length;
-        console.log("reached", lastLenght, "hints at", attempt + 1, "attempt");
+        // console.log("reached", lastLenght, "hints at", attempt + 1, "attempt");
       }
       positions = shuffle(positions);
       attempt++;
       continue;
     }
   }
+  return null;
+}
 
-  return success ? grid : null;
+function nextGenerate(info, attempts) {
+  let grid = null;
+  for (let i = 0; i < Math.ceil(attempts / 100); i++) {
+    let fullgrid = generateFullGrid(info);
+    grid = _generateHintGridFromFullGrid(info, i * 100, (i + 1) * 100, fullgrid);
+    if (grid !== null) {
+      break;
+    }
+  }
+  return grid;
 }
 
 
 function run() {
-  seedRand("43");
-  let attempts = 1000;
+  seedRand(Math.random().toString());
+  let attempts = 3000;
   for (let size = 4; size <= 16; size++) {
     let info = generateBoardInfo(size);
     if (info === null) {
@@ -470,4 +483,12 @@ function run() {
   }
 }
 
-run();
+// run();
+
+let size = 4;
+let info = generateBoardInfo(size);
+let grid = ".1...34........3";
+let board = boardFromGrid(info, grid);
+console.log("test", board);
+let test = search(info, [board]);
+console.log("test", test);
