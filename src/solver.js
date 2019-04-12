@@ -22,18 +22,10 @@
  */
 import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 
-let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25];
-let MAX_SEARCH_SPREAD = 2;
-let MAX_BOARDS = 5;
-let HINT_STEP = 10;
+const MAX_SEARCH_SPREAD = 2;
+const MAX_BOARDS = 5;
+const HINT_STEP = 10;
 
-
-/**
- * Ensure only sensible Sudoku boards are generated.
- */
-export function isValidSize(size) {
-  return VALID_SIZES.indexOf(size) !== -1;
-}
 
 /**
  * Generate all static information about a Sudoku board given its size.
@@ -44,6 +36,11 @@ function generateBoardInfo(size) {
   let width = _widthForSize(size);
   let height = size / width;
   let hints = _hintsForSize(size);
+
+  // Board of prime size is not sensible
+  if (width === size) {
+    return null;
+  }
 
   let chars = numbers(1, size).map(charFromNum).join("");
   let cells = size * size;
@@ -94,7 +91,7 @@ function _widthForSize(size) {
  * Size: 9 => Hints: 17
  */
 function _hintsForSize(size) {
-  return Math.ceil(size * size / 2);
+  return Math.ceil(size * size / 3);
   // return Math.ceil(size * size / 4.5);
 }
 
@@ -211,7 +208,9 @@ function eliminate(info, board, position, c) {
   return board;
 }
 
-
+/**
+ * Given a board find out if it is solved and find the "search" position with the least number of values > 1.
+ */
 function searchInfoFromBoard(info, board) {
   let minValuesLength = info.size;
   let maxValuesLength = 0;
@@ -236,6 +235,54 @@ function searchInfoFromBoard(info, board) {
     solved,
     searchPos
   };
+}
+
+
+/**
+ * Given a full grid, take out values so that only hints many remain.
+ */
+function generateHintGrid(info, fullGrid) {
+  let grid = fullGrid.split("");
+  let positions = shuffle(numbers(0, info.cells));
+  for (let i = info.cells - info.hints - 1; i >= 0; i--) {
+    grid[positions[i]] = ".";
+  }
+  return grid.join("");
+}
+
+
+/**
+ * Starting form a given board, find any valid solution.
+ */
+function searchAnySolution(info, board) {
+  if (board === null) {
+    return null;
+  }
+  let searchInfo = searchInfoFromBoard(info, board);
+  if (searchInfo.solved) {
+    return board;
+  }
+  let searchValues = shuffle(board[searchInfo.searchPos].split(""));
+  for (let i = 0; i < searchValues.length; i++) {
+    let newBoard = Object.assign({}, board);
+    newBoard = assign(info, newBoard, searchInfo.searchPos, searchValues[i]);
+    if (newBoard === null) {
+      continue;
+    }
+    // console.log("grid", gridFromBoard(info, newBoard));
+    newBoard = searchAnySolution(info, newBoard);
+    if (newBoard !== null) {
+      return newBoard;
+    }
+  }
+  return null;
+}
+
+function generateFullGrid(info) {
+  let baseGrid = shuffle(numbers(1, info.size).map(charFromNum)).join("") + ".".repeat(info.cells - info.size);
+  let baseBoard = boardFromGrid(info, baseGrid);
+  let solution = searchAnySolution(info, baseBoard)
+  return gridFromBoard(info, solution);
 }
 
 /**
@@ -310,17 +357,10 @@ function search(info, listOfValues) {
   return search(info, newListOfValues);
 }
 
-
-
-export function generate(size, attempts) {
-  if (!isValidSize(size)) {
-    return null;
-  }
-
-  let info = generateBoardInfo(size);
+export function generate(info, attempts) {
   let fullGrid = generateFullGrid(info);
   // console.log("fullGrid", fullGrid);
-  let attempt = 0;
+  let attempt = 1;
 
   for (; attempt < attempts; attempt++) {
     let grid = generateHintGrid(info, fullGrid);
@@ -344,69 +384,23 @@ export function generate(size, attempts) {
   };
 }
 
-/**
- * Given a full grid, take out values so that only hints many remain.
- */
-function generateHintGrid(info, fullGrid) {
-  let grid = fullGrid.split("");
-  let positions = shuffle(numbers(0, info.cells));
-  for (let i = info.cells - info.hints - 1; i >= 0; i--) {
-    grid[positions[i]] = ".";
-  }
-  return grid.join("");
-}
-
-
-/**
- * Starting form a given board, find any valid solution.
- */
-function searchAnySolution(info, board) {
-  if (board === null) {
-    return null;
-  }
-  let searchInfo = searchInfoFromBoard(info, board);
-  if (searchInfo.solved) {
-    return board;
-  }
-  let searchValues = shuffle(board[searchInfo.searchPos].split(""));
-  for (let i = 0; i < searchValues.length; i++) {
-    let newBoard = Object.assign({}, board);
-    newBoard = assign(info, newBoard, searchInfo.searchPos, searchValues[i]);
-    if (newBoard === null) {
-      continue;
-    }
-    // console.log("grid", gridFromBoard(info, newBoard));
-    newBoard = searchAnySolution(info, newBoard);
-    if (newBoard !== null) {
-      return newBoard;
-    }
-  }
-  return null;
-}
-
-function generateFullGrid(info) {
-  let baseGrid = shuffle(numbers(1, info.size).map(charFromNum)).join("") + ".".repeat(info.cells - info.size);
-  let baseBoard = boardFromGrid(info, baseGrid);
-  let solution = searchAnySolution(info, baseBoard)
-  return gridFromBoard(info, solution);
-}
 
 export function run() {
   seedRand("43");
-  let attempts = 10;
-  for (let size = 4; size <= 25; size++) {
-    if (!isValidSize(size)) {
+  let attempts = 1000;
+  for (let size = 4; size <= 16; size++) {
+    let info = generateBoardInfo(size);
+    if (info === null) {
       continue;
     }
 
-    let generateInfo = generate(size, attempts);
-    if (generateInfo !== null) {
-      if ("grid" in generateInfo) {
-        console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
-        // size++;
-      } else {
-        console.log("exhausted", generateInfo.attempt, "tries and failed");
-      }
+    let generateInfo = generate(info, attempts);
+    if ("grid" in generateInfo) {
+      console.log("success after", generateInfo.attempt, "tries: grid", generateInfo.grid);
+      console.log("solution", gridFromBoard(info, searchAnySolution(info, boardFromGrid(info, generateInfo.grid))));
+      // size++;
+    } else {
+      console.log("exhausted", generateInfo.attempt, "tries and failed");
     }
   }
 }
