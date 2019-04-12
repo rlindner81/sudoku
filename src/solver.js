@@ -22,39 +22,31 @@
  */
 import { flatten, numbers, shuffle, repeat, seedRand } from "@/helper";
 
-/**
- * List of valid Sudoku board sizes.
- */
 let VALID_SIZES = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25];
 let MAX_SEARCH_SPREAD = 2;
 let MAX_BOARDS = 5;
+let HINT_STEP = 10;
 
 
+/**
+ * Ensure only sensible Sudoku boards are generated.
+ */
 export function isValidSize(size) {
   return VALID_SIZES.indexOf(size) !== -1;
 }
 
-function boxIndices(width, height, offsetX, offsetY) {
-  let indices = [];
-  let size = width * height;
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      indices.push((x + offsetX * width) + (y + offsetY * height) * size);
-    }
-  }
-  return indices;
-}
+/**
+ * Generate all static information about a Sudoku board given its size.
+ */
+function generateBoardInfo(size) {
+  console.log("BoardInfo", "size", size, "=", _widthForSize(size), "x", size / _widthForSize(size), "hints", _hintsForSize(size));
 
-function generateInfo(size) {
-  console.log("generateInfo", "size", size, "=", widthForSize(size), "x", size / widthForSize(size), "hints", hintsForSize(size));
-
-  let size = size;
-  let width = widthForSize(size);
+  let width = _widthForSize(size);
   let height = size / width;
-  let hints = hintsForSize(size);
+  let hints = _hintsForSize(size);
 
-  let chars = numbers(1, size).map(charFromDigit).join("");
-  let cellNum = size * size;
+  let chars = numbers(1, size).map(charFromNum).join("");
+  let cells = size * size;
 
   let peersForPosition = [];
   let unitsForPosition = [];
@@ -63,7 +55,7 @@ function generateInfo(size) {
       let index = x + y * size;
       let row = numbers(y * size, size).filter(i => i !== index);
       let column = numbers(x, size, size).filter(i => i !== index);
-      let box = boxIndices(width, height, Math.floor(x / width), Math.floor(y / height)).filter(i => i !== index);
+      let box = _boxPositions(width, height, Math.floor(x / width), Math.floor(y / height)).filter(i => i !== index);
       let uniqueIndices = new Set(flatten([row, column, box]));
       let sortedIndices = [...uniqueIndices].sort((a, b) => a - b);
       unitsForPosition.push([row, column, box]);
@@ -76,7 +68,7 @@ function generateInfo(size) {
     width,
     height,
     hints,
-    cellNum,
+    cells,
     chars,
     unitsForPosition,
     peersForPosition
@@ -87,7 +79,7 @@ function generateInfo(size) {
  * The appropriate box width for a given board size. Should be the smallest number bigger than the square root of the
  * size that is also divisor.
  */
-function widthForSize(size) {
+function _widthForSize(size) {
   for (let i = Math.ceil(Math.sqrt(size)); i < size; i++) {
     if (size % i === 0) {
       return i;
@@ -101,19 +93,124 @@ function widthForSize(size) {
  * Size: 4 => Hints: 4
  * Size: 9 => Hints: 17
  */
-function hintsForSize(size) {
+function _hintsForSize(size) {
   return Math.ceil(size * size / 2);
   // return Math.ceil(size * size / 4.5);
 }
 
-function charFromDigit(i) {
+function _boxPositions(width, height, offsetX, offsetY) {
+  let indices = [];
+  let size = width * height;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      indices.push((x + offsetX * width) + (y + offsetY * height) * size);
+    }
+  }
+  return indices;
+}
+
+/**
+ * Given a number 0,1,..,[size] return the appropriate char '.','1',...,'9','A',... for the grid notation.
+ */
+function charFromNum(i) {
   return i === 0 ? "." : i < 10 ? String.fromCharCode(i + 48) : String.fromCharCode(i + 55)
 }
 
-function digitFromChar(c) {
+/**
+ * Given a char '.','1',...,'9','A',... from the grid notation, return the corresponding number.
+ */
+function numFromChar(c) {
   let i = c.charCodeAt(0);
   return c === "." ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i ? i - 55 : null;
 }
+
+/**
+ * Return the board associated with a given grid by assigning all non-empty fields.
+ */
+function boardFromGrid(info, grid) {
+  let board = {};
+  for (let i = 0; i < info.cells; i++) {
+    board[i] = info.chars;
+  }
+  for (let i = 0; i < info.cells; i++) {
+    if (grid[i] !== ".") {
+      board = assign(info, board, i, grid[i]);
+      if (board === null) {
+        return null;
+      }
+    }
+  }
+  return board;
+}
+
+/**
+ * Return the grid associated with a board. Only cells with a unique value will be non-empty in the grid.
+ */
+function gridFromBoard(info, board) {
+  let grid = new Array(info.cells);
+  for (let i = 0; i < info.cells; i++) {
+    grid[i] = board[i].length === 1 ? board[i] : ".";
+  }
+  return grid.join("");
+}
+
+/**
+ * Assign char c to board[position] by eliminating all remaining values.
+ */
+function assign(info, board, position, c) {
+  // console.log("assign", pos, c);
+  let remainingValues = board[position].replace(c, "");
+  for (let i = 0; i < remainingValues.length; i++) {
+    board = eliminate(info, board, position, remainingValues[i]);
+    if (board === null) {
+      return null;
+    }
+  }
+  return board;
+}
+
+/**
+ * Eliminate char c from board[position] and propagate appropriately.
+ */
+function eliminate(info, board, position, c) {
+  // console.log("eliminate", pos, c);
+  if (board[position].indexOf(c) === -1) {
+    return board;
+  }
+  board[position] = board[position].replace(c, "");
+
+  // Nothing remaining means the board was not solvable
+  if (board[position].length === 0) {
+    return null;
+  }
+
+  // Only one value remaining means we can remove this for all peers
+  if (board[position].length === 1) {
+    let c2 = board[position];
+    let peers = info.peersForPosition[position];
+    for (let i = 0; i < peers.length; i++) {
+      board = eliminate(info, board, peers[i], c2);
+      if (board === null) {
+        return null;
+      }
+    }
+  }
+
+  // Check if c is the only remaining option in any of the units (row, column, or box)
+  let units = info.unitsForPosition[position];
+  for (let i = 0; i < units.length; i++) {
+    let unit = units[i];
+    let cPositions = unit.filter(position => board[position].indexOf(c) !== -1);
+    if (cPositions.length === 0) {
+      return null;
+    }
+    if (cPositions.length === 1) {
+      return assign(info, board, cPositions[0], c);
+    }
+  }
+  return board;
+}
+
 
 function searchInfoFromBoard(info, board) {
   let minValuesLength = info.size;
@@ -121,7 +218,7 @@ function searchInfoFromBoard(info, board) {
   let searchSpread = info.size + 1;
   let searchPos = null;
   let solved;
-  for (let j = 0; j < info.cellNum; j++) {
+  for (let j = 0; j < info.cells; j++) {
     let valueLength = board[j].length;
     if (valueLength < minValuesLength) {
       minValuesLength = valueLength;
@@ -213,93 +310,14 @@ function search(info, listOfValues) {
   return search(info, newListOfValues);
 }
 
-/**
- * Assign char c to values[pos] by eliminating all remaining alternatives.
- */
-function assign(info, values, pos, c) {
-  // console.log("assign", pos, c);
-  let remainingValues = values[pos].replace(c, "");
-  for (let i = 0; i < remainingValues.length; i++) {
-    values = eliminate(info, values, pos, remainingValues[i]);
-    if (values === null) {
-      return null;
-    }
-  }
-  return values;
-}
 
-/**
- * Eliminate char c from values[pos] and trigger an assign, if only one value remains.
- */
-function eliminate(info, values, pos, c) {
-  // console.log("eliminate", pos, c);
-  if (values[pos].indexOf(c) === -1) {
-    return values;
-  }
-  values[pos] = values[pos].replace(c, "");
-
-  // Nothing remaining not solvable
-  if (values[pos].length === 0) {
-    return null;
-  }
-  // Only one value remaining can remove this for all peers
-  if (values[pos].length === 1) {
-    let c2 = values[pos];
-    let peers = info.peersForPosition[pos];
-    for (let i = 0; i < peers.length; i++) {
-      values = eliminate(info, values, peers[i], c2);
-      if (values === null) {
-        return null;
-      }
-    }
-  }
-  // Check if c is the only remaining option in any of the units (row, column, or box)
-  let units = info.unitsForPosition[pos];
-  for (let i = 0; i < units.length; i++) {
-    let unit = units[i];
-    let cPositions = unit.filter(p => values[p].indexOf(c) !== -1);
-    if (cPositions.length === 0) {
-      return null;
-    }
-    if (cPositions.length === 1) {
-      return assign(info, values, cPositions[0], c);
-    }
-  }
-  return values;
-}
-
-
-function boardFromGrid(info, grid) {
-  // console.log("valuesFromGrid", grid);
-  let board = {};
-  for (let i = 0; i < info.cellNum; i++) {
-    board[i] = info.chars;
-  }
-  for (let i = 0; i < info.cellNum; i++) {
-    if (grid[i] !== ".") {
-      board = assign(info, board, i, grid[i]);
-      if (board === null) {
-        return null;
-      }
-    }
-  }
-  return board;
-}
-
-function gridFromBoard(info, board) {
-  let grid = new Array(info.cellNum);
-  for (let i = 0; i < info.cellNum; i++) {
-    grid[i] = board[i].length === 1 ? board[i] : ".";
-  }
-  return grid.join("");
-}
 
 export function generate(size, attempts) {
   if (!isValidSize(size)) {
     return null;
   }
 
-  let info = generateInfo(size);
+  let info = generateBoardInfo(size);
   let fullGrid = generateFullGrid(info);
   // console.log("fullGrid", fullGrid);
   let attempt = 0;
@@ -331,8 +349,8 @@ export function generate(size, attempts) {
  */
 function generateHintGrid(info, fullGrid) {
   let grid = fullGrid.split("");
-  let positions = shuffle(numbers(0, info.cellNum));
-  for (let i = info.cellNum - info.hints - 1; i >= 0; i--) {
+  let positions = shuffle(numbers(0, info.cells));
+  for (let i = info.cells - info.hints - 1; i >= 0; i--) {
     grid[positions[i]] = ".";
   }
   return grid.join("");
@@ -367,7 +385,7 @@ function searchAnySolution(info, board) {
 }
 
 function generateFullGrid(info) {
-  let baseGrid = shuffle(numbers(1, info.size).map(charFromDigit)).join("") + ".".repeat(info.cellNum - info.size);
+  let baseGrid = shuffle(numbers(1, info.size).map(charFromNum)).join("") + ".".repeat(info.cells - info.size);
   let baseBoard = boardFromGrid(info, baseGrid);
   let solution = searchAnySolution(info, baseBoard)
   return gridFromBoard(info, solution);
@@ -375,8 +393,8 @@ function generateFullGrid(info) {
 
 export function run() {
   seedRand("43");
-  let attempts = 1000;
-  for (let size = 1; size <= 25; size++) {
+  let attempts = 10;
+  for (let size = 4; size <= 25; size++) {
     if (!isValidSize(size)) {
       continue;
     }
