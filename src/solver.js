@@ -35,7 +35,9 @@ function generateBoardInfo(size) {
 
   let width = _widthForSize(size);
   let height = size / width;
+  let cells = size * size;
   let hints = _hintsForSize(size);
+  let empties = cells - hints;
 
   // Board of prime size is not sensible
   if (width === size) {
@@ -43,7 +45,6 @@ function generateBoardInfo(size) {
   }
 
   let chars = numbers(1, size).map(charFromNum).join("");
-  let cells = size * size;
 
   let peersForPosition = [];
   let unitsForPosition = [];
@@ -61,11 +62,12 @@ function generateBoardInfo(size) {
   }
 
   return {
-    size,
     width,
     height,
-    hints,
+    size,
     cells,
+    hints,
+    empties,
     chars,
     unitsForPosition,
     peersForPosition
@@ -244,7 +246,7 @@ function searchInfoFromBoard(info, board) {
 function generateHintGrid(info, fullGrid) {
   let grid = fullGrid.split("");
   let positions = shuffle(numbers(0, info.cells));
-  for (let i = info.cells - info.hints - 1; i >= 0; i--) {
+  for (let i = 0; i < info.empties; i++) {
     grid[positions[i]] = ".";
   }
   return grid.join("");
