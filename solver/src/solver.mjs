@@ -39,12 +39,13 @@ export function numFromChar(c) {
   return c === EMPTY_CHAR ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i ? i - 55 : null;
 }
 
+
 /**
  * Generate all static information about a Sudoku board given its size.
  */
-function Solver(size, prng) {
+function Solver(size, shuffle) {
   this.size = size;
-  this.prng = prng;
+  this.shuffle = shuffle;
   this.width = this._widthForSize();
   this.height = this.size / this.width;
   this.cells = this.size * this.size;
@@ -248,7 +249,7 @@ Solver.prototype.searchAnySolution = function(board) {
   if (searchInfo.solved) {
     return board;
   }
-  let searchValues = this.prng.shuffle(board[searchInfo.position].split(""));
+  let searchValues = this.shuffle(board[searchInfo.position].split(""));
   for (let i = 0; i < searchValues.length; i++) {
     let newBoard = Object.assign({}, board);
     newBoard = this.assign(newBoard, searchInfo.position, searchValues[i]);
@@ -266,7 +267,7 @@ Solver.prototype.searchAnySolution = function(board) {
 
 Solver.prototype.generateFullGrid = function() {
   // console.log("generateFullGrid");
-  let baseGrid = this.prng.shuffle(numbers(1, this.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(this.cells - this.size);
+  let baseGrid = this.shuffle(numbers(1, this.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(this.cells - this.size);
   let baseBoard = this.boardFromGrid(baseGrid);
   let solution = this.searchAnySolution(baseBoard)
   return this.gridFromBoard(solution);
@@ -295,7 +296,7 @@ function _emptyAtPos(grid, pos) {
 
 Solver.prototype.generateHintGrid = function(attempts) {
   let fullGrid = this.generateFullGrid();
-  let positions = this.prng.shuffle(numbers(0, this.cells));
+  let positions = this.shuffle(numbers(0, this.cells));
   let grid = fullGrid;
   let lastLenght = positions.length;
 
@@ -316,7 +317,7 @@ Solver.prototype.generateHintGrid = function(attempts) {
         lastLenght = positions.length;
         // console.log("reached", lastLenght, "hints");
       }
-      positions = this.prng.shuffle(positions);
+      positions = this.shuffle(positions);
       attempt++;
       continue;
     }
