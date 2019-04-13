@@ -9,6 +9,11 @@
 * http://www.sudokuwiki.org/sudoku.htm
 * http://www.afjarvis.staff.shef.ac.uk/sudoku/
 
+Node modules new syntaxes
+* https://medium.com/@giltayar/native-es-modules-in-nodejs-status-and-future-directions-part-i-ee5ea3001f71
+Actually working memwatch package
+* https://www.npmjs.com/package/node-memwatch
+
 ## todo
 
 * boxsize 2,4 generation

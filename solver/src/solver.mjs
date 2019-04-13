@@ -21,13 +21,14 @@
  * 
  */
 import { writeFileSync } from "fs"
-import { flatten, numbers, shuffle, repeat, seedRand } from "./helper"
+import { flatten, numbers, shuffle, repeat, seedRand, Measure } from "./helper"
 
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
 const MAX_SEARCH_BOARDS = 5;
 const HINT_QUOTIENT = 1 / 5;
 // const HINT_QUOTIENT = 1/4.5;
+let timestart = new Date();
 
 /**
  * Generate all static information about a Sudoku board given its size.
@@ -286,6 +287,7 @@ function searchAnySolution(info, board) {
 }
 
 function generateFullGrid(info) {
+  // console.log("generateFullGrid");
   let baseGrid = shuffle(numbers(1, info.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(info.cells - info.size);
   let baseBoard = boardFromGrid(info, baseGrid);
   let solution = searchAnySolution(info, baseBoard)
@@ -394,20 +396,18 @@ function generate(info, attempts) {
   };
 }
 
-function hasUniqueSolution(info, searchInfo, board, fullgrid) {
+function hasUniqueSolution(info, searchInfo, board, fullGrid) {
+  // console.log("hasUniqueSolution");
   if (searchInfo.solved) {
     return true;
   }
-  let remainingValues = board[searchInfo.position].replace(fullgrid[searchInfo.position], "");
+  let remainingValues = board[searchInfo.position].replace(fullGrid[searchInfo.position], "");
   for (let i = 0; i < remainingValues.length; i++) {
     let c = remainingValues[i];
     let newBoard = Object.assign({}, board);
     newBoard[searchInfo.position] = c;
     let solution = searchAnySolution(info, newBoard);
     if (solution !== null) {
-      // console.log("       real solution", fullgrid);
-      // console.log("conflicting solution", gridFromBoard(info, solution), "differs in position", searchInfo.position);
-      // debugger;
       return false;
     }
   }
@@ -418,12 +418,16 @@ function _emptyAtPos(grid, pos) {
   return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
 }
 
-function _generateHintGridFromFullGrid(info, attempt, attempts, fullgrid) {
+let attemptMeasure = new Measure("attemptloop");
+export function nextGenerate(info, attempts) {
+  // console.log("nextGenerate", "timediff", new Date() - timestart, "calls", nextGenCalls++);
+  let fullGrid = generateFullGrid(info);
   let positions = shuffle(numbers(0, info.cells));
-  let grid = fullgrid;
+  let grid = fullGrid;
   let lastLenght = positions.length;
 
-  while (attempt < attempts) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    attemptMeasure.log();
     if (positions.length <= info.hints) {
       console.log("success on attempt", attempt + 1);
       return grid;
@@ -431,14 +435,15 @@ function _generateHintGridFromFullGrid(info, attempt, attempts, fullgrid) {
     let newGrid = _emptyAtPos(grid, positions[0]);
     let board = boardFromGrid(info, newGrid);
     let searchInfo = searchInfoFromBoard(info, board);
-    if (hasUniqueSolution(info, searchInfo, board, fullgrid)) {
+    if (hasUniqueSolution(info, searchInfo, board, fullGrid)) {
+      // console.log("progress", positions.length, "hints", info.hints);
       grid = newGrid;
       positions = positions.slice(1);
       continue;
     } else {
       if (positions.length < lastLenght) {
         lastLenght = positions.length;
-        // console.log("reached", lastLenght, "hints at", attempt + 1, "attempt");
+        // console.log("reached", lastLenght, "hints");
       }
       positions = shuffle(positions);
       attempt++;
@@ -448,22 +453,11 @@ function _generateHintGridFromFullGrid(info, attempt, attempts, fullgrid) {
   return null;
 }
 
-export function nextGenerate(info, attempts) {
-  let grid = null;
-  for (let i = 0; i < Math.ceil(attempts / 100); i++) {
-    let fullgrid = generateFullGrid(info);
-    grid = _generateHintGridFromFullGrid(info, i * 100, (i + 1) * 100, fullgrid);
-    if (grid !== null) {
-      break;
-    }
-  }
-  return grid;
-}
 
 function generateGridsPack(minSize) {
   seedRand("42");
   let numBoards = 20;
-  let attempts = 500;
+  let attempts = 300;
   let boardPacks = {};
   for (let size = minSize; size <= 25; size++) {
     let info = generateBoardInfo(size);
@@ -472,10 +466,13 @@ function generateGridsPack(minSize) {
     }
 
     let solutions = [];
+    let calls = 0;
     for (let i = 0; i < numBoards;) {
+      console.log("nextGen", calls++);
       let grid = nextGenerate(info, attempts);
       if (grid !== null) {
         i++;
+        console.log("timediff", new Date() - timestart);
         solutions.push(grid);
       }
     }
@@ -486,7 +483,7 @@ function generateGridsPack(minSize) {
   }
 }
 
-generateGridsPack(4);
+generateGridsPack(10);
 
 // let size = 4;
 // let info = generateBoardInfo(size);

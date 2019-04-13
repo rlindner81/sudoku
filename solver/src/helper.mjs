@@ -169,3 +169,19 @@ seedRand(Math.random().toString());
 export function rand() {
   return _rand();
 }
+
+export class Measure {
+  constructor(name) {
+    let now = new Date();
+
+    this.calls = 1;
+    this.name = name;
+    this.startTime = now;
+    this.lastCallTime = now;
+  }
+  log() {
+    let now = new Date();
+    console.log(`${this.name} | total ${now - this.startTime} | delta ${now - this.lastCallTime} | calls ${this.calls++}`);
+    this.lastCallTime = now;
+  }
+}
