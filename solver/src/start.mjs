@@ -14,7 +14,7 @@ function generateGridsPack(minSize) {
   let boardPacks = {};
   for (let size = minSize; size <= 25; size++) {
     let solver = new Solver(size, prng.shuffle.bind(prng));
-    if (solver === null) {
+    if (!solver.isValid()) {
       continue;
     }
     console.log("solver", solver.toString());
@@ -34,4 +34,4 @@ function generateGridsPack(minSize) {
   }
 }
 
-generateGridsPack(10);
+generateGridsPack(12);

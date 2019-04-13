@@ -53,10 +53,6 @@ function Solver(size, shuffle) {
   this.hints = this._hintsForSize();
   this.empties = this.cells - this.hints;
 
-  // Board of prime size is not sensible
-  if (this.width === this.size) {
-    return null;
-  }
   this.chars = numbers(1, this.size).map(charFromNum).join("");
 
   this.peersForPosition = [];
@@ -73,6 +69,13 @@ function Solver(size, shuffle) {
       this.peersForPosition.push(sortedIndices);
     }
   }
+}
+
+/**
+ * Boards of prime size are not sensible.
+ */
+Solver.prototype.isValid = function () {
+  return this.height !== 1;
 }
 
 Solver.prototype.toString = function () {
