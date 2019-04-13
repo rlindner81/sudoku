@@ -287,11 +287,12 @@ Solver.prototype.hasUniqueSolution = function (searchInfo, board, fullGrid) {
     return true;
   }
 
-  let remainingValues = board[searchInfo.position].replace(fullGrid[searchInfo.position], "");
+  let realValue = fullGrid[searchInfo.position];
+  let remainingValues = board[searchInfo.position].replace(realValue, "");
   for (let i = 0; i < remainingValues.length; i++) {
     let c = remainingValues[i];
     let newBoard = Object.assign({}, board);
-    newBoard[searchInfo.position] = c;
+    newBoard = this.assign(newBoard, searchInfo.position, c);
     let solution = this.searchAnySolution(newBoard, SEARCH_RECURSION_LIMIT);
     if (solution !== null) {
       return false;
