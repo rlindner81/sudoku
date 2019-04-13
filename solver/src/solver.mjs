@@ -22,7 +22,7 @@ import { flatten, numbers, repeat } from "./helper"
 
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 5;
-const SEARCH_RECURSION_LIMIT = 20;
+const SEARCH_RECURSION_LIMIT = 5;
 
 
 /**
@@ -250,7 +250,7 @@ Solver.prototype.searchAnySolution = function (board, depthLimit = -1, depth = 0
     return null;
   }
   if (0 <= depthLimit && depthLimit < depth) {
-    console.log("below recursion depth limit at", depth);
+    // console.log("below recursion depth limit at", depth);
     return board;
   }
 
