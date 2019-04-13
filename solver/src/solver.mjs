@@ -20,12 +20,7 @@
  * A `grid` is the internal representation where all fields are numbered from top left to bottom right.
  * 
  */
-const helper = require("./helper");
-const flatten = helper.flatten;
-const numbers = helper.numbers;
-const shuffle = helper.shuffle;
-const repeat = helper.repeat;
-const seedRand = helper.seedRand;
+import { flatten, numbers, shuffle, repeat, seedRand } from "./helper"
 
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
@@ -36,7 +31,7 @@ const HINT_QUOTIENT = 1 / 5;
 /**
  * Generate all static information about a Sudoku board given its size.
  */
-function generateBoardInfo(size) {
+export function generateBoardInfo(size) {
   let width = _widthForSize(size);
   let height = size / width;
   let cells = size * size;
@@ -115,14 +110,14 @@ function _boxPositions(width, height, offsetX, offsetY) {
 /**
  * Given a number 0,1,..,[size] return the appropriate char '.','1',...,'9','A',... for the grid notation.
  */
-function charFromNum(i) {
+export function charFromNum(i) {
   return i === 0 ? EMPTY_CHAR : i < 10 ? String.fromCharCode(i + 48) : String.fromCharCode(i + 55)
 }
 
 /**
  * Given a char '.','1',...,'9','A',... from the grid notation, return the corresponding number.
  */
-function numFromChar(c) {
+export function numFromChar(c) {
   let i = c.charCodeAt(0);
   return c === EMPTY_CHAR ? 0 : 48 < i && i < 58 ? i - 48 : 65 <= i ? i - 55 : null;
 }
@@ -452,7 +447,7 @@ function _generateHintGridFromFullGrid(info, attempt, attempts, fullgrid) {
   return null;
 }
 
-function nextGenerate(info, attempts) {
+export function nextGenerate(info, attempts) {
   let grid = null;
   for (let i = 0; i < Math.ceil(attempts / 100); i++) {
     let fullgrid = generateFullGrid(info);
@@ -483,12 +478,12 @@ function run() {
   }
 }
 
-// run();
+run();
 
-let size = 4;
-let info = generateBoardInfo(size);
-let grid = ".1...34........3";
-let board = boardFromGrid(info, grid);
-console.log("test", board);
-let test = search(info, [board]);
-console.log("test", test);
+// let size = 4;
+// let info = generateBoardInfo(size);
+// let grid = ".1...34........3";
+// let board = boardFromGrid(info, grid);
+// console.log("test", board);
+// let test = search(info, [board]);
+// console.log("test", test);

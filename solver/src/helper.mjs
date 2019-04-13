@@ -2,7 +2,7 @@
  * Returns true if and only if one of the calling arguments is null or undefined.
  * For the case of no arguments, it returns false.
  */
-function isNull() {
+export function isNull() {
   return Array.prototype.reduce.call(
     arguments,
     function(result, argument) {
@@ -18,7 +18,7 @@ function isNull() {
  *
  * Usage: if(hasNull(arguments)) {...}
  */
-function hasNull(list) {
+export function hasNull(list) {
   return isNull.apply(null, list);
 }
 
@@ -27,21 +27,21 @@ function hasNull(list) {
  *
  * Usage: let a = fallback(a, "a");
  */
-function fallback(value, fallback) {
+export function fallback(value, fallback) {
   return isNull(value) ? fallback : value;
 }
 
 /**
  * Flatten subarrays.
  */
-function flatten(A) {
+export function flatten(A) {
   return A.reduce((a, b) => a.concat(b));
 }
 
 /**
  * Repeat value n times in an array.
  */
-function repeat(v, n) {
+export function repeat(v, n) {
   let result = [];
   for (let i = 0; i < n; i++) {
     result.push(v);
@@ -56,7 +56,7 @@ function repeat(v, n) {
  *        numbers(1, 3) === [1, 2, 3]
  *        numbers(1, 3, 2) === [1, 3, 5]
  */
-function numbers(start, length, step) {
+export function numbers(start, length, step) {
   if (step === undefined) {
     step = 1;
   }
@@ -76,7 +76,7 @@ function numbers(start, length, step) {
  *        get(object, "a", "b") === object["a"]["b"] || null  (without acccess exceptions)
  */
 // TODO implement with exception handling and object case
-function get() {
+export function get() {
   if (hasNull(arguments) || arguments.length < 2) {
     return null;
   }
@@ -98,7 +98,7 @@ function get() {
  * Usage: capitalize("hello") === "Hello"
  *        capitalize("hello world") === "Hello world"
  */
-function capitalize(s) {
+export function capitalize(s) {
   return typeof s === "string" && s.length > 0
     ? s.charAt(0).toUpperCase() + s.slice(1)
     : null;
@@ -107,7 +107,7 @@ function capitalize(s) {
 /**
  * Shuffle an array in place.
  */
-function shuffle(a) {
+export function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
@@ -157,7 +157,7 @@ function sfc32(a, b, c, d) {
 //TODO rewrite so that helper.js holds no state and instead returns a rand from an optional seed. This rand can be
 //     passed into convenience functions like shuffle.
 let _rand;
-function seedRand(seed) {
+export function seedRand(seed) {
   let hash = xmur3(seed);
   _rand = sfc32(hash(), hash(), hash(), hash());
 }
@@ -166,10 +166,6 @@ seedRand(Math.random().toString());
 /**
  * Get pseudo-random numbers between 0 and 1.
  */
-function rand() {
+export function rand() {
   return _rand();
-}
-
-module.exports = {
-  flatten, numbers, shuffle, repeat, seedRand
 }
