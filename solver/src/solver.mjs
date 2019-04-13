@@ -438,12 +438,10 @@ function generateGridsPack(minSize) {
       if (grid !== null) {
         i++;
         solutions.push(grid);
+        boardPacks[size] = solutions
+        writeFileSync("./gridsPack.json", JSON.stringify(boardPacks, null, 2));
       }
     }
-
-    console.log("finished", numBoards, "solutions");
-    boardPacks[size] = solutions
-    writeFileSync("./gridsPack.json", JSON.stringify(boardPacks, null, 2));
   }
 }
 
