@@ -20,6 +20,7 @@
  * A `grid` is the internal representation where all fields are numbered from top left to bottom right.
  * 
  */
+import { writeFileSync } from "fs"
 import { flatten, numbers, shuffle, repeat, seedRand } from "./helper"
 
 const EMPTY_CHAR = ".";
@@ -459,26 +460,33 @@ export function nextGenerate(info, attempts) {
   return grid;
 }
 
-
-function run() {
-  seedRand(Math.random().toString());
-  let attempts = 3000;
-  for (let size = 4; size <= 16; size++) {
+function generateGridsPack(minSize) {
+  seedRand("42");
+  let numBoards = 20;
+  let attempts = 500;
+  let boardPacks = {};
+  for (let size = minSize; size <= 25; size++) {
     let info = generateBoardInfo(size);
     if (info === null) {
       continue;
     }
 
-    let grid = nextGenerate(info, attempts);
-    if (grid !== null) {
-      console.log("happy face", grid);
-    } else {
-      console.log("sad face after", attempts, "attempts");
+    let solutions = [];
+    for (let i = 0; i < numBoards;) {
+      let grid = nextGenerate(info, attempts);
+      if (grid !== null) {
+        i++;
+        solutions.push(grid);
+      }
     }
+
+    console.log("finished", numBoards, "solutions");
+    boardPacks[size] = solutions
+    writeFileSync("./gridsPack.json", JSON.stringify(boardPacks, null, 2));
   }
 }
 
-run();
+generateGridsPack(4);
 
 // let size = 4;
 // let info = generateBoardInfo(size);
