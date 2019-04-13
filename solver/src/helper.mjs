@@ -105,9 +105,9 @@ export function capitalize(s) {
 }
 
 /**
- * Measurement to track time and number of calls.
+ * Counter to track time and number of calls.
  */
-export class Measure {
+export class Counter {
   constructor(name) {
     let now = new Date();
     this.calls = 1;
@@ -118,8 +118,14 @@ export class Measure {
 
   log() {
     let now = new Date();
-    console.log(`${this.name} | total ${now - this.startTime} | delta ${now - this.lastCallTime} | calls ${this.calls++}`);
+    let log = `${this.name} | total ${now - this.startTime}ms | delta ${now - this.lastCallTime}ms | calls ${this.calls++}`;
+    if (arguments.length > 0) {
+      log = Array.prototype.reduce.call(arguments, (result, argument) => {
+        return `${result} | ${argument}`;
+      }, log);
+    }
     this.lastCallTime = now;
+    console.log(log);
   }
 }
 

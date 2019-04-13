@@ -21,19 +21,18 @@
  * 
  */
 import { writeFileSync } from "fs"
-import { flatten, numbers, repeat, Measure, PRNG } from "./helper"
+import { flatten, numbers, repeat, Counter, PRNG } from "./helper"
 
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
 const MAX_SEARCH_BOARDS = 5;
 const HINT_QUOTIENT = 1 / 5;
 // const HINT_QUOTIENT = 1/4.5;
-let timestart = new Date();
 
 /**
  * Generate all static information about a Sudoku board given its size.
  */
-export function generateBoardInfo(randomness, size) {
+export function generateBoardInfo(size, randomness) {
   let width = _widthForSize(size);
   let height = size / width;
   let cells = size * size;
@@ -367,38 +366,7 @@ function search(info, listOfValues) {
   return search(info, newListOfValues);
 }
 
-/**
- * Old school generate. Not really where it's at.
- */
-function generate(info, attempts) {
-  let fullGrid = generateFullGrid(info);
-  // console.log("fullGrid", fullGrid);
-  let attempt = 1;
-
-  for (; attempt < attempts; attempt++) {
-    let grid = generateHintGrid(info, fullGrid);
-    // console.log("hintGrid", grid);
-    // grid = ".......13...2............8....76.2....8...4...1.......2.....75.6..34.........8...";
-    // if (attempt % 1000 === 0) {
-    //   console.log("attempt", attempt, "grid", grid);
-    // }
-    let board = boardFromGrid(info, grid);
-    let solutions = search(info, [board]);
-    if (solutions !== null) {
-      return {
-        attempt,
-        grid,
-        solutions
-      };
-    }
-  }
-  return {
-    attempt
-  };
-}
-
 function hasUniqueSolution(info, searchInfo, board, fullGrid) {
-  // console.log("hasUniqueSolution");
   if (searchInfo.solved) {
     return true;
   }
@@ -419,18 +387,16 @@ function _emptyAtPos(grid, pos) {
   return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
 }
 
-let attemptMeasure = new Measure("attemptloop");
+let successCounter = new Counter("success");
 export function nextGenerate(info, attempts) {
-  // console.log("nextGenerate", "timediff", new Date() - timestart, "calls", nextGenCalls++);
   let fullGrid = generateFullGrid(info);
   let positions = info.randomness.shuffle(numbers(0, info.cells));
   let grid = fullGrid;
   let lastLenght = positions.length;
 
   for (let attempt = 0; attempt < attempts; attempt++) {
-    attemptMeasure.log();
     if (positions.length <= info.hints) {
-      console.log("success on attempt", attempt + 1);
+      successCounter.log(`attempt ${attempt + 1}`);
       return grid;
     }
     let newGrid = _emptyAtPos(grid, positions[0]);
@@ -458,22 +424,19 @@ export function nextGenerate(info, attempts) {
 function generateGridsPack(minSize) {
   let randomness = new PRNG("42");
   let numBoards = 20;
-  let attempts = 300;
+  let attempts = 500;
   let boardPacks = {};
   for (let size = minSize; size <= 25; size++) {
-    let info = generateBoardInfo(randomness, size);
+    let info = generateBoardInfo(size, randomness);
     if (info === null) {
       continue;
     }
 
     let solutions = [];
-    let calls = 0;
     for (let i = 0; i < numBoards;) {
-      console.log("nextGen", calls++);
       let grid = nextGenerate(info, attempts);
       if (grid !== null) {
         i++;
-        console.log("timediff", new Date() - timestart);
         solutions.push(grid);
       }
     }
@@ -484,19 +447,4 @@ function generateGridsPack(minSize) {
   }
 }
 
-// let size = 10;
-// let info = generateBoardInfo(size);
-// let newGrid = "........5....2.4.A...8..5.........3...7.9.A.....2.....6........5...........8........1....86.9.7....1";
-// let board = boardFromGrid(info, newGrid);
-// let searchInfo = searchInfoFromBoard(info, board);
-// let x = hasUniqueSolution(info, searchInfo, board, fullGrid);
-
 generateGridsPack(10);
-
-// let size = 4;
-// let info = generateBoardInfo(size);
-// let grid = ".1...34........3";
-// let board = boardFromGrid(info, grid);
-// console.log("test", board);
-// let test = search(info, [board]);
-// console.log("test", test);
