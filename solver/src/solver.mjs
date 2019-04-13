@@ -21,7 +21,7 @@
  * 
  */
 import { writeFileSync } from "fs"
-import { flatten, numbers, shuffle, repeat, seedRand, Measure } from "./helper"
+import { flatten, numbers, repeat, Measure, PRNG } from "./helper"
 
 const EMPTY_CHAR = ".";
 const MAX_SEARCH_SPREAD = 2;
@@ -33,7 +33,7 @@ let timestart = new Date();
 /**
  * Generate all static information about a Sudoku board given its size.
  */
-export function generateBoardInfo(size) {
+export function generateBoardInfo(randomness, size) {
   let width = _widthForSize(size);
   let height = size / width;
   let cells = size * size;
@@ -64,6 +64,7 @@ export function generateBoardInfo(size) {
   }
 
   return {
+    randomness,
     width,
     height,
     size,
@@ -251,7 +252,7 @@ function searchInfoFromBoard(info, board) {
  */
 function generateHintGrid(info, fullGrid) {
   let grid = fullGrid.split("");
-  let positions = shuffle(numbers(0, info.cells));
+  let positions = info.randomness.shuffle(numbers(0, info.cells));
   for (let i = 0; i < info.empties; i++) {
     grid[positions[i]] = EMPTY_CHAR;
   }
@@ -270,7 +271,7 @@ function searchAnySolution(info, board) {
   if (searchInfo.solved) {
     return board;
   }
-  let searchValues = shuffle(board[searchInfo.position].split(""));
+  let searchValues = info.randomness.shuffle(board[searchInfo.position].split(""));
   for (let i = 0; i < searchValues.length; i++) {
     let newBoard = Object.assign({}, board);
     newBoard = assign(info, newBoard, searchInfo.position, searchValues[i]);
@@ -288,7 +289,7 @@ function searchAnySolution(info, board) {
 
 function generateFullGrid(info) {
   // console.log("generateFullGrid");
-  let baseGrid = shuffle(numbers(1, info.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(info.cells - info.size);
+  let baseGrid = info.randomness.shuffle(numbers(1, info.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(info.cells - info.size);
   let baseBoard = boardFromGrid(info, baseGrid);
   let solution = searchAnySolution(info, baseBoard)
   return gridFromBoard(info, solution);
@@ -422,7 +423,7 @@ let attemptMeasure = new Measure("attemptloop");
 export function nextGenerate(info, attempts) {
   // console.log("nextGenerate", "timediff", new Date() - timestart, "calls", nextGenCalls++);
   let fullGrid = generateFullGrid(info);
-  let positions = shuffle(numbers(0, info.cells));
+  let positions = info.randomness.shuffle(numbers(0, info.cells));
   let grid = fullGrid;
   let lastLenght = positions.length;
 
@@ -445,7 +446,7 @@ export function nextGenerate(info, attempts) {
         lastLenght = positions.length;
         // console.log("reached", lastLenght, "hints");
       }
-      positions = shuffle(positions);
+      positions = info.randomness.shuffle(positions);
       attempt++;
       continue;
     }
@@ -455,12 +456,12 @@ export function nextGenerate(info, attempts) {
 
 
 function generateGridsPack(minSize) {
-  seedRand("42");
+  let randomness = new PRNG("42");
   let numBoards = 20;
   let attempts = 300;
   let boardPacks = {};
   for (let size = minSize; size <= 25; size++) {
-    let info = generateBoardInfo(size);
+    let info = generateBoardInfo(randomness, size);
     if (info === null) {
       continue;
     }
@@ -482,6 +483,13 @@ function generateGridsPack(minSize) {
     writeFileSync("./gridsPack.json", JSON.stringify(boardPacks, null, 2));
   }
 }
+
+// let size = 10;
+// let info = generateBoardInfo(size);
+// let newGrid = "........5....2.4.A...8..5.........3...7.9.A.....2.....6........5...........8........1....86.9.7....1";
+// let board = boardFromGrid(info, newGrid);
+// let searchInfo = searchInfoFromBoard(info, board);
+// let x = hasUniqueSolution(info, searchInfo, board, fullGrid);
 
 generateGridsPack(10);
 
