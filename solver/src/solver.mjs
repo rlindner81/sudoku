@@ -22,6 +22,7 @@ import { flatten, numbers, repeat } from "./helper"
 
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 5;
+const UNIQUE_CHECK_TIME_LIMIT = 0; // 10min
 
 
 /**
@@ -51,6 +52,7 @@ function Solver(size, shuffle) {
   this.cells = this.size * this.size;
   this.hints = this._hintsForSize();
   this.empties = this.cells - this.hints;
+  this.stopUniqueCheck = false;
 
   // Board of prime size is not sensible
   if (this.width === this.size) {
@@ -74,7 +76,7 @@ function Solver(size, shuffle) {
   }
 }
 
-Solver.prototype.toString = function() {
+Solver.prototype.toString = function () {
   return `size ${this.size} = ${this.width}x${this.height} | hints ${this.hints}`;
 }
 
@@ -82,7 +84,7 @@ Solver.prototype.toString = function() {
  * The appropriate box width for a given board size. Should be the smallest number bigger than the square root of the
  * size that is also divisor.
  */
-Solver.prototype._widthForSize = function() {
+Solver.prototype._widthForSize = function () {
   for (let i = Math.ceil(Math.sqrt(this.size)); i < this.size; i++) {
     if (this.size % i === 0) {
       return i;
@@ -96,11 +98,11 @@ Solver.prototype._widthForSize = function() {
  * Size: 4 => Hints: 4
  * Size: 9 => Hints: 17
  */
-Solver.prototype._hintsForSize = function() {
+Solver.prototype._hintsForSize = function () {
   return Math.ceil(this.size * this.size * HINT_QUOTIENT);
 }
 
-Solver.prototype._boxPositions = function(offsetX, offsetY) {
+Solver.prototype._boxPositions = function (offsetX, offsetY) {
   let indices = [];
   let size = this.width * this.height;
   for (let y = 0; y < this.height; y++) {
@@ -118,7 +120,7 @@ Solver.prototype._boxPositions = function(offsetX, offsetY) {
 /**
  * Return the board associated with a given grid by assigning all non-empty fields.
  */
-Solver.prototype.boardFromGrid = function(grid) {
+Solver.prototype.boardFromGrid = function (grid) {
   let board = {};
   for (let i = 0; i < this.cells; i++) {
     board[i] = this.chars;
@@ -137,7 +139,7 @@ Solver.prototype.boardFromGrid = function(grid) {
 /**
  * Return the grid associated with a board. Only cells with a unique value will be non-empty in the grid.
  */
-Solver.prototype.gridFromBoard = function(board) {
+Solver.prototype.gridFromBoard = function (board) {
   let grid = new Array(this.cells);
   for (let i = 0; i < this.cells; i++) {
     grid[i] = board[i].length === 1 ? board[i] : EMPTY_CHAR;
@@ -148,7 +150,7 @@ Solver.prototype.gridFromBoard = function(board) {
 /**
  * Assign char c to board[position] by eliminating all remaining values.
  */
-Solver.prototype.assign = function(board, position, c) {
+Solver.prototype.assign = function (board, position, c) {
   // console.log("assign", pos, c);
   let remainingValues = board[position].replace(c, "");
   for (let i = 0; i < remainingValues.length; i++) {
@@ -163,7 +165,7 @@ Solver.prototype.assign = function(board, position, c) {
 /**
  * Eliminate char c from board[position] and propagate appropriately.
  */
-Solver.prototype.eliminate = function(board, position, c) {
+Solver.prototype.eliminate = function (board, position, c) {
   // console.log("eliminate", pos, c);
   if (board[position].indexOf(c) === -1) {
     return board;
@@ -212,7 +214,7 @@ Solver.prototype.eliminate = function(board, position, c) {
 /**
  * Given a board find out if it is solved and find the "search" position with the least number of values > 1.
  */
-Solver.prototype.searchInfoFromBoard = function(board) {
+Solver.prototype.searchInfoFromBoard = function (board) {
   let minValuesLength = this.size;
   let maxValuesLength = 0;
   let spread = this.size + 1;
@@ -241,8 +243,13 @@ Solver.prototype.searchInfoFromBoard = function(board) {
 /**
  * Starting form a given board, find any valid solution.
  */
-Solver.prototype.searchAnySolution = function(board) {
+Solver.prototype.searchAnySolution = function (board) {
   if (board === null) {
+    return null;
+  }
+  if (this.stopUniqueCheck) {
+    this.stopUniqueCheck = false;
+    console.log("Uniqueness timeout");
     return null;
   }
   let searchInfo = this.searchInfoFromBoard(board);
@@ -265,7 +272,7 @@ Solver.prototype.searchAnySolution = function(board) {
   return null;
 }
 
-Solver.prototype.generateFullGrid = function() {
+Solver.prototype.generateFullGrid = function () {
   // console.log("generateFullGrid");
   let baseGrid = this.shuffle(numbers(1, this.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(this.cells - this.size);
   let baseBoard = this.boardFromGrid(baseGrid);
@@ -273,10 +280,14 @@ Solver.prototype.generateFullGrid = function() {
   return this.gridFromBoard(solution);
 }
 
-Solver.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
+Solver.prototype.hasUniqueSolution = function (searchInfo, board, fullGrid) {
   if (searchInfo.solved) {
     return true;
   }
+  // let timeout = setTimeout(function () {
+  //   this.stopUniqueCheck = true;
+  // }.bind(this), UNIQUE_CHECK_TIME_LIMIT);
+
   let remainingValues = board[searchInfo.position].replace(fullGrid[searchInfo.position], "");
   for (let i = 0; i < remainingValues.length; i++) {
     let c = remainingValues[i];
@@ -284,9 +295,11 @@ Solver.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
     newBoard[searchInfo.position] = c;
     let solution = this.searchAnySolution(newBoard);
     if (solution !== null) {
+      // clearTimeout(timeout);
       return false;
     }
   }
+  // clearTimeout(timeout);
   return true;
 }
 
@@ -294,7 +307,7 @@ function _emptyAtPos(grid, pos) {
   return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
 }
 
-Solver.prototype.generateHintGrid = function(attempts) {
+Solver.prototype.generateHintGrid = function (attempts) {
   let fullGrid = this.generateFullGrid();
   let positions = this.shuffle(numbers(0, this.cells));
   let grid = fullGrid;

@@ -12,7 +12,7 @@ function generateGridsPack(minSize) {
   let attempts = 500;
   let boardPacks = {};
   for (let size = minSize; size <= 25; size++) {
-    let solver = new Solver(size, prng.rand);
+    let solver = new Solver(size, prng.shuffle.bind(prng));
     if (solver === null) {
       continue;
     }
