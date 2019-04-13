@@ -22,7 +22,7 @@ import { flatten, numbers, repeat } from "./helper"
 
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 5;
-const UNIQUE_CHECK_TIME_LIMIT = 0; // 10min
+const SEARCH_RECURSION_LIMIT = 20;
 
 
 /**
@@ -52,7 +52,6 @@ function Solver(size, shuffle) {
   this.cells = this.size * this.size;
   this.hints = this._hintsForSize();
   this.empties = this.cells - this.hints;
-  this.stopUniqueCheck = false;
 
   // Board of prime size is not sensible
   if (this.width === this.size) {
@@ -243,15 +242,15 @@ Solver.prototype.searchInfoFromBoard = function (board) {
 /**
  * Starting form a given board, find any valid solution.
  */
-Solver.prototype.searchAnySolution = function (board) {
+Solver.prototype.searchAnySolution = function (board, depthLimit = -1, depth = 0) {
   if (board === null) {
     return null;
   }
-  if (this.stopUniqueCheck) {
-    this.stopUniqueCheck = false;
-    console.log("Uniqueness timeout");
-    return null;
+  if (0 <= depthLimit && depthLimit < depth) {
+    console.log("below recursion depth limit at", depth);
+    return board;
   }
+
   let searchInfo = this.searchInfoFromBoard(board);
   if (searchInfo.solved) {
     return board;
@@ -263,8 +262,8 @@ Solver.prototype.searchAnySolution = function (board) {
     if (newBoard === null) {
       continue;
     }
-    // console.log("grid", gridFromBoard(newBoard));
-    newBoard = this.searchAnySolution(newBoard);
+    // console.log("grid", this.gridFromBoard(newBoard));
+    newBoard = this.searchAnySolution(newBoard, depthLimit, depth++);
     if (newBoard !== null) {
       return newBoard;
     }
@@ -276,7 +275,7 @@ Solver.prototype.generateFullGrid = function () {
   // console.log("generateFullGrid");
   let baseGrid = this.shuffle(numbers(1, this.size).map(charFromNum)).join("") + EMPTY_CHAR.repeat(this.cells - this.size);
   let baseBoard = this.boardFromGrid(baseGrid);
-  let solution = this.searchAnySolution(baseBoard)
+  let solution = this.searchAnySolution(baseBoard);
   return this.gridFromBoard(solution);
 }
 
@@ -284,22 +283,17 @@ Solver.prototype.hasUniqueSolution = function (searchInfo, board, fullGrid) {
   if (searchInfo.solved) {
     return true;
   }
-  // let timeout = setTimeout(function () {
-  //   this.stopUniqueCheck = true;
-  // }.bind(this), UNIQUE_CHECK_TIME_LIMIT);
 
   let remainingValues = board[searchInfo.position].replace(fullGrid[searchInfo.position], "");
   for (let i = 0; i < remainingValues.length; i++) {
     let c = remainingValues[i];
     let newBoard = Object.assign({}, board);
     newBoard[searchInfo.position] = c;
-    let solution = this.searchAnySolution(newBoard);
+    let solution = this.searchAnySolution(newBoard, SEARCH_RECURSION_LIMIT);
     if (solution !== null) {
-      // clearTimeout(timeout);
       return false;
     }
   }
-  // clearTimeout(timeout);
   return true;
 }
 

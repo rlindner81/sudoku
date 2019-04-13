@@ -5,9 +5,10 @@ import Solver from "./solver"
 import PRNG from "./prng"
 
 let successCounter = new Counter("success");
+let fullgridCounter = new Counter("fullgrid");
 
 function generateGridsPack(minSize) {
-  let prng = new PRNG("42");
+  let prng = new PRNG("44");
   let numBoards = 20;
   let attempts = 500;
   let boardPacks = {};
@@ -20,6 +21,7 @@ function generateGridsPack(minSize) {
 
     let solutions = [];
     for (let i = 0; i < numBoards;) {
+      // fullgridCounter.log();
       let grid = solver.generateHintGrid(attempts);
       if (grid !== null) {
         successCounter.log();
