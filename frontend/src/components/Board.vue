@@ -28,9 +28,7 @@
 // import Keypad from "@/components/Keypad.vue";
 
 import { isNull, fallback, flatten, numbers } from "@/util/helper.mjs";
-
-import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.mjs";
-
+import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.mjs"; // eslint-disable-line no-unused-vars
 import PRNG from "@/util/PRNG.mjs";
 
 export default {
@@ -125,7 +123,6 @@ export default {
     //
     // === GAME LOGIC ===
     //
-    // 1 => 9! * 2 * 6^4 * 6^4 = 1218998108160 ~= 10^12
     generate(options) {
       options = fallback(options, {});
       let size = fallback(options.size, this.size);
@@ -148,19 +145,19 @@ export default {
 
       this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
 
-      // [
-      //   this.randomRelabel,
-      //   this.randomTranspose,
-      //   this.randomRowPermutation,
-      //   this.randomColumnPermutation
-      // ].forEach(fn => {
-      //   let state = {};
-      //   [hintGrid, fullGrid].forEach(grid => {
-      //     state.grid = grid;
-      //     fn(state);
-      //     grid = state.grid;
-      //   });
-      // });
+      [
+        this.randomRelabel,
+        this.randomTranspose,
+        this.randomRowPermutation,
+        this.randomColumnPermutation
+      ].forEach(fn => {
+        let state = {};
+        [hintGrid, fullGrid].forEach(grid => {
+          state.grid = grid;
+          fn(state);
+          grid = state.grid;
+        });
+      });
 
       this.hintGrid = hintGrid;
       this.fullGrid = fullGrid;
@@ -169,7 +166,8 @@ export default {
     scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid) {
       let hintPositions = this.prng.shuffle(numbers(0, this.sudoku.cells));
       let hints = hintGrid.filter(c => c !== 0).length;
-      let missingHints = Math.ceil(this.sudoku.cells / difficultyQuotient) - hints;
+      let missingHints =
+        Math.ceil(this.sudoku.cells / difficultyQuotient) - hints;
 
       for (let i = 0; i < this.sudoku.cells; i++) {
         let x = hintPositions[i];
@@ -183,27 +181,33 @@ export default {
       }
     },
     randomRelabel(state) {
-      state.labels = fallback(state.labels, shuffle(numbers(0, this.size)));
-      // console.log("before relabel", this.gridFromSquares(state.grid), state.labels);
+      state.labels = fallback(
+        state.labels,
+        this.prng.shuffle(numbers(1, this.size))
+      );
+      // console.log("before relabel", state.grid.map(charFromNum).join(""), state.labels); // eslint-disable-line
 
       for (let i = 0; i < this.sudoku.cells; i++) {
         let value = state.grid[i];
-        if (value !== null) {
-          state.grid[i] = state.labels[value];
+        if (value !== 0) {
+          state.grid[i] = state.labels[value - 1];
         }
       }
 
-      // console.log(" after relabel", this.gridFromSquares(state.grid));
+      // console.log(" after relabel", state.grid.map(charFromNum).join("")); // eslint-disable-line
     },
     randomTranspose(state) {
-      state.transpose = fallback(state.transpose, rand() < 0.5);
-      // console.log("before transpose", this.gridFromSquares(state.grid), state.transpose);
+      if (this.sudoku.width !== this.sudoku.height) {
+        return;
+      }
+      state.transpose = fallback(state.transpose, this.prng.rand() < 0.5);
+      // console.log("before transpose", state.grid.map(charFromNum).join(""), state.transpose); // eslint-disable-line
 
-      if (state.transpose === true) {
-        for (let i = 0; i < this.boardSize; i++) {
+      if (state.transpose) {
+        for (let i = 0; i < this.size; i++) {
           for (let j = 0; j < i; j++) {
-            let x = j + this.boardSize * i;
-            let y = i + this.boardSize * j;
+            let x = j + this.size * i;
+            let y = i + this.size * j;
             let value = state.grid[x];
             state.grid[x] = state.grid[y];
             state.grid[y] = value;
@@ -211,48 +215,50 @@ export default {
         }
       }
 
-      // console.log(" after transpose", this.gridFromSquares(state.grid));
+      // console.log(" after transpose", state.grid.map(charFromNum).join("")); // eslint-disable-line
     },
-    getPermutationIndices() {
+    getPermutationIndices(isRow = true) {
+      let width = isRow ? this.sudoku.width : this.sudoku.height;
+      let height = isRow ? this.sudoku.height : this.sudoku.width;
       let indices = [];
-      for (let i = 0; i < this.boxSize; i++) {
-        indices.push(shuffle(numbers(i * this.boxSize, this.boxSize)));
+      for (let i = 0; i < width; i++) {
+        indices.push(this.prng.shuffle(numbers(i * height, height)));
       }
-      return flatten(shuffle(indices));
+      return flatten(this.prng.shuffle(indices));
     },
     randomRowPermutation(state) {
       if (isNull(state.rows)) {
-        state.rows = this.getPermutationIndices();
+        state.rows = this.getPermutationIndices(true);
       }
-      // console.log("before row permute", this.gridFromSquares(state.grid), state.rows);
+      // console.log("before row permute", state.grid.map(charFromNum).join(""), state.rows); // eslint-disable-line
 
-      let oldSquares = state.grid.slice();
-      for (let i = 0; i < this.boardSize; i++) {
-        for (let j = 0; j < this.boardSize; j++) {
-          let x = j + this.boardSize * i;
-          let y = j + this.boardSize * state.rows[i];
-          state.grid[x] = oldSquares[y];
+      let oldGrid = state.grid.slice();
+      for (let i = 0; i < this.size; i++) {
+        for (let j = 0; j < this.size; j++) {
+          let x = j + this.size * i;
+          let y = j + this.size * state.rows[i];
+          state.grid[x] = oldGrid[y];
         }
       }
 
-      // console.log("after row permute", this.gridFromSquares(state.grid));
+      // console.log(" after row permute", state.grid.map(charFromNum).join("")); // eslint-disable-line
     },
     randomColumnPermutation(state) {
       if (isNull(state.cols)) {
-        state.cols = this.getPermutationIndices();
+        state.cols = this.getPermutationIndices(false);
       }
-      // console.log("before col permute", this.gridFromSquares(state.grid), state.cols);
+      // console.log("before col permute", state.grid.map(charFromNum).join(""), state.cols); // eslint-disable-line
 
-      let oldSquares = state.grid.slice();
-      for (let i = 0; i < this.boardSize; i++) {
-        for (let j = 0; j < this.boardSize; j++) {
-          let x = j + this.boardSize * i;
-          let y = state.cols[j] + this.boardSize * i;
-          state.grid[x] = oldSquares[y];
+      let oldGrid = state.grid.slice();
+      for (let i = 0; i < this.size; i++) {
+        for (let j = 0; j < this.size; j++) {
+          let x = j + this.size * i;
+          let y = state.cols[j] + this.size * i;
+          state.grid[x] = oldGrid[y];
         }
       }
 
-      // console.log("after col permute", this.gridFromSquares(state.grid));
+      // console.log(" after col permute", state.grid.map(charFromNum).join("")); // eslint-disable-line
     },
     // debug() {
     //   let grid = this.gridFromSquares(this.squares);
