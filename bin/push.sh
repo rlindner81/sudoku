@@ -4,7 +4,7 @@ script_dir=`dirname "$script"`
 
 export PROJECT=sudoku
 export NODE_ENV=production
-export BASE_URL=/sudoku/
+export BASE_URL=/
 
 npm run build
 ssh goodnogood.org "mkdir -p /root/nginx-webroot/$PROJECT"
