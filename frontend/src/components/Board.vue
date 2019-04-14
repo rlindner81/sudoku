@@ -31,12 +31,8 @@ import {
   isNull,
   fallback,
   flatten,
-  numbers,
-  shuffle,
-  seedRand,
-  rand
+  numbers
 } from "@/helper";
-import gamespack from "@/data/gamespack.json";
 
 const squareMap = {
   "1": 0,

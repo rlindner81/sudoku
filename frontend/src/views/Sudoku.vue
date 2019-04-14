@@ -41,9 +41,8 @@
 <script>
 import Board from "@/components/Board.vue";
 import { fallback } from "@/helper";
-import { run } from "@/solver";
 
-import gamespack from "@/data/gamespack.json";
+import gridspack from "@/data/gridspack.json";
 // https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
 import symbolspack from "@/data/symbolspack.json";
 
