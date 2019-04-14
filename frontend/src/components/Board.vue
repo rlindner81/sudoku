@@ -31,6 +31,9 @@ import { isNull, fallback, flatten, numbers } from "@/util/helper.mjs";
 import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.mjs"; // eslint-disable-line no-unused-vars
 import PRNG from "@/util/PRNG.mjs";
 
+// import Counter from "@/util/Counter.mjs";
+// const generateCounter = new Counter("generate");
+
 export default {
   name: "Board",
   components: {
@@ -117,7 +120,11 @@ export default {
           };
     },
     displayCell(value) {
-      return value === 0 ? "" : this.symbols[value - 1];
+      return value === 0
+        ? ""
+        : value <= this.symbols.length
+        ? this.symbols[value - 1]
+        : value;
     },
 
     //
@@ -310,7 +317,6 @@ $border-square: 2px solid lightgray;
   @media screen and (min-width: 1000px) {
     font-size: calc(2 * 10px);
   }
-  &.size-18,
   &.size-16,
   &.size-15,
   &.size-14 {
