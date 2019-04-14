@@ -93,24 +93,26 @@ export default {
 
     let size = parseInt(query.size);
     query.size =
-      !isNaN(size) && this.sizes().indexOf(size) !== -1 ? size : DEFAULT_SIZE;
+      !isNaN(size) && this.sizes.indexOf(size) !== -1 ? size : DEFAULT_SIZE;
     this.size = query.size;
 
     let difficulty = query.difficulty;
     query.difficulty =
-      !isNull(difficulty) && this.difficulties().indexOf(difficulty) !== -1
+      !isNull(difficulty) && this.difficulties.indexOf(difficulty) !== -1
         ? difficulty
         : DEFAULT_DIFFICULTY;
     this.difficulty = query.difficulty;
 
     let symbols = query.symbols;
     query.symbols =
-      !isNull(symbols) && this.symbolnames().indexOf(symbols) !== -1
+      !isNull(symbols) && this.symbolnames.indexOf(symbols) !== -1
         ? symbols
         : DEFAULT_SYMBOLS;
     this.symbols = query.symbols;
 
-    query.seed = fallback(query.seed, this.randomSeed());
+    let seed = query.seed;
+    query.seed =
+      !isNull(seed) && seed.match(/^\d{8}$/) ? seed : this.randomSeed();
     this.seed = query.seed;
 
     this.$router.replace({ query });
