@@ -25,14 +25,14 @@
 </template>
 
 <script>
-// import Keypad from "@/components/Keypad.vue";
+// import Keypad from "@/components/Keypad";
 
 import {
   isNull,
   fallback,
   flatten,
   numbers
-} from "@/helper";
+} from "@/util/helper";
 
 const squareMap = {
   "1": 0,

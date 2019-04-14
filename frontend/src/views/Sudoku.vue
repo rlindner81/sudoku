@@ -39,12 +39,12 @@
 </template>
 
 <script>
-import Board from "@/components/Board.vue";
-import { fallback } from "@/helper";
+import Board from "@/components/Board";
+import { fallback } from "@/util/helper";
 
-import gridspack from "@/data/gridspack.json";
+import gridspack from "@/data/gridspack";
 // https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
-import symbolspack from "@/data/symbolspack.json";
+import symbolspack from "@/data/symbolspack";
 
 export default {
   name: "Sudoku",
