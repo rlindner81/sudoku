@@ -1,3 +1,26 @@
+const TIME_UNITS = Object.entries({
+  ms: 1000,
+  sec: 60,
+  min: 60,
+  hour: 24,
+  day: null
+});
+
+function timeDiffToString(timeDiff) {
+  let unit;
+  for (let i = 0; i < TIME_UNITS.length; i++) {
+    unit = TIME_UNITS[i][0];
+    let limit = TIME_UNITS[i][1];
+
+    if (limit !== null && limit <= timeDiff) {
+      timeDiff = timeDiff / limit;
+    } else {
+      break;
+    }
+  }
+  return `${timeDiff % 1 !== 0 ? timeDiff.toFixed(1) : timeDiff} ${unit}`;
+}
+
 /**
  * Counter to track time and number of calls.
  */
@@ -13,8 +36,8 @@ Counter.prototype.log = function(additionalLogs) {
   let now = new Date();
   let logs = [
     this.name,
-    `total ${now - this.startTime}ms`,
-    `delta ${now - this.lastCallTime}ms`,
+    `total ${timeDiffToString(now - this.startTime)}`,
+    `delta ${timeDiffToString(now - this.lastCallTime)}`,
     `call ${this.calls++}`
   ];
   if (additionalLogs) {
