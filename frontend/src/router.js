@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Sudoku from "./views/Sudoku";
+import Sudoku from "./views/Sudoku.vue";
 
 Vue.use(Router);
 

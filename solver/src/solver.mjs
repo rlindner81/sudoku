@@ -18,7 +18,7 @@
  *   -----------------
  *
  */
-import { flatten, numbers, repeat } from "./helper"
+import { flatten, numbers, repeat } from "./helper.mjs"
 
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 5;

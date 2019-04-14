@@ -17,7 +17,7 @@
  *   -----------------
  *
  */
-import { flatten, numbers } from "./helper";
+import { flatten, numbers } from "./helper.mjs";
 
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 5;
@@ -61,14 +61,13 @@ export function isValidSize(size) {
 /**
  * Generate all static information about a Sudoku board given its size.
  */
-function Sudoku(size, shuffle) {
+function Sudoku(size, prng) {
   this.size = size;
-  this.shuffle = shuffle;
+  this.prng = prng;
   this.width = this._widthForSize();
   this.height = this.size / this.width;
   this.cells = this.size * this.size;
   this.hints = this._hintsForSize();
-  this.difficulties = this._difficultiesForSize();
   this.empties = this.cells - this.hints;
 
   this.chars = numbers(1, this.size)
@@ -276,7 +275,7 @@ Sudoku.prototype.searchAnySolution = function(
   if (searchInfo.solved) {
     return board;
   }
-  let searchValues = this.shuffle(board[searchInfo.position].split(""));
+  let searchValues = this.prng.shuffle(board[searchInfo.position].split(""));
   for (let i = 0; i < searchValues.length; i++) {
     let newBoard = Object.assign({}, board);
     newBoard = this.assign(newBoard, searchInfo.position, searchValues[i]);
@@ -295,7 +294,7 @@ Sudoku.prototype.searchAnySolution = function(
 Sudoku.prototype.generateFullGrid = function() {
   // console.log("generateFullGrid");
   let baseGrid =
-    this.shuffle(numbers(1, this.size).map(charFromNum)).join("") +
+    this.prng.shuffle(numbers(1, this.size).map(charFromNum)).join("") +
     EMPTY_CHAR.repeat(this.cells - this.size);
   let baseBoard = this.boardFromGrid(baseGrid);
   let solution = this.searchAnySolution(baseBoard);
@@ -327,7 +326,7 @@ function _emptyAtPos(grid, pos) {
 
 Sudoku.prototype.generateHintGrid = function(attempts) {
   let fullGrid = this.generateFullGrid();
-  let positions = this.shuffle(numbers(0, this.cells));
+  let positions = this.prng.shuffle(numbers(0, this.cells));
   let grid = fullGrid;
   let lastLenght = positions.length;
 
@@ -348,7 +347,7 @@ Sudoku.prototype.generateHintGrid = function(attempts) {
         lastLenght = positions.length;
         // console.log("reached", lastLenght, "hints");
       }
-      positions = this.shuffle(positions);
+      positions = this.prng.shuffle(positions);
       attempt++;
       continue;
     }

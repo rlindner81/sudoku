@@ -40,13 +40,13 @@
 </template>
 
 <script>
-import Board from "@/components/Board";
-import { isNull, fallback } from "@/util/helper";
+import Board from "@/components/Board.vue";
+import { isNull, fallback } from "@/util/helper.mjs";
 
-import gridspack from "@/data/gridspack";
-import difficulties from "@/data/difficulties";
+import gridspack from "@/data/gridspack.json";
+import difficulties from "@/data/difficulties.json";
 // https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
-import symbolspack from "@/data/symbolspack";
+import symbolspack from "@/data/symbolspack.json";
 
 const DEFAULT_SIZE = 9;
 const DEFAULT_DIFFICULTY = "hard";

@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { isNull } from "@/util/helper";
+import { isNull } from "@/util/helper.mjs";
 
 export default {
   name: "Keypad",

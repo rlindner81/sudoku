@@ -25,13 +25,13 @@
 </template>
 
 <script>
-// import Keypad from "@/components/Keypad";
+// import Keypad from "@/components/Keypad.vue";
 
-import { isNull, fallback, flatten, numbers } from "@/util/helper";
+import { isNull, fallback, flatten, numbers } from "@/util/helper.mjs";
 
-import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku";
+import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.mjs";
 
-import PRNG from "@/util/PRNG";
+import PRNG from "@/util/PRNG.mjs";
 
 export default {
   name: "Board",
@@ -63,6 +63,7 @@ export default {
   data() {
     return {
       prng: null,
+      sudoku: null,
       hintGrid: null,
       fullGrid: null,
       board: null
@@ -90,6 +91,7 @@ export default {
   },
   created() {
     this.prng = new PRNG(this.seed);
+    this.sudoku = new Sudoku(this.size, this.prng);
     this.generate();
   },
   methods: {
