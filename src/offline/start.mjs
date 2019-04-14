@@ -5,7 +5,7 @@ import Counter from "./../util/Counter.mjs";
 import { default as Sudoku, isValidSize } from "./../util/Sudoku.mjs";
 import PRNG from "./../util/PRNG.mjs";
 
-let successCounter = new Counter("success");
+const successCounter = new Counter("success");
 
 function generateGridsPack(minSize) {
   let prng = new PRNG("42");
@@ -28,7 +28,10 @@ function generateGridsPack(minSize) {
         i++;
         solutions.push(grid);
         boardPacks[size] = solutions;
-        writeFileSync("./gridsPack.json", JSON.stringify(boardPacks, null, 2));
+        writeFileSync(
+          "./newGridsPack.json",
+          JSON.stringify(boardPacks, null, 2)
+        );
       }
     }
   }
