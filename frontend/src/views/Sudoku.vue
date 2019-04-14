@@ -171,7 +171,7 @@ $accent-font-color: white;
       margin: 0.5rem;
       padding: 0.125rem 1rem;
       background: rgba($accent-color, 0.75);
-      width: 8rem;
+      min-width: 8rem;
       color: $accent-font-color;
       box-shadow: none;
       border: 1px solid darken($accent-color, 10%);
