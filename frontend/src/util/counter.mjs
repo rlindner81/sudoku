@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Counter to track time and number of calls.
  */
@@ -24,6 +23,7 @@ Counter.prototype.log = function() {
     );
   }
   this.lastCallTime = now;
+  // eslint-disable-next-line no-console
   console.log(log);
 };
 
