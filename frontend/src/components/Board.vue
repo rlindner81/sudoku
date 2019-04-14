@@ -8,7 +8,7 @@
           :class="getColumnClasses(i, j)"
           @click="onClick($event, j + size * i)"
         >
-          {{ displaySquare(squares[j + size * i]) }}
+          {{ displayCell(board[j + size * i]) }}
         </td>
       </tr>
     </table>
@@ -74,16 +74,19 @@ export default {
   computed: {
     selectedSquare() {
       return this.selectedPosition !== null
-        ? this.squares[this.selectedPosition]
+        ? this.board[this.selectedPosition]
         : null;
     }
   },
   watch: {
     size: function(newVal) {
-      this.generate({ boxSize: newVal });
+      this.sudoku = new Sudoku(newVal, this.prng);
+      this.generate({ size: newVal });
     },
     seed: function(newVal) {
-      this.generate({ seed: newVal });
+      this.prng = new PRNG(newVal);
+      this.sudoku = new Sudoku(this.size, this.prng);
+      this.generate();
     },
     difficultyQuotient: function(newVal) {
       this.generate({ difficultyQuotient: newVal });
@@ -98,25 +101,14 @@ export default {
     //
     // === DISPLAY ===
     //
-    squaresFromGrid(grid) {
-      let squares = [];
-      for (let i = 0; i < this.squareSize; i++) {
-        let value = grid[i];
-        squares.push(value === "." ? null : squareMap[value]);
-      }
-      return squares;
-    },
-    gridFromSquares(squares) {
-      return squares.map(value => (value === null ? "." : value + 1)).join("");
-    },
     getBoardClasses() {
       return {
         board: true,
-        [`size-${this.boxSize}`]: true
+        [`size-${this.size}`]: true
       };
     },
     getRowClasses(i) {
-      return i === 0 || i % this.boxSize !== 0
+      return i === 0 || i % this.sudoku.height !== 0
         ? { row: true }
         : {
             row: true,
@@ -124,15 +116,15 @@ export default {
           };
     },
     getColumnClasses(i, j) {
-      return j === 0 || j % this.boxSize !== 0
+      return j === 0 || j % this.sudoku.width !== 0
         ? { column: true }
         : {
             column: true,
             "border-box-left": true
           };
     },
-    displaySquare(value) {
-      return isNull(value) ? "" : this.symbols[value];
+    displayCell(value) {
+      return value === 0 ? "" : this.symbols[value - 1];
     },
 
     //
@@ -141,87 +133,87 @@ export default {
     // 1 => 9! * 2 * 6^4 * 6^4 = 1218998108160 ~= 10^12
     generate(options) {
       options = fallback(options, {});
-      let difficulty = fallback(options.difficulty, this.difficulty);
-      let seed = fallback(options.seed, this.seed);
-      let boxSize = fallback(options.boxSize, this.boxSize);
+      let size = fallback(options.size, this.size);
+      let difficultyQuotient = fallback(
+        options.difficultyQuotient,
+        this.difficultyQuotient
+      );
 
-      seedRand(difficulty + seed);
+      let grid = this.grids[Math.floor(this.prng.rand() * this.grids.length)];
+      let hintBoard = this.sudoku.boardFromGrid(grid);
+      let fullBoard = this.sudoku.searchAnySolution(hintBoard);
+      let hintGrid = grid.split("").map(numFromChar);
+      let fullGrid = this.sudoku
+        .gridFromBoard(fullBoard)
+        .split("")
+        .map(numFromChar);
 
-      let games = gamespack[`size-${boxSize}`].games;
-      let game = games[Math.floor(rand() * games.length)];
-      let startSquares = this.squaresFromGrid(game[0]);
-      let endSquares = this.squaresFromGrid(game[1]);
+      // this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
 
-      this.scaleDifficulty(boxSize, difficulty, startSquares, endSquares);
+      // [
+      //   this.randomRelabel,
+      //   this.randomTranspose,
+      //   this.randomRowPermutation,
+      //   this.randomColumnPermutation
+      // ].forEach(fn => {
+      //   let state = {};
+      //   [hintGrid, fullGrid].forEach(grid => {
+      //     state.grid = grid;
+      //     fn(state);
+      //     grid = state.grid;
+      //   });
+      // });
 
-      [
-        this.randomRelabel,
-        this.randomTranspose,
-        this.randomRowPermutation,
-        this.randomColumnPermutation
-      ].forEach(fn => {
-        let state = {};
-        [startSquares, endSquares].forEach(squares => {
-          state.squares = squares;
-          fn(state);
-          squares = state.squares;
-        });
-      });
-
-      this.startSquares = startSquares;
-      this.endSquares = endSquares;
-      this.squares = startSquares.slice();
+      this.hintGrid = hintGrid;
+      this.fullGrid = fullGrid;
+      this.board = hintGrid.slice();
     },
-    scaleDifficulty(boxSize, difficulty, startSquares, endSquares) {
-      let hintPositions = shuffle(numbers(0, this.squareSize));
-      let hints = startSquares.filter(s => s !== null).length;
-      let missingHints =
-        gamespack[`size-${boxSize}`].difficulties[difficulty] - hints;
+    scaleDifficulty(size, difficulty, hintGrid, fullGrid) {
+      let hintPositions = this.prgn.shuffle(numbers(0, this.sudoku.cells));
+      let hints = hintGrid.filter(c => c !== null).length;
+      let empties = this.sudoku.empties;
 
-      for (let i = 0; i < this.squareSize; i++) {
+      for (let i = 0; i < this.sudoku.cells; i++) {
         let x = hintPositions[i];
-        if (startSquares[x] !== null) {
+        if (hintGrid[x] !== null) {
           continue;
         }
-        startSquares[x] = endSquares[x];
-        if (--missingHints <= 0) {
+        hintGrid[x] = fullGrid[x];
+        if (--empties <= 0) {
           break;
         }
       }
     },
     randomRelabel(state) {
-      state.labels = fallback(
-        state.labels,
-        shuffle(numbers(0, this.boardSize))
-      );
-      // console.log("before relabel", this.gridFromSquares(state.squares), state.labels);
+      state.labels = fallback(state.labels, shuffle(numbers(0, this.size)));
+      // console.log("before relabel", this.gridFromSquares(state.grid), state.labels);
 
-      for (let i = 0; i < this.squareSize; i++) {
-        let value = state.squares[i];
+      for (let i = 0; i < this.sudoku.cells; i++) {
+        let value = state.grid[i];
         if (value !== null) {
-          state.squares[i] = state.labels[value];
+          state.grid[i] = state.labels[value];
         }
       }
 
-      // console.log(" after relabel", this.gridFromSquares(state.squares));
+      // console.log(" after relabel", this.gridFromSquares(state.grid));
     },
     randomTranspose(state) {
       state.transpose = fallback(state.transpose, rand() < 0.5);
-      // console.log("before transpose", this.gridFromSquares(state.squares), state.transpose);
+      // console.log("before transpose", this.gridFromSquares(state.grid), state.transpose);
 
       if (state.transpose === true) {
         for (let i = 0; i < this.boardSize; i++) {
           for (let j = 0; j < i; j++) {
             let x = j + this.boardSize * i;
             let y = i + this.boardSize * j;
-            let value = state.squares[x];
-            state.squares[x] = state.squares[y];
-            state.squares[y] = value;
+            let value = state.grid[x];
+            state.grid[x] = state.grid[y];
+            state.grid[y] = value;
           }
         }
       }
 
-      // console.log(" after transpose", this.gridFromSquares(state.squares));
+      // console.log(" after transpose", this.gridFromSquares(state.grid));
     },
     getPermutationIndices() {
       let indices = [];
@@ -234,47 +226,47 @@ export default {
       if (isNull(state.rows)) {
         state.rows = this.getPermutationIndices();
       }
-      // console.log("before row permute", this.gridFromSquares(state.squares), state.rows);
+      // console.log("before row permute", this.gridFromSquares(state.grid), state.rows);
 
-      let oldSquares = state.squares.slice();
+      let oldSquares = state.grid.slice();
       for (let i = 0; i < this.boardSize; i++) {
         for (let j = 0; j < this.boardSize; j++) {
           let x = j + this.boardSize * i;
           let y = j + this.boardSize * state.rows[i];
-          state.squares[x] = oldSquares[y];
+          state.grid[x] = oldSquares[y];
         }
       }
 
-      // console.log("after row permute", this.gridFromSquares(state.squares));
+      // console.log("after row permute", this.gridFromSquares(state.grid));
     },
     randomColumnPermutation(state) {
       if (isNull(state.cols)) {
         state.cols = this.getPermutationIndices();
       }
-      // console.log("before col permute", this.gridFromSquares(state.squares), state.cols);
+      // console.log("before col permute", this.gridFromSquares(state.grid), state.cols);
 
-      let oldSquares = state.squares.slice();
+      let oldSquares = state.grid.slice();
       for (let i = 0; i < this.boardSize; i++) {
         for (let j = 0; j < this.boardSize; j++) {
           let x = j + this.boardSize * i;
           let y = state.cols[j] + this.boardSize * i;
-          state.squares[x] = oldSquares[y];
+          state.grid[x] = oldSquares[y];
         }
       }
 
-      // console.log("after col permute", this.gridFromSquares(state.squares));
+      // console.log("after col permute", this.gridFromSquares(state.grid));
     },
     // debug() {
     //   let grid = this.gridFromSquares(this.squares);
     //   let state = { squares: Array.from(grid), cols: [1,0,3,2,4,5,6,7,8] };
     //   this.randomColumnPermutation(state);
-    //   this.squares = this.squaresFromGrid(this.gridFromSquares(state.squares));
+    //   this.squares = this.squaresFromGrid(this.gridFromSquares(state.grid));
     // },
     solve() {
-      this.squares = this.endSquares.slice();
+      this.board = this.fullGrid.slice();
     },
     reset() {
-      this.squares = this.startSquares.slice();
+      this.board = this.hintGrid.slice();
     },
 
     //
@@ -310,20 +302,33 @@ $border-square: 2px solid lightgray;
   text-align: center;
   user-select: none;
 
-  font-size: 5vw;
+  font-size: 2vw;
   @media screen and (min-width: 1000px) {
-    font-size: calc(5 * 10px);
+    font-size: calc(2 * 10px);
   }
-  &.size-2 {
-    font-size: 10vw;
-    @media screen and (min-width: 1000px) {
-      font-size: calc(10 * 10px);
-    }
-  }
-  &.size-4 {
+  &.size-18,
+  &.size-16,
+  &.size-15,
+  &.size-14 {
     font-size: 3.2vw;
     @media screen and (min-width: 1000px) {
       font-size: calc(3.2 * 10px);
+    }
+  }
+  &.size-12,
+  &.size-10,
+  &.size-9,
+  &.size-8 {
+    font-size: 5vw;
+    @media screen and (min-width: 1000px) {
+      font-size: calc(5 * 10px);
+    }
+  }
+  &.size-6,
+  &.size-4 {
+    font-size: 10vw;
+    @media screen and (min-width: 1000px) {
+      font-size: calc(10 * 10px);
     }
   }
 
