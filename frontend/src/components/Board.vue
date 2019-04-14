@@ -306,6 +306,11 @@ $border-board: 4px solid black;
 $border-box: 3px solid darkgray;
 $border-square: 2px solid lightgray;
 
+$small-width: 800px;
+$border-board-small: 3px solid black;
+$border-box-small: 2px solid darkgray;
+$border-square-small: 1px solid lightgray;
+
 .board {
   border-collapse: collapse;
   table-layout: fixed;
@@ -344,26 +349,48 @@ $border-square: 2px solid lightgray;
 
   .row:first-child .column {
     border-top: $border-board;
+    @media screen and (max-width: $small-width) {
+      border-top: $border-board-small;
+    }
   }
   .row .column:first-child {
     border-left: $border-board;
+    @media screen and (max-width: $small-width) {
+      border-left: $border-board-small;
+    }
   }
   .row:last-child .column {
     border-bottom: $border-board;
+    @media screen and (max-width: $small-width) {
+      border-bottom: $border-board-small;
+    }
   }
   .row .column:last-child {
     border-right: $border-board;
+    @media screen and (max-width: $small-width) {
+      border-right: $border-board-small;
+    }
   }
   .row.border-box-top {
     border-top: $border-box;
+    @media screen and (max-width: $small-width) {
+      border-top: $border-box-small;
+    }
   }
   .row .column.border-box-left {
     border-left: $border-box;
+    @media screen and (max-width: $small-width) {
+      border-left: $border-box-small;
+    }
   }
 
   .row {
     .column {
       border: $border-square;
+      @media screen and (max-width: $small-width) {
+        border: $border-square-small;
+      }
+
       line-height: 0;
     }
   }
