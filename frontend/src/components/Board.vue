@@ -80,21 +80,16 @@ export default {
   },
   watch: {
     size: function(newVal) {
-      this.sudoku = new Sudoku(newVal, this.prng);
       this.generate({ size: newVal });
     },
     seed: function(newVal) {
-      this.prng = new PRNG(newVal);
-      this.sudoku = new Sudoku(this.size, this.prng);
-      this.generate();
+      this.generate({ seed: newVal });
     },
     difficultyQuotient: function(newVal) {
       this.generate({ difficultyQuotient: newVal });
     }
   },
   created() {
-    this.prng = new PRNG(this.seed);
-    this.sudoku = new Sudoku(this.size, this.prng);
     this.generate();
   },
   methods: {
@@ -134,10 +129,13 @@ export default {
     generate(options) {
       options = fallback(options, {});
       let size = fallback(options.size, this.size);
+      let seed = fallback(options.seed, this.seed);
       let difficultyQuotient = fallback(
         options.difficultyQuotient,
         this.difficultyQuotient
       );
+      this.prng = new PRNG(seed);
+      this.sudoku = new Sudoku(size, this.prng);
 
       let grid = this.grids[Math.floor(this.prng.rand() * this.grids.length)];
       let hintBoard = this.sudoku.boardFromGrid(grid);
@@ -148,7 +146,7 @@ export default {
         .split("")
         .map(numFromChar);
 
-      // this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
+      this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
 
       // [
       //   this.randomRelabel,
@@ -168,20 +166,20 @@ export default {
       this.fullGrid = fullGrid;
       this.board = hintGrid.slice();
     },
-    scaleDifficulty(size, difficulty, hintGrid, fullGrid) {
-      let hintPositions = this.prgn.shuffle(numbers(0, this.sudoku.cells));
-      let hints = hintGrid.filter(c => c !== null).length;
-      let empties = this.sudoku.empties;
+    scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid) {
+      let hintPositions = this.prng.shuffle(numbers(0, this.sudoku.cells));
+      let hints = hintGrid.filter(c => c !== 0).length;
+      let missingHints = Math.ceil(this.sudoku.cells / difficultyQuotient) - hints;
 
       for (let i = 0; i < this.sudoku.cells; i++) {
         let x = hintPositions[i];
-        if (hintGrid[x] !== null) {
+        if (hintGrid[x] !== 0) {
           continue;
         }
-        hintGrid[x] = fullGrid[x];
-        if (--empties <= 0) {
+        if (missingHints-- <= 0) {
           break;
         }
+        hintGrid[x] = fullGrid[x];
       }
     },
     randomRelabel(state) {
