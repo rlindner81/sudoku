@@ -10,7 +10,7 @@ stop_script() {
 }
 
 start_script() {
-  nohup node --experimental-modules "$script_dir"/../solver/src/start.mjs >"$script_txt" 2>&1 &
+  nohup node --experimental-modules "$script_dir"/../src/offline/start.mjs >"$script_txt" 2>&1 &
   echo "$!" >"$script_pid"
 }
 
