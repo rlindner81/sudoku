@@ -1,14 +1,14 @@
 <template>
   <div>
     <table :class="getBoardClasses()">
-      <tr v-for="(row, i) in boardSize" :key="i" :class="getRowClasses(i)">
+      <tr v-for="(row, i) in size" :key="i" :class="getRowClasses(i)">
         <td
-          v-for="(col, j) in boardSize"
+          v-for="(col, j) in size"
           :key="j"
           :class="getColumnClasses(i, j)"
-          @click="onClick($event, j + boardSize * i)"
+          @click="onClick($event, j + size * i)"
         >
-          {{ displaySquare(squares[j + boardSize * i]) }}
+          {{ displaySquare(squares[j + size * i]) }}
         </td>
       </tr>
     </table>
@@ -25,34 +25,13 @@
 </template>
 
 <script>
-/* eslint-disable */
 // import Keypad from "@/components/Keypad";
 
-import {
-  isNull,
-  fallback,
-  flatten,
-  numbers
-} from "@/util/helper";
+import { isNull, fallback, flatten, numbers } from "@/util/helper";
 
-const squareMap = {
-  "1": 0,
-  "2": 1,
-  "3": 2,
-  "4": 3,
-  "5": 4,
-  "6": 5,
-  "7": 6,
-  "8": 7,
-  "9": 8,
-  a: 9,
-  b: 10,
-  c: 11,
-  d: 12,
-  e: 13,
-  f: 14,
-  g: 15
-};
+import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku";
+
+import PRNG from "@/util/PRNG";
 
 export default {
   name: "Board",
@@ -60,16 +39,20 @@ export default {
     // Keypad
   },
   props: {
-    boxSize: {
+    size: {
       type: Number,
-      default: 3
-    },
-    difficulty: {
-      type: String,
       required: true
     },
     seed: {
       type: String,
+      required: true
+    },
+    grids: {
+      type: Array,
+      required: true
+    },
+    difficultyQuotient: {
+      type: Number,
       required: true
     },
     symbols: {
@@ -79,20 +62,15 @@ export default {
   },
   data() {
     return {
-      startSquares: null,
-      endSquares: null,
-      squares: null,
-      showKeypad: false,
-      selectedPosition: null
+      prng: null,
+      hintGrid: null,
+      fullGrid: null,
+      board: null
+      // showKeypad: false,
+      // selectedPosition: null
     };
   },
   computed: {
-    boardSize() {
-      return this.boxSize * this.boxSize;
-    },
-    squareSize() {
-      return this.boxSize * this.boxSize * this.boxSize * this.boxSize;
-    },
     selectedSquare() {
       return this.selectedPosition !== null
         ? this.squares[this.selectedPosition]
@@ -100,17 +78,18 @@ export default {
     }
   },
   watch: {
-    boxSize: function(newVal) {
+    size: function(newVal) {
       this.generate({ boxSize: newVal });
-    },
-    difficulty: function(newVal) {
-      this.generate({ difficulty: newVal });
     },
     seed: function(newVal) {
       this.generate({ seed: newVal });
+    },
+    difficultyQuotient: function(newVal) {
+      this.generate({ difficultyQuotient: newVal });
     }
   },
   created() {
+    this.prng = new PRNG(this.seed);
     this.generate();
   },
   methods: {

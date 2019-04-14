@@ -61,7 +61,7 @@ export function isValidSize(size) {
 /**
  * Generate all static information about a Sudoku board given its size.
  */
-function Solver(size, shuffle) {
+function Sudoku(size, shuffle) {
   this.size = size;
   this.shuffle = shuffle;
   this.width = this._widthForSize();
@@ -94,7 +94,7 @@ function Solver(size, shuffle) {
   }
 }
 
-Solver.prototype.toString = function() {
+Sudoku.prototype.toString = function() {
   return `size ${this.size} = ${this.width}x${this.height} | hints ${
     this.hints
   }`;
@@ -104,7 +104,7 @@ Solver.prototype.toString = function() {
  * The appropriate box width for a given board size. Should be the smallest number bigger than the square root of the
  * size that is also divisor.
  */
-Solver.prototype._widthForSize = function() {
+Sudoku.prototype._widthForSize = function() {
   for (let i = Math.ceil(Math.sqrt(this.size)); i < this.size; i++) {
     if (this.size % i === 0) {
       return i;
@@ -118,11 +118,11 @@ Solver.prototype._widthForSize = function() {
  * Size: 4 => Hints: 4
  * Size: 9 => Hints: 17
  */
-Solver.prototype._hintsForSize = function() {
+Sudoku.prototype._hintsForSize = function() {
   return Math.ceil(this.size * this.size * HINT_QUOTIENT);
 };
 
-Solver.prototype._boxPositions = function(offsetX, offsetY) {
+Sudoku.prototype._boxPositions = function(offsetX, offsetY) {
   let indices = [];
   for (let y = 0; y < this.height; y++) {
     for (let x = 0; x < this.width; x++) {
@@ -139,7 +139,7 @@ Solver.prototype._boxPositions = function(offsetX, offsetY) {
 /**
  * Return the board associated with a given grid by assigning all non-empty fields.
  */
-Solver.prototype.boardFromGrid = function(grid) {
+Sudoku.prototype.boardFromGrid = function(grid) {
   let board = {};
   for (let i = 0; i < this.cells; i++) {
     board[i] = this.chars;
@@ -158,7 +158,7 @@ Solver.prototype.boardFromGrid = function(grid) {
 /**
  * Return the grid associated with a board. Only cells with a unique value will be non-empty in the grid.
  */
-Solver.prototype.gridFromBoard = function(board) {
+Sudoku.prototype.gridFromBoard = function(board) {
   let grid = new Array(this.cells);
   for (let i = 0; i < this.cells; i++) {
     grid[i] = board[i].length === 1 ? board[i] : EMPTY_CHAR;
@@ -169,7 +169,7 @@ Solver.prototype.gridFromBoard = function(board) {
 /**
  * Assign char c to board[position] by eliminating all remaining values.
  */
-Solver.prototype.assign = function(board, position, c) {
+Sudoku.prototype.assign = function(board, position, c) {
   // console.log("assign", pos, c);
   let remainingValues = board[position].replace(c, "");
   for (let i = 0; i < remainingValues.length; i++) {
@@ -184,7 +184,7 @@ Solver.prototype.assign = function(board, position, c) {
 /**
  * Eliminate char c from board[position] and propagate appropriately.
  */
-Solver.prototype.eliminate = function(board, position, c) {
+Sudoku.prototype.eliminate = function(board, position, c) {
   // console.log("eliminate", pos, c);
   if (board[position].indexOf(c) === -1) {
     return board;
@@ -230,7 +230,7 @@ Solver.prototype.eliminate = function(board, position, c) {
 /**
  * Given a board find out if it is solved and find the "search" position with the least number of values > 1.
  */
-Solver.prototype.searchInfoFromBoard = function(board) {
+Sudoku.prototype.searchInfoFromBoard = function(board) {
   let minValuesLength = this.size;
   let maxValuesLength = 0;
   let spread = this.size + 1;
@@ -259,7 +259,7 @@ Solver.prototype.searchInfoFromBoard = function(board) {
 /**
  * Starting form a given board, find any valid solution.
  */
-Solver.prototype.searchAnySolution = function(
+Sudoku.prototype.searchAnySolution = function(
   board,
   depthLimit = -1,
   depth = 0
@@ -292,7 +292,7 @@ Solver.prototype.searchAnySolution = function(
   return null;
 };
 
-Solver.prototype.generateFullGrid = function() {
+Sudoku.prototype.generateFullGrid = function() {
   // console.log("generateFullGrid");
   let baseGrid =
     this.shuffle(numbers(1, this.size).map(charFromNum)).join("") +
@@ -302,7 +302,7 @@ Solver.prototype.generateFullGrid = function() {
   return this.gridFromBoard(solution);
 };
 
-Solver.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
+Sudoku.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
   if (searchInfo.solved) {
     return true;
   }
@@ -325,7 +325,7 @@ function _emptyAtPos(grid, pos) {
   return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
 }
 
-Solver.prototype.generateHintGrid = function(attempts) {
+Sudoku.prototype.generateHintGrid = function(attempts) {
   let fullGrid = this.generateFullGrid();
   let positions = this.shuffle(numbers(0, this.cells));
   let grid = fullGrid;
@@ -356,4 +356,4 @@ Solver.prototype.generateHintGrid = function(attempts) {
   return null;
 };
 
-export default Solver;
+export default Sudoku;

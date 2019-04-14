@@ -9,12 +9,12 @@
         >
       </select>
       <select v-model="difficulty">
-        <option v-for="(d, i) in difficulties" :key="i" :value="d">{{
+        <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">{{
           d
         }}</option>
       </select>
       <select v-model="symbols">
-        <option v-for="(s, i) in symbolnames" :key="i" :value="s">
+        <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">
           {{ s }}</option
         >
       </select>
@@ -28,10 +28,11 @@
         <Board
           ref="board"
           class="board"
-          :difficulty="difficulty"
-          :symbols="symbolspack[symbols]"
+          :size="size"
           :seed="seed"
-          :box-size="size"
+          :grids="gridspack[size]"
+          :difficulty-quotient="difficulties[difficulty]"
+          :symbols="symbolspack[symbols]"
         />
       </div>
     </div>
@@ -51,6 +52,8 @@ const DEFAULT_SIZE = 9;
 const DEFAULT_DIFFICULTY = "hard";
 const DEFAULT_SYMBOLS = "numbers";
 
+const SEED_RE = /^\d{8}$/;
+
 export default {
   name: "Sudoku",
   components: {
@@ -58,8 +61,9 @@ export default {
   },
   data() {
     return {
-      solver: null,
-      symbolspack: symbolspack,
+      gridspack,
+      difficulties,
+      symbolspack,
       size: null,
       difficulty: null,
       symbols: null,
@@ -67,14 +71,14 @@ export default {
     };
   },
   computed: {
-    difficulties() {
-      return this.size === null ? null : Object.keys(difficulties);
-    },
-    symbolnames() {
-      return Object.keys(symbolspack);
-    },
     sizes() {
       return Object.keys(gridspack).map(size => parseInt(size));
+    },
+    difficultyKeys() {
+      return Object.keys(difficulties);
+    },
+    symbolsKeys() {
+      return Object.keys(symbolspack);
     }
   },
   watch: {
@@ -98,21 +102,21 @@ export default {
 
     let difficulty = query.difficulty;
     query.difficulty =
-      !isNull(difficulty) && this.difficulties.indexOf(difficulty) !== -1
+      !isNull(difficulty) && this.difficultyKeys.indexOf(difficulty) !== -1
         ? difficulty
         : DEFAULT_DIFFICULTY;
     this.difficulty = query.difficulty;
 
     let symbols = query.symbols;
     query.symbols =
-      !isNull(symbols) && this.symbolnames.indexOf(symbols) !== -1
+      !isNull(symbols) && this.symbolsKeys.indexOf(symbols) !== -1
         ? symbols
         : DEFAULT_SYMBOLS;
     this.symbols = query.symbols;
 
     let seed = query.seed;
     query.seed =
-      !isNull(seed) && seed.match(/^\d{8}$/) ? seed : this.randomSeed();
+      !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
     this.seed = query.seed;
 
     this.$router.replace({ query });
