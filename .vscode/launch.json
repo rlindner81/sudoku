@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "Start",
-      "program": "${workspaceFolder}/solver/src/start.mjs",
+      "program": "${workspaceFolder}/src/offline/start.mjs",
       "runtimeArgs": [
         "--experimental-modules"
       ]

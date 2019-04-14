@@ -1,11 +1,11 @@
-import { writeFileSync } from "fs"
+/* eslint-disable no-console */
+import { writeFileSync } from "fs";
 
-import Counter from "./counter"
-import Solver from "./solver"
-import PRNG from "./prng"
+import Counter from "./../util/Counter.mjs";
+import { default as Sudoku, isValidSize } from "./../util/Sudoku.mjs";
+import PRNG from "./../util/PRNG.mjs";
 
 let successCounter = new Counter("success");
-let fullgridCounter = new Counter("fullgrid");
 
 function generateGridsPack(minSize) {
   let prng = new PRNG("44");
@@ -13,21 +13,21 @@ function generateGridsPack(minSize) {
   let attempts = 500;
   let boardPacks = {};
   for (let size = minSize; size <= 25; size++) {
-    let solver = new Solver(size, prng.shuffle.bind(prng));
-    if (!solver.isValid()) {
+    let solver = new Sudoku(size, prng);
+    if (!isValidSize(size)) {
       continue;
     }
     console.log("solver", solver.toString());
 
     let solutions = [];
-    for (let i = 0; i < numBoards;) {
+    for (let i = 0; i < numBoards; ) {
       // fullgridCounter.log();
       let grid = solver.generateHintGrid(attempts);
       if (grid !== null) {
         successCounter.log();
         i++;
         solutions.push(grid);
-        boardPacks[size] = solutions
+        boardPacks[size] = solutions;
         writeFileSync("./gridsPack.json", JSON.stringify(boardPacks, null, 2));
       }
     }
