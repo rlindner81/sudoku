@@ -32,7 +32,7 @@ function Counter(name) {
   this.lastCallTime = now;
 }
 
-Counter.prototype.log = function(additionalLogs) {
+Counter.prototype.log = function(additionalLogs = null) {
   let now = new Date();
   let logs = [
     this.name,
@@ -41,13 +41,21 @@ Counter.prototype.log = function(additionalLogs) {
     `call ${this.calls++}`
   ];
   if (additionalLogs) {
-    Object.keys(additionalLogs).forEach(logKey => {
-      logs.push(`${logKey} ${additionalLogs[logKey]}`);
+    Object.entries(additionalLogs).forEach(([logKey, value]) => {
+      logs.push(`${logKey} ${value}`);
     });
   }
   this.lastCallTime = now;
   // eslint-disable-next-line no-console
   console.log(logs.join(" | "));
+};
+
+Counter.prototype.logEvery = function(frequency = 100, additionalLogs = null) {
+  if (this.calls % frequency !== 0) {
+    this.calls++;
+    return;
+  }
+  this.log(additionalLogs);
 };
 
 export default Counter;

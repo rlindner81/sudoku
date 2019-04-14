@@ -18,10 +18,14 @@
  *
  */
 import { flatten, numbers } from "./helper.mjs";
+// import Counter from "./Counter.mjs";
 
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 5;
-const SEARCH_RECURSION_LIMIT = 5;
+const SEARCH_RECURSION_LIMIT = 7;
+
+// const searchCounter = new Counter("search");
+// const uniqueCounter = new Counter("unique");
 
 /**
  * Given a number 0,1,..,[size] return the appropriate char '.','1',...,'9','A',... for the grid notation.
@@ -266,6 +270,7 @@ Sudoku.prototype.searchAnySolution = function(
   if (board === null) {
     return null;
   }
+  // searchCounter.logEvery(1000, { depth });
   if (0 <= depthLimit && depthLimit < depth) {
     // console.log("below recursion depth limit at", depth);
     return board;
@@ -305,6 +310,7 @@ Sudoku.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
   if (searchInfo.solved) {
     return true;
   }
+  // uniqueCounter.log();
 
   let realValue = fullGrid[searchInfo.position];
   let remainingValues = board[searchInfo.position].replace(realValue, "");

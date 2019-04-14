@@ -8,7 +8,7 @@ import PRNG from "./../util/PRNG.mjs";
 let successCounter = new Counter("success");
 
 function generateGridsPack(minSize) {
-  let prng = new PRNG("44");
+  let prng = new PRNG("42");
   let numBoards = 20;
   let attempts = 500;
   let boardPacks = {};
@@ -34,4 +34,4 @@ function generateGridsPack(minSize) {
   }
 }
 
-generateGridsPack(12);
+generateGridsPack(24);
