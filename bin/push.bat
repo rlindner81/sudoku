@@ -7,7 +7,7 @@ SET SCP=pscp
 SET NODE_ENV=production
 SET BASE_URL=/
 
-PUSHD %~dp0..\frontend
+PUSHD %~dp0..\
 
 CALL npm run build
 %SSH% ^
