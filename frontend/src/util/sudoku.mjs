@@ -49,6 +49,16 @@ export function numFromChar(c) {
 }
 
 /**
+ * Easy check if a size is valid, i.e., not prime.
+ */
+export function isValidSize(size) {
+  for (let i = 2, s = Math.sqrt(size); i <= s; i++) {
+    if (size % i === 0) return true;
+  }
+  return false;
+}
+
+/**
  * Generate all static information about a Sudoku board given its size.
  */
 function Solver(size, shuffle) {
@@ -58,6 +68,7 @@ function Solver(size, shuffle) {
   this.height = this.size / this.width;
   this.cells = this.size * this.size;
   this.hints = this._hintsForSize();
+  this.difficulties = this._difficultiesForSize();
   this.empties = this.cells - this.hints;
 
   this.chars = numbers(1, this.size)
@@ -82,13 +93,6 @@ function Solver(size, shuffle) {
     }
   }
 }
-
-/**
- * Boards of prime size are not sensible.
- */
-Solver.prototype.isValid = function() {
-  return this.height !== 1;
-};
 
 Solver.prototype.toString = function() {
   return `size ${this.size} = ${this.width}x${this.height} | hints ${

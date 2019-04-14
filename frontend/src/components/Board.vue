@@ -25,6 +25,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 // import Keypad from "@/components/Keypad";
 
 import {

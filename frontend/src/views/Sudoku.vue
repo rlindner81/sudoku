@@ -14,7 +14,7 @@
         }}</option>
       </select>
       <select v-model="symbols">
-        <option v-for="(s, i) in symbolpacknames" :key="i" :value="s">
+        <option v-for="(s, i) in symbolnames" :key="i" :value="s">
           {{ s }}</option
         >
       </select>
@@ -40,11 +40,16 @@
 
 <script>
 import Board from "@/components/Board";
-import { fallback } from "@/util/helper";
+import { isNull, fallback } from "@/util/helper";
 
 import gridspack from "@/data/gridspack";
+import difficulties from "@/data/difficulties";
 // https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
 import symbolspack from "@/data/symbolspack";
+
+const DEFAULT_SIZE = 9;
+const DEFAULT_DIFFICULTY = "hard";
+const DEFAULT_SYMBOLS = "numbers";
 
 export default {
   name: "Sudoku",
@@ -53,6 +58,7 @@ export default {
   },
   data() {
     return {
+      solver: null,
       symbolspack: symbolspack,
       size: null,
       difficulty: null,
@@ -62,15 +68,13 @@ export default {
   },
   computed: {
     difficulties() {
-      return this.size === null
-        ? null
-        : Object.keys(gamespack[`size-${this.size}`].difficulties);
+      return this.size === null ? null : Object.keys(difficulties);
     },
-    symbolpacknames() {
+    symbolnames() {
       return Object.keys(symbolspack);
     },
     sizes() {
-      return [2, 3, 4];
+      return Object.keys(gridspack).map(size => parseInt(size));
     }
   },
   watch: {
@@ -87,19 +91,28 @@ export default {
   created() {
     let query = Object.assign({}, this.$route.query);
 
-    query.size = fallback(query.size, this.sizes[1]);
-    this.size = parseInt(query.size);
+    let size = parseInt(query.size);
+    query.size =
+      !isNaN(size) && this.sizes().indexOf(size) !== -1 ? size : DEFAULT_SIZE;
+    this.size = query.size;
 
-    query.difficulty = fallback(query.difficulty, this.difficulties[1]);
+    let difficulty = query.difficulty;
+    query.difficulty =
+      !isNull(difficulty) && this.difficulties().indexOf(difficulty) !== -1
+        ? difficulty
+        : DEFAULT_DIFFICULTY;
     this.difficulty = query.difficulty;
 
-    query.symbols = fallback(query.symbols, this.symbolpacknames[0]);
+    let symbols = query.symbols;
+    query.symbols =
+      !isNull(symbols) && this.symbolnames().indexOf(symbols) !== -1
+        ? symbols
+        : DEFAULT_SYMBOLS;
     this.symbols = query.symbols;
 
     query.seed = fallback(query.seed, this.randomSeed());
     this.seed = query.seed;
 
-    run();
     this.$router.replace({ query });
   },
   methods: {
