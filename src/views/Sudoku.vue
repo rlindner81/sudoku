@@ -46,6 +46,7 @@ import { isNull, fallback } from "@/util/helper.mjs";
 import gridspack from "@/data/gridspack.json";
 import difficulties from "@/data/difficulties.json";
 // https://unicode-table.com/en/blocks/miscellaneous-symbols-and-pictographs/
+// https://emojipedia.org/nature/
 import symbolspack from "@/data/symbolspack.json";
 
 const DEFAULT_SIZE = 9;
