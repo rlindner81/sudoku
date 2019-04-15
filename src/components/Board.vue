@@ -119,9 +119,11 @@ export default {
             "border-box-left": true
           };
     },
+    // NOTE: for consistent square cells, it is either this hack or line-height 0, which causes random problems in the
+    //       renderer
     displayCell(value) {
       return value === 0
-        ? ""
+        ? "\u00a0" // non-breaking space
         : value <= this.symbols.length
         ? this.symbols[value - 1]
         : value;
@@ -391,7 +393,7 @@ $border-square-small: 1px solid lightgray;
         border: $border-square-small;
       }
 
-      line-height: 0;
+      // line-height: 1;
     }
   }
 }
