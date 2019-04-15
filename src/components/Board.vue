@@ -319,14 +319,14 @@ $border-square-small: 1px solid lightgray;
   user-select: none;
 
   font-size: 2vw;
-  @media screen and (min-width: 1000px) {
+  @media (min-width: 1000px) {
     font-size: calc(2 * 10px);
   }
   &.size-16,
   &.size-15,
   &.size-14 {
     font-size: 3.2vw;
-    @media screen and (min-width: 1000px) {
+    @media (min-width: 1000px) {
       font-size: calc(3.2 * 10px);
     }
   }
@@ -335,14 +335,14 @@ $border-square-small: 1px solid lightgray;
   &.size-9,
   &.size-8 {
     font-size: 5vw;
-    @media screen and (min-width: 1000px) {
+    @media (min-width: 1000px) {
       font-size: calc(5 * 10px);
     }
   }
   &.size-6,
   &.size-4 {
     font-size: 10vw;
-    @media screen and (min-width: 1000px) {
+    @media (min-width: 1000px) {
       font-size: calc(10 * 10px);
     }
   }
