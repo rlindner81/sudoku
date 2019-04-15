@@ -327,13 +327,18 @@ $border-square-small: 1px solid lightgray;
   &.size-16,
   &.size-15,
   &.size-14 {
-    font-size: 3.2vw;
+    font-size: 3vw;
     @media (min-width: 1000px) {
-      font-size: calc(3.2 * 10px);
+      font-size: calc(3 * 10px);
     }
   }
-  &.size-12,
   &.size-10,
+  &.size-12 {
+    font-size: 4vw;
+    @media screen and (min-width: 1000px) {
+      font-size: calc(4 * 10px);
+    }
+  }
   &.size-9,
   &.size-8 {
     font-size: 5vw;
