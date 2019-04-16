@@ -335,7 +335,7 @@ $border-square-small: 1px solid lightgray;
   &.size-10,
   &.size-12 {
     font-size: 4vw;
-    @media screen and (min-width: 1000px) {
+    @media (min-width: 1000px) {
       font-size: calc(4 * 10px);
     }
   }
