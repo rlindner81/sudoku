@@ -120,7 +120,7 @@ export default {
           };
     },
     // NOTE: for consistent square cells, it is either this hack or line-height 0, which causes random problems in the
-    //       renderer
+    //       renderer. Print does seem to need the line-height 0 though.
     displayCell(value) {
       return value === 0
         ? "\u00a0" // non-breaking space
@@ -398,7 +398,9 @@ $border-square-small: 1px solid lightgray;
         border: $border-square-small;
       }
 
-      // line-height: 1;
+      @media print {
+        line-height: 0;
+      }
     }
   }
 }
