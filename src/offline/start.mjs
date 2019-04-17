@@ -29,7 +29,7 @@ function generateGridsPack(minSize) {
         solutions.push(grid);
         boardPacks[size] = solutions;
         writeFileSync(
-          "./newGridsPack.json",
+          "./newGridsPack25.json",
           JSON.stringify(boardPacks, null, 2)
         );
       }
@@ -37,4 +37,4 @@ function generateGridsPack(minSize) {
   }
 }
 
-generateGridsPack(24);
+generateGridsPack(25);
