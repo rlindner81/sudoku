@@ -5,5 +5,6 @@
 </template>
 
 <style lang="scss">
-@import "@/style/app.scss";
+@import "@/style/variables.scss";
+@import "@/../node_modules/bootstrap/scss/bootstrap.scss";
 </style>
