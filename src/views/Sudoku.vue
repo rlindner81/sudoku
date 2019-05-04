@@ -2,13 +2,21 @@
   <div class="sudoku">
     <header>
       <nav class="navbar navbar-dark bg-dark">
-        <span class="navbar-brand">{{ difficulty }} Sudoku {{ seed }}</span>
+        <div class="container">
+          <span class="navbar-brand">{{ difficulty }} Sudoku {{ seed }}</span>
+        </div>
       </nav>
       <!-- <button @click="$refs.board.debug()">Debug</button> -->
     </header>
 
-    <main role="main" class="container">
-      <form>
+    <main role="main" class="container d-print-block">
+      <div class="row d-none d-print-block">
+        <div class="col">
+          <h1>{{ difficulty }} Sudoku {{ seed }}</h1>
+        </div>
+      </div>
+
+      <form class="pb-2 pt-3 d-print-none">
         <div class="form-row">
           <div class="col">
             <button
@@ -28,16 +36,16 @@
           </div>
           <div class="col">
             <select v-model="difficulty" class="btn-primary form-control">
-              <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">
-                {{ d }}
-              </option>
+              <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">{{
+                d
+              }}</option>
             </select>
           </div>
           <div class="col">
             <select v-model="symbols" class="btn-primary form-control">
-              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">{{
-                s
-              }}</option>
+              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">
+                {{ s }}
+              </option>
             </select>
           </div>
           <div class="col">
@@ -70,7 +78,7 @@
         </div>
       </form>
 
-      <div class="row">
+      <div class="row py-2">
         <div class="col">
           <div class="square-outer">
             <div class="square-inner">
@@ -203,15 +211,10 @@ export default {
 
 <style lang="scss">
 .sudoku {
-  nav > span,
+  nav span,
+  h1,
   select {
     text-transform: capitalize;
-  }
-
-  form {
-    @media print {
-      display: none;
-    }
   }
 
   .square-outer {

@@ -6,14 +6,14 @@ module.exports = {
       skipWaiting: true,
       clientsClaim: true
     }
-  },
-  css: {
-    loaderOptions: {
-      sass: {
-        data: `
-          @import "@/style/variables.scss";
-        `
-      }
-    }
   }
+  // https://cli.vuejs.org/config/#css-loaderoptions
+  // css: {
+  //   loaderOptions: {
+  //     // https://github.com/webpack-contrib/sass-loader
+  //     sass: {
+  //       data: ""
+  //     }
+  //   }
+  // }
 };
