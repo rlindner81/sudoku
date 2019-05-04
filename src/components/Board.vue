@@ -105,17 +105,17 @@ export default {
     },
     getRowClasses(i) {
       return i === 0 || i % this.sudoku.height !== 0
-        ? { row: true }
+        ? { "board-row": true }
         : {
-            row: true,
+            "board-row": true,
             "border-box-top": true
           };
     },
     getColumnClasses(i, j) {
       return j === 0 || j % this.sudoku.width !== 0
-        ? { column: true }
+        ? { "board-column": true }
         : {
-            column: true,
+            "board-column": true,
             "border-box-left": true
           };
     },
@@ -354,45 +354,45 @@ $border-square-small: 1px solid lightgray;
     }
   }
 
-  .row:first-child .column {
+  .board-row:first-child .board-column {
     border-top: $border-board;
     @media screen and (max-width: $small-width) {
       border-top: $border-board-small;
     }
   }
-  .row .column:first-child {
+  .board-row .board-column:first-child {
     border-left: $border-board;
     @media screen and (max-width: $small-width) {
       border-left: $border-board-small;
     }
   }
-  .row:last-child .column {
+  .board-row:last-child .board-column {
     border-bottom: $border-board;
     @media screen and (max-width: $small-width) {
       border-bottom: $border-board-small;
     }
   }
-  .row .column:last-child {
+  .board-row .board-column:last-child {
     border-right: $border-board;
     @media screen and (max-width: $small-width) {
       border-right: $border-board-small;
     }
   }
-  .row.border-box-top {
+  .board-row.border-box-top {
     border-top: $border-box;
     @media screen and (max-width: $small-width) {
       border-top: $border-box-small;
     }
   }
-  .row .column.border-box-left {
+  .board-row .board-column.border-box-left {
     border-left: $border-box;
     @media screen and (max-width: $small-width) {
       border-left: $border-box-small;
     }
   }
 
-  .row {
-    .column {
+  .board-row {
+    .board-column {
       border: $border-square;
       @media screen and (max-width: $small-width) {
         border: $border-square-small;

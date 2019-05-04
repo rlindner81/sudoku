@@ -1,45 +1,99 @@
 <template>
-  <div class="home">
-    <h1>{{ difficulty }} Sudoku {{ seed }}</h1>
-    <div class="input-lane">
-      <button @click="onClickNew()">New</button>
-      <select v-model="size">
-        <option v-for="(s, i) in sizes" :key="i" :value="s"
-          >Size {{ s }}</option
-        >
-      </select>
-      <select v-model="difficulty">
-        <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">{{
-          d
-        }}</option>
-      </select>
-      <select v-model="symbols">
-        <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">
-          {{ s }}</option
-        >
-      </select>
-      <button @click="$refs.board.solve()">Solve</button>
-      <button @click="$refs.board.reset()">Reset</button>
-      <button onclick="window.print();return false;">Print</button>
+  <div class="sudoku">
+    <header>
+      <nav class="navbar navbar-dark bg-dark">
+        <span class="navbar-brand">{{ difficulty }} Sudoku {{ seed }}</span>
+      </nav>
       <!-- <button @click="$refs.board.debug()">Debug</button> -->
-    </div>
-    <div class="square-outer">
-      <div class="square-inner">
-        <Board
-          ref="board"
-          class="board"
-          :size="size"
-          :seed="seed"
-          :grids="gridspack[size]"
-          :difficulty-quotient="difficulties[difficulty]"
-          :symbols="symbolspack[symbols]"
-        />
+    </header>
+
+    <main role="main" class="container">
+      <form>
+        <div class="form-row">
+          <div class="col">
+            <button
+              type="button"
+              class="btn btn-primary form-control"
+              @click="onClickNew()"
+            >
+              New
+            </button>
+          </div>
+          <div class="col">
+            <select v-model="size" class="btn-primary form-control">
+              <option v-for="(s, i) in sizes" :key="i" :value="s"
+                >Size {{ s }}</option
+              >
+            </select>
+          </div>
+          <div class="col">
+            <select v-model="difficulty" class="btn-primary form-control">
+              <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">
+                {{ d }}
+              </option>
+            </select>
+          </div>
+          <div class="col">
+            <select v-model="symbols" class="btn-primary form-control">
+              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">{{
+                s
+              }}</option>
+            </select>
+          </div>
+          <div class="col">
+            <button
+              type="button"
+              class="btn btn-primary form-control"
+              @click="$refs.board.solve()"
+            >
+              Solve
+            </button>
+          </div>
+          <div class="col">
+            <button
+              type="button"
+              class="btn btn-primary form-control"
+              @click="$refs.board.reset()"
+            >
+              Reset
+            </button>
+          </div>
+          <div class="col">
+            <button
+              type="button"
+              class="btn btn-primary form-control"
+              onclick="window.print();return false;"
+            >
+              Print
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="row">
+        <div class="col">
+          <div class="square-outer">
+            <div class="square-inner">
+              <Board
+                ref="board"
+                class="board"
+                :size="size"
+                :seed="seed"
+                :grids="gridspack[size]"
+                :difficulty-quotient="difficulties[difficulty]"
+                :symbols="symbolspack[symbols]"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script>
+import { Dropdown } from "../../node_modules/bootstrap/js/src"; // eslint-disable-line no-unused-vars
+
 import Board from "@/components/Board.vue";
 import { isNull, fallback } from "@/util/helper.mjs";
 
@@ -148,50 +202,19 @@ export default {
 </script>
 
 <style lang="scss">
-$size: 60rem;
-$accent-color: green;
-$accent-font-color: white;
-
-.home {
-  margin: 0 auto;
-  max-width: $size;
-
-  > * {
-    margin: 2rem 0;
-  }
-
-  h1,
+.sudoku {
+  nav > span,
   select {
     text-transform: capitalize;
   }
 
-  .input-lane {
-    margin: -0.5rem;
-    button,
-    select {
-      margin: 0.5rem;
-      padding: 0.125rem 1rem;
-      background: rgba($accent-color, 0.75);
-      min-width: 8rem;
-      color: $accent-font-color;
-      box-shadow: none;
-      border: 1px solid darken($accent-color, 10%);
-      border-radius: 3px;
-      font-weight: 500;
-      font-size: 3vw;
-
-      @media screen and (min-width: 600px) {
-        font-size: calc(3 * 6px);
-      }
-    }
-
+  form {
     @media print {
       display: none;
     }
   }
 
   .square-outer {
-    max-width: $size;
     width: 100%;
     padding-top: 100%;
     position: relative;
