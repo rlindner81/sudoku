@@ -7,7 +7,10 @@
 <script></script>
 
 <style lang="scss">
-@import url("https://fonts.googleapis.com/css?family=Rubik");
+// https://fonts.google.com/
+// @import url("https://fonts.googleapis.com/css?family=Cambay");
+// $font-family-base: "Cambay", sans-serif;
+
 @import "@/style/variables.scss";
 @import "@/../node_modules/bootstrap/scss/bootstrap.scss";
 </style>

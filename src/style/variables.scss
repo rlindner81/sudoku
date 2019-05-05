@@ -18,7 +18,7 @@ $gray-lightest: #fafafa;
 $primary: $orange;
 $success: $green;
 $info: $yellow;
-$warning: $orange;
+$warning: $blue;
 $danger: $red;
 
 // Override button colors
@@ -36,17 +36,14 @@ $state-info-text: darken($info, 30);
 $state-warning-text: darken($warning, 30);
 $state-danger-text: darken($danger, 10);
 
-// Override badges padding (doubled because otherwise too crammed)
-$badge-padding-x: 0.8em;
-$badge-padding-y: 0.4em;
+// Override line height
+// $line-height-base: 1; 
 
-// Don't make badges normal instead of bold
-$badge-font-weight: normal;
-
-// Override fonts
-$font-family-sans-serif: 'Rubik', sans-serif;
-$font-family-base: $font-family-sans-serif;
+// Override page size
+$print-page-size: a4;
+// $print-body-min-width: 1200px; 
 
 // Set global options
 $enable-shadows: false;
 $enable-gradients: true;
+$enable-print-styles: true;

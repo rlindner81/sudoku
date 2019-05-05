@@ -9,8 +9,8 @@
       <!-- <button @click="$refs.board.debug()">Debug</button> -->
     </header>
 
-    <main role="main" class="container d-print-block">
-      <div class="row d-none d-print-block">
+    <main role="main" class="container">
+      <div class="row d-none d-print-block py-4">
         <div class="col">
           <h1>{{ difficulty }} Sudoku {{ seed }}</h1>
         </div>
@@ -36,16 +36,16 @@
           </div>
           <div class="col">
             <select v-model="difficulty" class="btn-primary form-control">
-              <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">{{
-                d
-              }}</option>
+              <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">
+                {{ d }}
+              </option>
             </select>
           </div>
           <div class="col">
             <select v-model="symbols" class="btn-primary form-control">
-              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">
-                {{ s }}
-              </option>
+              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">{{
+                s
+              }}</option>
             </select>
           </div>
           <div class="col">
@@ -100,8 +100,6 @@
 </template>
 
 <script>
-import { Dropdown } from "../../node_modules/bootstrap/js/src"; // eslint-disable-line no-unused-vars
-
 import Board from "@/components/Board.vue";
 import { isNull, fallback } from "@/util/helper.mjs";
 
@@ -210,6 +208,18 @@ export default {
 </script>
 
 <style lang="scss">
+@media print {
+  body,
+  .container {
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  .col {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
 .sudoku {
   nav span,
   h1,
