@@ -72,24 +72,24 @@ export function numbers(start, length, step) {
 /**
  * Returns the element of a nested array or object if possible, otherwise null.
  *
- * Usage: get(array, 1, 2, 3) === array[1][2][3] || null      (without acccess exceptions)
- *        get(object, "a", "b") === object["a"]["b"] || null  (without acccess exceptions)
+ * Usage: get(array, 1, 2, 3) === array[1][2][3] || null      (without access exceptions)
+ *        get(object, "a", "b") === object["a"]["b"] || null  (without access exceptions)
  */
-// TODO implement with exception handling and object case
-export function get() {
+export function getByPath() {
   if (hasNull(arguments) || arguments.length < 2) {
     return null;
   }
-  let array = arguments[0];
-  let indices = Array.prototype.slice.call(arguments, 1);
-  for (let i = 0; i < indices.length; i++) {
-    let index = indices[i];
-    if (!Array.isArray(array) || array.length <= index) {
-      return null;
+  let node = arguments[0];
+  let keys = Array.prototype.slice.call(arguments, 1);
+  try {
+    for (let i = 0; i < keys.length; i++) {
+      let key = keys[i];
+      node = node[key];
     }
-    array = array[index];
+    return node;
+  } catch (err) {
+    return null;
   }
-  return array;
 }
 
 /**
