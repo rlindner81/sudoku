@@ -12,6 +12,15 @@
       "runtimeArgs": [
         "--experimental-modules"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug",
+      "program": "${workspaceFolder}/src/offline/debug.mjs",
+      "runtimeArgs": [
+        "--experimental-modules"
+      ]
     }
   ]
 }
