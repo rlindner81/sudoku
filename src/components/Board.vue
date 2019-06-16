@@ -152,6 +152,9 @@ export default {
         .split("")
         .map(numFromChar);
 
+      // console.log("initial hintgrid", hintGrid.map(charFromNum).join("")); // eslint-disable-line
+      // console.log("initial fullgrid", fullGrid.map(charFromNum).join("")); // eslint-disable-line
+
       this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
 
       [
@@ -167,6 +170,9 @@ export default {
           grid = state.grid;
         });
       });
+
+      // console.log("final hintgrid", hintGrid.map(charFromNum).join("")); // eslint-disable-line
+      // console.log("final fullgrid", fullGrid.map(charFromNum).join("")); // eslint-disable-line
 
       this.hintGrid = hintGrid;
       this.fullGrid = fullGrid;
