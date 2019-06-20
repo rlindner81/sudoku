@@ -5,7 +5,7 @@
 export function isNull() {
   return Array.prototype.reduce.call(
     arguments,
-    function(result, argument) {
+    function (result, argument) {
       return result || argument === undefined || argument === null;
     },
     false
@@ -102,4 +102,18 @@ export function capitalize(s) {
   return typeof s === "string" && s.length > 0
     ? s.charAt(0).toUpperCase() + s.slice(1)
     : null;
+}
+
+/**
+ * Returns argument value for a given key.
+ * node script.js --size 1
+ *
+ * Usage: argValue("--size") === "1"
+ *        argValue("--height") === null
+ */
+let args = null;
+function argValue(key) {
+  args = args !== null ? args : process.argv.slice(2);
+  let i = args.indexOf(key);
+  return i !== -1 && i + 1 < args.size ? null : args[i + 1];
 }

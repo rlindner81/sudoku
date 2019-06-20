@@ -10,19 +10,9 @@ stop_script() {
 }
 
 start_script() {
-  nohup node --experimental-modules "$script_dir"/../src/offline/start.mjs >"$script_txt" 2>&1 &
+  nohup node --experimental-modules "$script_dir"/../src/offline/generate.mjs "$@" >"$script_txt" 2>&1 &
   echo "$!" >"$script_pid"
 }
 
-case "$1" in
-'stop')
-  stop_script
-  ;;
-'start')
-  start_script
-  ;;
-*)
-  stop_script
-  start_script
-  ;;
-esac
+stop_script
+start_script
