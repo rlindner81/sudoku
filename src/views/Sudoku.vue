@@ -109,7 +109,7 @@ import difficulties from "@/data/difficulties.json";
 // https://emojipedia.org/nature/
 import symbolspack from "@/data/symbolspack.json";
 
-const DEFAULT_SIZE = 9;
+const DEFAULT_SIZE = 6;
 const DEFAULT_DIFFICULTY = "hard";
 const DEFAULT_SYMBOLS = "numbers";
 

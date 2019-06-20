@@ -140,7 +140,7 @@ export default {
       );
       this.prng = new PRNG(seed);
       this.sudoku = new Sudoku(size, this.prng);
-      let debugSudoku = new Sudoku(size, new PRNG(seed));
+      // let debugSudoku = new Sudoku(size, new PRNG(seed));  // eslint-disable-line
 
       let grid = this.grids[Math.floor(this.prng.rand() * this.grids.length)];
       let hintBoard = this.sudoku.boardFromGrid(grid);
@@ -151,12 +151,13 @@ export default {
         .split("")
         .map(numFromChar);
 
-      this.$log.debug("initial hintgrid", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join("")), hintGrid.map(charFromNum).join(""));
+      this.$log.debug("initial hintgrid", hintGrid.map(charFromNum).join(""));
+      // this.$log.debug("unique?", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join("")));  // eslint-disable-line
       this.$log.debug("initial fullgrid", fullGrid.map(charFromNum).join(""));
 
       this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
 
-      this.$log.debug("after scale", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join("")), hintGrid.map(charFromNum).join(""));
+      this.$log.debug("after scale", hintGrid.map(charFromNum).join(""));
 
       [
         this.randomRelabel,
@@ -172,7 +173,8 @@ export default {
         });
       });
 
-      this.$log.debug("final hintgrid", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join("")), hintGrid.map(charFromNum).join(""));
+      this.$log.debug("final hintgrid", hintGrid.map(charFromNum).join(""));
+      // this.$log.debug("unique?", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join(""))); // eslint-disable-line
       this.$log.debug("final fullgrid", fullGrid.map(charFromNum).join(""));
 
       this.hintGrid = hintGrid;
