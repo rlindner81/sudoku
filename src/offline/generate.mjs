@@ -8,9 +8,9 @@ import { argValue } from "./../util/helper.mjs";
 
 const successCounter = new Counter("success");
 
-const size = argValue("--size") || 9;
-const count = argValue("--count") || 20;
-const attempts = argValue("--attempts") || 500;
+const size = parseInt(argValue("--size")) || 9;
+const count = parseInt(argValue("--count")) || 20;
+const attempts = parseInt(argValue("--attempts")) || 500;
 const filename = argValue("--filename") || `newGrids${size}.json`;
 
 const prng = new PRNG("42");

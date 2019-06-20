@@ -7,10 +7,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Start",
-      "program": "${workspaceFolder}/src/offline/start.mjs",
+      "name": "Generate",
+      "program": "${workspaceFolder}/src/offline/generate.mjs",
       "runtimeArgs": [
         "--experimental-modules"
+      ],
+      "args": [
+        "--size",
+        "8"
       ]
     },
     {

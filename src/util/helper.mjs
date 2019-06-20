@@ -115,5 +115,5 @@ let args = null;
 export function argValue(key) {
   args = args !== null ? args : process.argv.slice(2);
   let i = args.indexOf(key);
-  return i !== -1 && i + 1 < args.size ? null : args[i + 1];
+  return i !== -1 && i + 1 < args.length ? args[i + 1] : null;
 }
