@@ -10,7 +10,7 @@ import store from "./store.js";
 import "./registerServiceWorker.js";
 
 Vue.config.productionTip = false;
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 
 Vue.use(VueLogger, {
   logLevel: isProduction ? "error" : "debug"

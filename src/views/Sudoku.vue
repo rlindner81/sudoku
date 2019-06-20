@@ -19,19 +19,13 @@
       <form class="pb-2 pt-3 d-print-none">
         <div class="form-row">
           <div class="col">
-            <button
-              type="button"
-              class="btn btn-primary form-control"
-              @click="onClickNew()"
-            >
+            <button type="button" class="btn btn-primary form-control" @click="onClickNew()">
               New
             </button>
           </div>
           <div class="col">
             <select v-model="size" class="btn-primary form-control">
-              <option v-for="(s, i) in sizes" :key="i" :value="s"
-                >Size {{ s }}</option
-              >
+              <option v-for="(s, i) in sizes" :key="i" :value="s">Size {{ s }}</option>
             </select>
           </div>
           <div class="col">
@@ -43,35 +37,21 @@
           </div>
           <div class="col">
             <select v-model="symbols" class="btn-primary form-control">
-              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">{{
-                s
-              }}</option>
+              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">{{ s }}</option>
             </select>
           </div>
           <div class="col">
-            <button
-              type="button"
-              class="btn btn-primary form-control"
-              @click="$refs.board.solve()"
-            >
+            <button type="button" class="btn btn-primary form-control" @click="$refs.board.solve()">
               Solve
             </button>
           </div>
           <div class="col">
-            <button
-              type="button"
-              class="btn btn-primary form-control"
-              @click="$refs.board.reset()"
-            >
+            <button type="button" class="btn btn-primary form-control" @click="$refs.board.reset()">
               Reset
             </button>
           </div>
           <div class="col">
-            <button
-              type="button"
-              class="btn btn-primary form-control"
-              onclick="window.print();return false;"
-            >
+            <button type="button" class="btn btn-primary form-control" onclick="window.print();return false;">
               Print
             </button>
           </div>
@@ -109,7 +89,7 @@ import difficulties from "@/data/difficulties.json";
 // https://emojipedia.org/nature/
 import symbolspack from "@/data/symbolspack.json";
 
-const DEFAULT_SIZE = 6;
+const DEFAULT_SIZE = 9;
 const DEFAULT_DIFFICULTY = "hard";
 const DEFAULT_SYMBOLS = "numbers";
 
@@ -157,27 +137,20 @@ export default {
     let query = Object.assign({}, this.$route.query);
 
     let size = parseInt(query.size);
-    query.size =
-      !isNaN(size) && this.sizes.indexOf(size) !== -1 ? size : DEFAULT_SIZE;
+    query.size = !isNaN(size) && this.sizes.indexOf(size) !== -1 ? size : DEFAULT_SIZE;
     this.size = query.size;
 
     let difficulty = query.difficulty;
     query.difficulty =
-      !isNull(difficulty) && this.difficultyKeys.indexOf(difficulty) !== -1
-        ? difficulty
-        : DEFAULT_DIFFICULTY;
+      !isNull(difficulty) && this.difficultyKeys.indexOf(difficulty) !== -1 ? difficulty : DEFAULT_DIFFICULTY;
     this.difficulty = query.difficulty;
 
     let symbols = query.symbols;
-    query.symbols =
-      !isNull(symbols) && this.symbolsKeys.indexOf(symbols) !== -1
-        ? symbols
-        : DEFAULT_SYMBOLS;
+    query.symbols = !isNull(symbols) && this.symbolsKeys.indexOf(symbols) !== -1 ? symbols : DEFAULT_SYMBOLS;
     this.symbols = query.symbols;
 
     let seed = query.seed;
-    query.seed =
-      !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
+    query.seed = !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
     this.seed = query.seed;
 
     this.$router.replace({ query });
