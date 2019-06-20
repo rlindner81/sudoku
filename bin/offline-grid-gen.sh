@@ -15,4 +15,4 @@ start_script() {
 }
 
 stop_script
-start_script
+start_script "$@"
