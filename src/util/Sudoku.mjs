@@ -18,11 +18,13 @@
  *
  */
 import { flatten, numbers } from "./helper.mjs";
-// import Counter from "./Counter.mjs";
+import Counter from "./Counter.mjs";
 
 const EMPTY_CHAR = ".";
-const HINT_QUOTIENT = 1 / 5;
-const SEARCH_RECURSION_LIMIT = 7;
+const HINT_QUOTIENT = 1 / 4;
+// const HINT_QUOTIENT = 1 / 5;
+const SEARCH_RECURSION_LIMIT = 5;
+const SPREAD_LIMIT = 3;
 
 // const searchCounter = new Counter("search");
 // const uniqueCounter = new Counter("unique");
@@ -34,8 +36,8 @@ export function charFromNum(i) {
   return i === 0
     ? EMPTY_CHAR
     : i < 10
-    ? String.fromCharCode(i + 48)
-    : String.fromCharCode(i + 55);
+      ? String.fromCharCode(i + 48)
+      : String.fromCharCode(i + 55);
 }
 
 /**
@@ -46,10 +48,10 @@ export function numFromChar(c) {
   return c === EMPTY_CHAR
     ? 0
     : 48 < i && i < 58
-    ? i - 48
-    : 65 <= i
-    ? i - 55
-    : null;
+      ? i - 48
+      : 65 <= i
+        ? i - 55
+        : null;
 }
 
 /**
@@ -97,17 +99,17 @@ function Sudoku(size, prng) {
   }
 }
 
-Sudoku.prototype.toString = function() {
+Sudoku.prototype.toString = function () {
   return `size ${this.size} = ${this.width}x${this.height} | hints ${
     this.hints
-  }`;
+    }`;
 };
 
 /**
  * The appropriate box width for a given board size. Should be the smallest number bigger than the square root of the
  * size that is also divisor.
  */
-Sudoku.prototype._widthForSize = function() {
+Sudoku.prototype._widthForSize = function () {
   for (let i = Math.ceil(Math.sqrt(this.size)); i < this.size; i++) {
     if (this.size % i === 0) {
       return i;
@@ -121,11 +123,11 @@ Sudoku.prototype._widthForSize = function() {
  * Size: 4 => Hints: 4
  * Size: 9 => Hints: 17
  */
-Sudoku.prototype._hintsForSize = function() {
+Sudoku.prototype._hintsForSize = function () {
   return Math.ceil(this.size * this.size * HINT_QUOTIENT);
 };
 
-Sudoku.prototype._boxPositions = function(offsetX, offsetY) {
+Sudoku.prototype._boxPositions = function (offsetX, offsetY) {
   let indices = [];
   for (let y = 0; y < this.height; y++) {
     for (let x = 0; x < this.width; x++) {
@@ -142,7 +144,7 @@ Sudoku.prototype._boxPositions = function(offsetX, offsetY) {
 /**
  * Return the board associated with a given grid by assigning all non-empty fields.
  */
-Sudoku.prototype.boardFromGrid = function(grid) {
+Sudoku.prototype.boardFromGrid = function (grid) {
   let board = {};
   for (let i = 0; i < this.cells; i++) {
     board[i] = this.chars;
@@ -161,7 +163,7 @@ Sudoku.prototype.boardFromGrid = function(grid) {
 /**
  * Return the grid associated with a board. Only cells with a unique value will be non-empty in the grid.
  */
-Sudoku.prototype.gridFromBoard = function(board) {
+Sudoku.prototype.gridFromBoard = function (board) {
   let grid = new Array(this.cells);
   for (let i = 0; i < this.cells; i++) {
     grid[i] = board[i].length === 1 ? board[i] : EMPTY_CHAR;
@@ -172,7 +174,7 @@ Sudoku.prototype.gridFromBoard = function(board) {
 /**
  * Assign char c to board[position] by eliminating all remaining values.
  */
-Sudoku.prototype.assign = function(board, position, c) {
+Sudoku.prototype.assign = function (board, position, c) {
   // console.log("assign", pos, c);
   let remainingValues = board[position].replace(c, "");
   for (let i = 0; i < remainingValues.length; i++) {
@@ -187,7 +189,7 @@ Sudoku.prototype.assign = function(board, position, c) {
 /**
  * Eliminate char c from board[position] and propagate appropriately.
  */
-Sudoku.prototype.eliminate = function(board, position, c) {
+Sudoku.prototype.eliminate = function (board, position, c) {
   // console.log("eliminate", pos, c);
   if (board[position].indexOf(c) === -1) {
     return board;
@@ -233,7 +235,7 @@ Sudoku.prototype.eliminate = function(board, position, c) {
 /**
  * Given a board find out if it is solved and find the "search" position with the least number of values > 1.
  */
-Sudoku.prototype.searchInfoFromBoard = function(board) {
+Sudoku.prototype.searchInfoFromBoard = function (board) {
   let minValuesLength = this.size;
   let maxValuesLength = 0;
   let spread = this.size + 1;
@@ -255,14 +257,15 @@ Sudoku.prototype.searchInfoFromBoard = function(board) {
   solved = minValuesLength === 1 && maxValuesLength === 1;
   return {
     solved,
-    position
+    position,
+    spread
   };
 };
 
 /**
  * Starting form a given board, find any valid solution.
  */
-Sudoku.prototype.searchAnySolution = function(
+Sudoku.prototype.searchAnySolution = function (
   board,
   depthLimit = -1,
   depth = 0
@@ -296,7 +299,7 @@ Sudoku.prototype.searchAnySolution = function(
   return null;
 };
 
-Sudoku.prototype.generateFullGrid = function() {
+Sudoku.prototype.generateFullGrid = function () {
   // console.log("generateFullGrid");
   let baseGrid =
     this.prng.shuffle(numbers(1, this.size).map(charFromNum)).join("") +
@@ -306,41 +309,45 @@ Sudoku.prototype.generateFullGrid = function() {
   return this.gridFromBoard(solution);
 };
 
-Sudoku.prototype.gridHasUniqueSolution = function(grid) {
+Sudoku.prototype.gridHasUniqueSolution = function (grid) {
   let board = this.boardFromGrid(grid);
   let fullBoard = this.searchAnySolution(board);
   let fullGrid = this.gridFromBoard(fullBoard);
   return this.hasUniqueSolution(board, fullGrid);
 };
 
-Sudoku.prototype.hasUniqueSolution = function(board, fullGrid) {
-  let searchInfo = this.searchInfoFromBoard(board);
-  if (searchInfo.solved) {
+Sudoku.prototype.hasUniqueSolution = function (board, fullGrid, depth = 0) {
+  let { solved, position, spread } = this.searchInfoFromBoard(board);
+  if (solved) {
     return true;
   }
-  // uniqueCounter.log();
+  // if (depth !== 0) uniqueCounter.log({ depth, spread });
+  if (SPREAD_LIMIT < spread) {
+    // console.log("abandoned for too much spread");
+    return false;
+  }
 
-  let realValue = fullGrid[searchInfo.position];
-  let remainingValues = board[searchInfo.position].replace(realValue, "");
+  let realValue = fullGrid[position];
+  let remainingValues = board[position].replace(realValue, "");
   for (let i = 0; i < remainingValues.length; i++) {
     let c = remainingValues[i];
     let newBoard = Object.assign({}, board);
-    newBoard = this.assign(newBoard, searchInfo.position, c);
+    newBoard = this.assign(newBoard, position, c);
     let solution = this.searchAnySolution(newBoard, SEARCH_RECURSION_LIMIT);
     if (solution !== null) {
       return false;
     }
   }
 
-  board = this.assign(board, searchInfo.position, realValue);
-  return this.hasUniqueSolution(board, fullGrid);
+  board = this.assign(board, position, realValue);
+  return this.hasUniqueSolution(board, fullGrid, depth++);
 };
 
 function _emptyAtPos(grid, pos) {
   return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
 }
 
-Sudoku.prototype.generateHintGrid = function(attempts) {
+Sudoku.prototype.generateHintGrid = function (attempts) {
   let fullGrid = this.generateFullGrid();
   let positions = this.prng.shuffle(numbers(0, this.cells));
   let grid = fullGrid;
