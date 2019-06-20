@@ -306,6 +306,14 @@ Sudoku.prototype.generateFullGrid = function() {
   return this.gridFromBoard(solution);
 };
 
+Sudoku.prototype.gridHasUniqueSolution = function(grid) {
+  let board = this.boardFromGrid(grid);
+  let fullBoard = this.searchAnySolution(board);
+  let fullGrid = this.gridFromBoard(fullBoard);
+  let searchInfo = this.searchInfoFromBoard(board);
+  return this.hasUniqueSolution(searchInfo, board, fullGrid);
+};
+
 Sudoku.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
   if (searchInfo.solved) {
     return true;
