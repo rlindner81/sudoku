@@ -310,11 +310,11 @@ Sudoku.prototype.gridHasUniqueSolution = function(grid) {
   let board = this.boardFromGrid(grid);
   let fullBoard = this.searchAnySolution(board);
   let fullGrid = this.gridFromBoard(fullBoard);
-  let searchInfo = this.searchInfoFromBoard(board);
-  return this.hasUniqueSolution(searchInfo, board, fullGrid);
+  return this.hasUniqueSolution(board, fullGrid);
 };
 
-Sudoku.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
+Sudoku.prototype.hasUniqueSolution = function(board, fullGrid) {
+  let searchInfo = this.searchInfoFromBoard(board);
   if (searchInfo.solved) {
     return true;
   }
@@ -331,7 +331,9 @@ Sudoku.prototype.hasUniqueSolution = function(searchInfo, board, fullGrid) {
       return false;
     }
   }
-  return true;
+
+  board = this.assign(board, searchInfo.position, realValue);
+  return this.hasUniqueSolution(board, fullGrid);
 };
 
 function _emptyAtPos(grid, pos) {
@@ -350,8 +352,7 @@ Sudoku.prototype.generateHintGrid = function(attempts) {
     }
     let newGrid = _emptyAtPos(grid, positions[0]);
     let board = this.boardFromGrid(newGrid);
-    let searchInfo = this.searchInfoFromBoard(board);
-    if (this.hasUniqueSolution(searchInfo, board, fullGrid)) {
+    if (this.hasUniqueSolution(board, fullGrid)) {
       // console.log("progress", positions.length, "hints", this.hints);
       grid = newGrid;
       positions = positions.slice(1);
