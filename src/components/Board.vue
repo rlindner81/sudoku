@@ -7,9 +7,7 @@
           :key="j"
           :class="getColumnClasses(i, j)"
           @click="onClick($event, j + size * i)"
-        >
-          {{ displayCell(board[j + size * i]) }}
-        </td>
+        >{{ displayCell(board[j + size * i]) }}</td>
       </tr>
     </table>
 
@@ -28,7 +26,7 @@
 // import Keypad from "@/components/Keypad.vue";
 
 import { isNull, fallback, flatten, numbers } from "@/util/helper.mjs";
-import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.mjs"; // eslint-disable-line no-unused-vars
+import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.mjs";
 import PRNG from "@/util/PRNG.mjs";
 
 // import Counter from "@/util/Counter.mjs";
@@ -152,10 +150,12 @@ export default {
         .split("")
         .map(numFromChar);
 
-      // console.log("initial hintgrid", hintGrid.map(charFromNum).join("")); // eslint-disable-line
-      // console.log("initial fullgrid", fullGrid.map(charFromNum).join("")); // eslint-disable-line
+      this.$log.debug("initial hintgrid", hintGrid.map(charFromNum).join(""));
+      this.$log.debug("initial fullgrid", fullGrid.map(charFromNum).join(""));
 
       this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
+
+      this.$log.debug("after scale", hintGrid.map(charFromNum).join(""));
 
       [
         this.randomRelabel,
@@ -171,8 +171,8 @@ export default {
         });
       });
 
-      // console.log("final hintgrid", hintGrid.map(charFromNum).join("")); // eslint-disable-line
-      // console.log("final fullgrid", fullGrid.map(charFromNum).join("")); // eslint-disable-line
+      this.$log.debug("final hintgrid", hintGrid.map(charFromNum).join(""));
+      this.$log.debug("final fullgrid", fullGrid.map(charFromNum).join(""));
 
       this.hintGrid = hintGrid;
       this.fullGrid = fullGrid;
@@ -200,7 +200,11 @@ export default {
         state.labels,
         this.prng.shuffle(numbers(1, this.size))
       );
-      // console.log("before relabel", state.grid.map(charFromNum).join(""), state.labels); // eslint-disable-line
+      this.$log.debug(
+        "before relabel",
+        state.grid.map(charFromNum).join(""),
+        state.labels
+      );
 
       for (let i = 0; i < this.sudoku.cells; i++) {
         let value = state.grid[i];
@@ -209,14 +213,14 @@ export default {
         }
       }
 
-      // console.log(" after relabel", state.grid.map(charFromNum).join("")); // eslint-disable-line
+      this.$log.debug(" after relabel", state.grid.map(charFromNum).join(""));
     },
     randomTranspose(state) {
       if (this.sudoku.width !== this.sudoku.height) {
         return;
       }
       state.transpose = fallback(state.transpose, this.prng.rand() < 0.5);
-      // console.log("before transpose", state.grid.map(charFromNum).join(""), state.transpose); // eslint-disable-line
+      this.$log.debug("before transpose",state.grid.map(charFromNum).join(""),state.transpose);
 
       if (state.transpose) {
         for (let i = 0; i < this.size; i++) {
@@ -230,7 +234,7 @@ export default {
         }
       }
 
-      // console.log(" after transpose", state.grid.map(charFromNum).join("")); // eslint-disable-line
+      this.$log.debug(" after transpose", state.grid.map(charFromNum).join(""));
     },
     getPermutationIndices(isRow = true) {
       let width = isRow ? this.sudoku.width : this.sudoku.height;
@@ -245,7 +249,11 @@ export default {
       if (isNull(state.rows)) {
         state.rows = this.getPermutationIndices(true);
       }
-      // console.log("before row permute", state.grid.map(charFromNum).join(""), state.rows); // eslint-disable-line
+      this.$log.debug(
+        "before row permute",
+        state.grid.map(charFromNum).join(""),
+        state.rows
+      );
 
       let oldGrid = state.grid.slice();
       for (let i = 0; i < this.size; i++) {
@@ -256,13 +264,20 @@ export default {
         }
       }
 
-      // console.log(" after row permute", state.grid.map(charFromNum).join("")); // eslint-disable-line
+      this.$log.debug(
+        " after row permute",
+        state.grid.map(charFromNum).join("")
+      );
     },
     randomColumnPermutation(state) {
       if (isNull(state.cols)) {
         state.cols = this.getPermutationIndices(false);
       }
-      // console.log("before col permute", state.grid.map(charFromNum).join(""), state.cols); // eslint-disable-line
+      this.$log.debug(
+        "before col permute",
+        state.grid.map(charFromNum).join(""),
+        state.cols
+      );
 
       let oldGrid = state.grid.slice();
       for (let i = 0; i < this.size; i++) {
@@ -273,7 +288,10 @@ export default {
         }
       }
 
-      // console.log(" after col permute", state.grid.map(charFromNum).join("")); // eslint-disable-line
+      this.$log.debug(
+        " after col permute",
+        state.grid.map(charFromNum).join("")
+      );
     },
     // debug() {
     //   let grid = this.gridFromSquares(this.squares);
