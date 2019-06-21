@@ -11,7 +11,6 @@ stop_start_script() {
   echo "$!" >"$script_dir/$1-$script_name.pid"
 }
 
-stop_start_script 9
 stop_start_script 10
 stop_start_script 12
 stop_start_script 14
