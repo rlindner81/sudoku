@@ -175,7 +175,6 @@ Sudoku.prototype.gridFromBoard = function (board) {
  * Assign char c to board[position] by eliminating all remaining values.
  */
 Sudoku.prototype.assign = function (board, position, c) {
-  // console.log("assign", pos, c);
   let remainingValues = board[position].replace(c, "");
   for (let i = 0; i < remainingValues.length; i++) {
     board = this.eliminate(board, position, remainingValues[i]);
@@ -190,7 +189,6 @@ Sudoku.prototype.assign = function (board, position, c) {
  * Eliminate char c from board[position] and propagate appropriately.
  */
 Sudoku.prototype.eliminate = function (board, position, c) {
-  // console.log("eliminate", pos, c);
   if (board[position].indexOf(c) === -1) {
     return board;
   }
@@ -275,7 +273,7 @@ Sudoku.prototype.searchAnySolution = function (
   }
   // searchCounter.logEvery(1000, { depth });
   if (0 <= depthLimit && depthLimit < depth) {
-    // console.log("below recursion depth limit at", depth);
+    console.log("hit recursion depth limit at", depth);
     return board;
   }
 
@@ -300,7 +298,6 @@ Sudoku.prototype.searchAnySolution = function (
 };
 
 Sudoku.prototype.generateFullGrid = function () {
-  // console.log("generateFullGrid");
   let baseGrid =
     this.prng.shuffle(numbers(1, this.size).map(charFromNum)).join("") +
     EMPTY_CHAR.repeat(this.cells - this.size);
@@ -323,7 +320,7 @@ Sudoku.prototype.hasUniqueSolution = function (board, fullGrid, depth = 0) {
   }
   // if (depth !== 0) uniqueCounter.log({ depth, spread });
   if (SPREAD_LIMIT < spread) {
-    // console.log("abandoned for too much spread");
+    console.log("hit spread limit at", spread);
     return false;
   }
 
@@ -343,7 +340,7 @@ Sudoku.prototype.hasUniqueSolution = function (board, fullGrid, depth = 0) {
   return this.hasUniqueSolution(board, fullGrid, depth++);
 };
 
-function _emptyAtPos(grid, pos) {
+function _clearAtPos(grid, pos) {
   return grid.substr(0, pos) + EMPTY_CHAR + grid.substr(pos + 1);
 }
 
@@ -351,24 +348,26 @@ Sudoku.prototype.generateHintGrid = function (attempts) {
   let fullGrid = this.generateFullGrid();
   let positions = this.prng.shuffle(numbers(0, this.cells));
   let grid = fullGrid;
-  let lastLenght = positions.length;
+  // let lastLenght = positions.length;
 
   for (let attempt = 0; attempt < attempts; attempt++) {
     if (positions.length <= this.hints) {
       return grid;
     }
-    let newGrid = _emptyAtPos(grid, positions[0]);
+    let newGrid = _clearAtPos(grid, positions[0]);
     let board = this.boardFromGrid(newGrid);
     if (this.hasUniqueSolution(board, fullGrid)) {
-      // console.log("progress", positions.length, "hints", this.hints);
+      attempt = 0;
+      attempts = Math.floor(attempts * (1 + 3 * Math.pow(this.hints / positions.length, 10)));
+      // console.log("progress", positions.length, "hints", this.hints, "attempts", attempts);
       grid = newGrid;
       positions = positions.slice(1);
       continue;
     } else {
-      if (positions.length < lastLenght) {
-        lastLenght = positions.length;
-        // console.log("reached", lastLenght, "hints");
-      }
+      // if (positions.length < lastLenght) {
+      //   lastLenght = positions.length;
+      //   console.log("reached", lastLenght, "hints");
+      // }
       positions = this.prng.shuffle(positions);
       attempt++;
       continue;
