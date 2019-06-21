@@ -23,7 +23,7 @@ import Counter from "./Counter.mjs";
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 4;
 // const HINT_QUOTIENT = 1 / 5;
-const SEARCH_RECURSION_LIMIT = 5;
+const SEARCH_RECURSION_LIMIT = 2;
 const SPREAD_LIMIT = 3;
 
 // const searchCounter = new Counter("search");
@@ -273,7 +273,7 @@ Sudoku.prototype.searchAnySolution = function (
   }
   // searchCounter.logEvery(1000, { depth });
   if (0 <= depthLimit && depthLimit < depth) {
-    console.log("hit recursion depth limit at", depth);
+    // console.log("hit recursion depth limit at", depth);
     return board;
   }
 
