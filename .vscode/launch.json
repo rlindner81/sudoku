@@ -25,6 +25,15 @@
       "runtimeArgs": [
         "--experimental-modules"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Select",
+      "program": "${workspaceFolder}/bin/select.mjs",
+      "runtimeArgs": [
+        "--experimental-modules"
+      ]
     }
   ]
 }

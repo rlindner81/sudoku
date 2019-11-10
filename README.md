@@ -8,6 +8,7 @@
 * https://github.com/norvig/pytudes/blob/master/py/sudoku.py
 * http://www.sudokuwiki.org/sudoku.htm
 * http://www.afjarvis.staff.shef.ac.uk/sudoku/
+* https://sites.google.com/site/dobrichev/sudoku-puzzle-collections
 
 Node modules new syntaxes
 * https://medium.com/@giltayar/native-es-modules-in-nodejs-status-and-future-directions-part-i-ee5ea3001f71
@@ -21,7 +22,6 @@ Actually working memwatch package
 * Input with hover for Desktop
 * Confetti for solving
 * Helper get function codeing
-* Confetti for solving
 
 ## similar puzzles
 
