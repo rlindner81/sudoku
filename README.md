@@ -4,11 +4,17 @@
 
 * https://en.wikipedia.org/wiki/Mathematics_of_Sudoku
 * https://codepen.io/pavlovsk/pen/XmjPOE
-* http://www.norvig.com/sudoku.html
 * https://github.com/norvig/pytudes/blob/master/py/sudoku.py
 * http://www.sudokuwiki.org/sudoku.htm
 * http://www.afjarvis.staff.shef.ac.uk/sudoku/
 * https://sites.google.com/site/dobrichev/sudoku-puzzle-collections
+
+Solver implementations
+* Donald E. Knuth (Exact cover problem/Dancing links): 
+  * https://www-cs-faculty.stanford.edu/~knuth/programs/sudoku.w
+  * https://www-cs-faculty.stanford.edu/~knuth/programs.html
+* Bram Cohen (SAT): https://bramcohen.livejournal.com/70250.html
+* Peter Norvig (Brute force): http://www.norvig.com/sudoku.html
 
 Node modules new syntaxes
 * https://medium.com/@giltayar/native-es-modules-in-nodejs-status-and-future-directions-part-i-ee5ea3001f71
