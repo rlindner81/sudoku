@@ -186,6 +186,8 @@ export default {
   .container {
     min-width: 0 !important;
     max-width: none !important;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
   .col {
     padding-left: 0 !important;
