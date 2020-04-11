@@ -91,7 +91,7 @@ import symbolspack from "@/data/symbolspack.json";
 
 const DEFAULT_SIZE = 9;
 const DEFAULT_DIFFICULTY = "hard";
-const DEFAULT_SYMBOLS = "numbers";
+const DEFAULT_SYMBOLS = "alphanum";
 
 const SEED_RE = /^\d{8}$/;
 
