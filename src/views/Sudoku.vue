@@ -95,6 +95,13 @@ const DEFAULT_SYMBOLS = "alphanum";
 
 const SEED_RE = /^\d{8}$/;
 
+const queryChanged = (query, newQuery) => {
+  return !["size", "difficulty", "symbols", "seed"].reduce(
+    (result, field) => result && query[field] && newQuery[field] && query[field] == newQuery[field],
+    true
+  );
+};
+
 export default {
   name: "Sudoku",
   components: {
@@ -153,19 +160,22 @@ export default {
     query.seed = !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
     this.seed = query.seed;
 
-    this.$router.replace({ query });
+    if (queryChanged(this.$route.query, query)) {
+      this.$router.replace({ query });
+    }
   },
   methods: {
     updateQuery(options) {
       options = fallback(options, {});
-      this.$router.push({
-        query: {
-          size: fallback(options.size, this.size),
-          difficulty: fallback(options.difficulty, this.difficulty),
-          symbols: fallback(options.symbols, this.symbols),
-          seed: fallback(options.seed, this.seed)
-        }
-      });
+      const query = {
+        size: fallback(options.size, this.size),
+        difficulty: fallback(options.difficulty, this.difficulty),
+        symbols: fallback(options.symbols, this.symbols),
+        seed: fallback(options.seed, this.seed)
+      };
+      if (queryChanged(this.$route.query, query)) {
+        this.$router.push({ query });
+      }
     },
     onClickNew() {
       this.seed = this.randomSeed();
