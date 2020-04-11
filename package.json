@@ -9,28 +9,28 @@
     "offline": "node --experimental-modules src/offline/start.mjs"
   },
   "dependencies": {
-    "register-service-worker": "^1.6.2",
-    "vue": "^2.6.10",
-    "vue-router": "^3.1.3",
-    "vuejs-logger": "^1.5.3",
-    "vuex": "^3.1.1"
+    "register-service-worker": "^1.7.1",
+    "vue": "^2.6.11",
+    "vue-router": "^3.1.6",
+    "vuejs-logger": "^1.5.4",
+    "vuex": "^3.1.3"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.7.0",
-    "@vue/cli-plugin-eslint": "^3.7.0",
-    "@vue/cli-plugin-pwa": "^3.7.0",
-    "@vue/cli-service": "^3.7.0",
-    "@vue/eslint-config-prettier": "^4.0.1",
-    "babel-eslint": "^10.0.3",
-    "bootstrap": "^4.3.1",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.2.3",
+    "@vue/cli-plugin-babel": "^4.3.1",
+    "@vue/cli-plugin-eslint": "^4.3.1",
+    "@vue/cli-plugin-pwa": "^4.3.1",
+    "@vue/cli-service": "^4.3.1",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "babel-eslint": "^10.1.0",
+    "bootstrap": "^4.4.1",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^6.2.2",
     "fibers": "^4.0.2",
-    "jquery": "^3.4.1",
-    "popper.js": "^1.16.0",
-    "sass": "^1.23.3",
-    "sass-loader": "^7.3.1",
-    "vue-template-compiler": "^2.6.10"
+    "jquery": "^3.5.0",
+    "popper.js": "^1.16.1",
+    "sass": "^1.26.3",
+    "sass-loader": "^8.0.2",
+    "vue-template-compiler": "^2.6.11"
   },
   "prettier": {
     "printWidth": 120
