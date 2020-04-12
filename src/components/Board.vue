@@ -29,6 +29,14 @@ import PRNG from "@/util/PRNG.mjs";
 // import Counter from "@/util/Counter.mjs";
 // const generateCounter = new Counter("generate");
 
+const countOccurrences = (grid, size) => {
+  const occurrences = new Array(size + 1).fill(0);
+  for (const i of numbers(0, grid.length)) {
+    occurrences[grid[i]]++;
+  }
+  return occurrences;
+};
+
 export default {
   name: "Board",
   components: {
@@ -147,7 +155,9 @@ export default {
       // this.$log.debug("unique?", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join("")));  // eslint-disable-line
       this.$log.debug("initial fullgrid", fullGrid.map(charFromNum).join(""));
 
+      this.$log.debug("occurrences before scale", countOccurrences(hintGrid, size));
       this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
+      this.$log.debug("occurrences after scale", countOccurrences(hintGrid, size));
 
       this.$log.debug("after scale", hintGrid.map(charFromNum).join(""));
 
@@ -175,15 +185,19 @@ export default {
       let hints = hintGrid.filter(c => c !== 0).length;
       let missingHints = Math.ceil(this.sudoku.cells / difficultyQuotient) - hints;
 
+      let occurrences = countOccurrences(hintGrid, size);
+      let least = occurrences.indexOf(Math.min(...occurrences));
       for (let i = 0; i < this.sudoku.cells; i++) {
         let x = hintPositions[i];
-        if (hintGrid[x] !== 0) {
+        if (hintGrid[x] !== 0 || fullGrid[x] !== least) {
           continue;
         }
         if (missingHints-- <= 0) {
           break;
         }
         hintGrid[x] = fullGrid[x];
+        occurrences[least]++;
+        least = occurrences.indexOf(Math.min(...occurrences));
       }
     },
     randomRelabel(state) {
