@@ -15,7 +15,7 @@ The puzzle is repeated in a comment line at the beginning of the output.
 #include <stdlib.h>
 char buf[bufsize];
 int pos[9][9], row[9][9], col[9][9], box[9][9]; /* things to cover */
-main() {
+int main() {
   register int c,j,k,d,x;
   @<Input the given problem@>;
   @<Output the comment line@>;

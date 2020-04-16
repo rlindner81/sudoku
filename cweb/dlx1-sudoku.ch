@@ -28,7 +28,7 @@ int n=7; /* size of the prespecified clue board */
   }
 @y
   if (spacing && (count mod spacing==0)) {
-    register cc,r,x,y;
+    register int cc,r,x,y;
     for (k=0;k<=level;k++) {
       for (r=choice[k]+1;nd[r].itm>0;r++) ;
       r=nd[r].up, cc=nd[r].itm, x=cl[cc].name[1], y=cl[cc].name[2];

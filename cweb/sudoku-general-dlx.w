@@ -67,7 +67,7 @@ int c; /* how many clues have been given? */
 int bc; /* how many boxes have been defined? */
 int cells; /* how many cells are left, after holes deducted? */
 unsigned int inbox[32][32]; /* which boxes contain this cell? */
-main() {
+int main() {
   register int d,i,j,k,kk,n,x;
   @<Input the given problem@>;
   @<Output the comment line@>;

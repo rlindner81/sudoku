@@ -116,7 +116,7 @@ typedef unsigned long long ullng; /* ditto */
 @<Type definitions@>;
 @<Global variables@>;
 @<Subroutines@>;
-main (int argc, char *argv[]) {
+int main (int argc, char *argv[]) {
   register int cc,i,j,k,p,pp,q,r,t,cur_node,best_itm;
   @<Process the command line@>;
   @<Input the item names@>;

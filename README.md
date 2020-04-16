@@ -11,8 +11,11 @@
 
 Solver implementations
 * Donald E. Knuth (Exact cover problem/Dancing links): 
-  * https://www-cs-faculty.stanford.edu/~knuth/programs/sudoku.w
   * https://www-cs-faculty.stanford.edu/~knuth/programs.html
+    * SUDOKU-DLX, SUDOKU-GENERAL-DLX, and DLX1-SUDOKU
+  * https://www-cs-faculty.stanford.edu/~knuth/sgb.html
+    * Dependency gb_flip.h
+    * http://ftp.cs.stanford.edu/pub/sgb/
 * Bram Cohen (SAT): https://bramcohen.livejournal.com/70250.html
 * Peter Norvig (Brute force): http://www.norvig.com/sudoku.html
 
