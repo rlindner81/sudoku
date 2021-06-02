@@ -9,7 +9,7 @@
     "offline": "node --experimental-modules src/offline/start.mjs"
   },
   "dependencies": {
-    "register-service-worker": "1.7.1",
+    "register-service-worker": "1.7.2",
     "vue": "2.6.11",
     "vue-router": "3.1.6",
     "vuejs-logger": "1.5.4",
