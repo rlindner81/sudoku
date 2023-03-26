@@ -31,10 +31,7 @@ function generateGrids() {
       i++;
       solutions.push(grid);
       boardPacks[size] = solutions;
-      writeFileSync(
-        filename,
-        JSON.stringify(boardPacks, null, 2)
-      );
+      writeFileSync(filename, JSON.stringify(boardPacks, null, 2));
     }
   }
 }
