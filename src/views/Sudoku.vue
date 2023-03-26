@@ -124,7 +124,7 @@ const queryChanged = (query, newQuery) => {
       result &&
       query[field] &&
       newQuery[field] &&
-      query[field] === newQuery[field],
+      query[field] == newQuery[field], // NOTE: this double equals is on purpose, because size is an int that gets compared to a string
     true
   );
 };
