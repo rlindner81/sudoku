@@ -21,28 +21,31 @@
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary w-100"
+              class="btn btn-primary w-100 text-white"
               @click="onClickNew()"
             >
               New
             </button>
           </div>
           <div class="col">
-            <select v-model="size" class="btn btn-primary w-100">
+            <select v-model="size" class="btn btn-primary w-100 text-white">
               <option v-for="(s, i) in sizes" :key="i" :value="s">
                 Size {{ s }}
               </option>
             </select>
           </div>
           <div class="col">
-            <select v-model="difficulty" class="btn btn-primary w-100">
+            <select
+              v-model="difficulty"
+              class="btn btn-primary w-100 text-white"
+            >
               <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">
                 {{ d }}
               </option>
             </select>
           </div>
           <div class="col">
-            <select v-model="symbols" class="btn btn-primary w-100">
+            <select v-model="symbols" class="btn btn-primary w-100 text-white">
               <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">
                 {{ s }}
               </option>
@@ -51,7 +54,7 @@
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary w-100"
+              class="btn btn-primary w-100 text-white"
               @click="$refs.board.solve()"
             >
               Solve
@@ -60,7 +63,7 @@
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary w-100"
+              class="btn btn-primary w-100 text-white"
               @click="$refs.board.reset()"
             >
               Reset
@@ -69,7 +72,7 @@
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary w-100"
+              class="btn btn-primary w-100 text-white"
               onclick="window.print();return false;"
             >
               Print
