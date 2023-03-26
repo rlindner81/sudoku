@@ -121,7 +121,7 @@ const queryChanged = (query, newQuery) => {
       result &&
       query[field] &&
       newQuery[field] &&
-      query[field] == newQuery[field],
+      query[field] === newQuery[field],
     true
   );
 };
