@@ -2,7 +2,7 @@
   <div class="sudoku">
     <header>
       <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
+        <div class="container d-print-none">
           <span class="navbar-brand">{{ difficulty }} Sudoku {{ seed }}</span>
         </div>
       </nav>
@@ -16,33 +16,33 @@
         </div>
       </div>
 
-      <form class="pb-2 pt-3 d-print-none">
-        <div class="form-row">
+      <div class="pb-2 pt-3 d-print-none">
+        <div class="row">
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary form-control"
+              class="btn btn-primary w-100"
               @click="onClickNew()"
             >
               New
             </button>
           </div>
           <div class="col">
-            <select v-model="size" class="btn-primary form-control">
+            <select v-model="size" class="btn btn-primary w-100">
               <option v-for="(s, i) in sizes" :key="i" :value="s">
                 Size {{ s }}
               </option>
             </select>
           </div>
           <div class="col">
-            <select v-model="difficulty" class="btn-primary form-control">
+            <select v-model="difficulty" class="btn btn-primary w-100">
               <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">
                 {{ d }}
               </option>
             </select>
           </div>
           <div class="col">
-            <select v-model="symbols" class="btn-primary form-control">
+            <select v-model="symbols" class="btn btn-primary w-100">
               <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">
                 {{ s }}
               </option>
@@ -51,7 +51,7 @@
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary form-control"
+              class="btn btn-primary w-100"
               @click="$refs.board.solve()"
             >
               Solve
@@ -60,7 +60,7 @@
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary form-control"
+              class="btn btn-primary w-100"
               @click="$refs.board.reset()"
             >
               Reset
@@ -69,14 +69,14 @@
           <div class="col">
             <button
               type="button"
-              class="btn btn-primary form-control"
+              class="btn btn-primary w-100"
               onclick="window.print();return false;"
             >
               Print
             </button>
           </div>
         </div>
-      </form>
+      </div>
 
       <div class="row py-2">
         <div class="col">
