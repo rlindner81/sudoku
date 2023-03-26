@@ -13,11 +13,11 @@ Vue.config.productionTip = false;
 const isProduction = process.env.NODE_ENV === "production";
 
 Vue.use(VueLogger, {
-  logLevel: isProduction ? "error" : "debug"
+  logLevel: isProduction ? "error" : "debug",
 });
 
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount("#app");

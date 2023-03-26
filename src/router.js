@@ -11,7 +11,7 @@ export default new Router({
     {
       path: "/",
       name: "sudoku",
-      component: Sudoku
-    }
-  ]
+      component: Sudoku,
+    },
+  ],
 });
