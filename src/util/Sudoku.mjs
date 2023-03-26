@@ -36,8 +36,8 @@ export function charFromNum(i) {
   return i === 0
     ? EMPTY_CHAR
     : i < 10
-      ? String.fromCharCode(i + 48)
-      : String.fromCharCode(i + 55);
+    ? String.fromCharCode(i + 48)
+    : String.fromCharCode(i + 55);
 }
 
 /**
@@ -48,10 +48,10 @@ export function numFromChar(c) {
   return c === EMPTY_CHAR
     ? 0
     : 48 < i && i < 58
-      ? i - 48
-      : 65 <= i
-        ? i - 55
-        : null;
+    ? i - 48
+    : 65 <= i
+    ? i - 55
+    : null;
 }
 
 /**
@@ -76,21 +76,19 @@ function Sudoku(size, prng) {
   this.hints = this._hintsForSize();
   this.empties = this.cells - this.hints;
 
-  this.chars = numbers(1, this.size)
-    .map(charFromNum)
-    .join("");
+  this.chars = numbers(1, this.size).map(charFromNum).join("");
 
   this.peersForPosition = [];
   this.unitsForPosition = [];
   for (let y = 0; y < this.size; y++) {
     for (let x = 0; x < this.size; x++) {
       let index = x + y * this.size;
-      let row = numbers(y * this.size, this.size).filter(i => i !== index);
-      let column = numbers(x, this.size, this.size).filter(i => i !== index);
+      let row = numbers(y * this.size, this.size).filter((i) => i !== index);
+      let column = numbers(x, this.size, this.size).filter((i) => i !== index);
       let box = this._boxPositions(
         Math.floor(x / this.width),
         Math.floor(y / this.height)
-      ).filter(i => i !== index);
+      ).filter((i) => i !== index);
       let uniqueIndices = new Set(flatten([row, column, box]));
       let sortedIndices = [...uniqueIndices].sort((a, b) => a - b);
       this.unitsForPosition.push([row, column, box]);
@@ -100,9 +98,7 @@ function Sudoku(size, prng) {
 }
 
 Sudoku.prototype.toString = function () {
-  return `size ${this.size} = ${this.width}x${this.height} | hints ${
-    this.hints
-    }`;
+  return `size ${this.size} = ${this.width}x${this.height} | hints ${this.hints}`;
 };
 
 /**
@@ -215,7 +211,7 @@ Sudoku.prototype.eliminate = function (board, position, c) {
   let units = this.unitsForPosition[position];
   for (let i = 0; i < units.length; i++) {
     let unit = units[i];
-    let cPositions = unit.filter(p => {
+    let cPositions = unit.filter((p) => {
       return board[p].indexOf(c) !== -1;
     });
     if (cPositions.length === 0) {
@@ -256,7 +252,7 @@ Sudoku.prototype.searchInfoFromBoard = function (board) {
   return {
     solved,
     position,
-    spread
+    spread,
   };
 };
 
@@ -358,7 +354,9 @@ Sudoku.prototype.generateHintGrid = function (attempts) {
     let board = this.boardFromGrid(newGrid);
     if (this.hasUniqueSolution(board, fullGrid)) {
       attempt = 0;
-      attempts = Math.floor(attempts * (1 + 3 * Math.pow(this.hints / positions.length, 10)));
+      attempts = Math.floor(
+        attempts * (1 + 3 * Math.pow(this.hints / positions.length, 10))
+      );
       // console.log("progress", positions.length, "hints", this.hints, "attempts", attempts);
       grid = newGrid;
       positions = positions.slice(1);

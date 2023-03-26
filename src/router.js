@@ -6,12 +6,12 @@ Vue.use(Router);
 
 export default new Router({
   mode: "history",
-  base: process.env.BASE_URL,
+  base: import.meta.BASE_URL,
   routes: [
     {
       path: "/",
       name: "sudoku",
-      component: Sudoku
-    }
-  ]
+      component: Sudoku,
+    },
+  ],
 });

@@ -2,7 +2,7 @@
   <div class="sudoku">
     <header>
       <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
+        <div class="container d-print-none">
           <span class="navbar-brand">{{ difficulty }} Sudoku {{ seed }}</span>
         </div>
       </nav>
@@ -16,47 +16,70 @@
         </div>
       </div>
 
-      <form class="pb-2 pt-3 d-print-none">
-        <div class="form-row">
+      <div class="pb-2 pt-3 d-print-none">
+        <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-primary form-control" @click="onClickNew()">
+            <button
+              type="button"
+              class="btn btn-primary w-100 text-white"
+              @click="onClickNew()"
+            >
               New
             </button>
           </div>
           <div class="col">
-            <select v-model="size" class="btn-primary form-control">
-              <option v-for="(s, i) in sizes" :key="i" :value="s">Size {{ s }}</option>
+            <select v-model="size" class="btn btn-primary w-100 text-white">
+              <option v-for="(s, i) in sizes" :key="i" :value="s">
+                Size {{ s }}
+              </option>
             </select>
           </div>
           <div class="col">
-            <select v-model="difficulty" class="btn-primary form-control">
+            <select
+              v-model="difficulty"
+              class="btn btn-primary w-100 text-white"
+            >
               <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">
                 {{ d }}
               </option>
             </select>
           </div>
           <div class="col">
-            <select v-model="symbols" class="btn-primary form-control">
-              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">{{ s }}</option>
+            <select v-model="symbols" class="btn btn-primary w-100 text-white">
+              <option v-for="(s, i) in symbolsKeys" :key="i" :value="s">
+                {{ s }}
+              </option>
             </select>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-primary form-control" @click="$refs.board.solve()">
+            <button
+              type="button"
+              class="btn btn-primary w-100 text-white"
+              @click="$refs.board.solve()"
+            >
               Solve
             </button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-primary form-control" @click="$refs.board.reset()">
+            <button
+              type="button"
+              class="btn btn-primary w-100 text-white"
+              @click="$refs.board.reset()"
+            >
               Reset
             </button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-primary form-control" onclick="window.print();return false;">
+            <button
+              type="button"
+              class="btn btn-primary w-100 text-white"
+              onclick="window.print();return false;"
+            >
               Print
             </button>
           </div>
         </div>
-      </form>
+      </div>
 
       <div class="row py-2">
         <div class="col">
@@ -97,7 +120,11 @@ const SEED_RE = /^\d{8}$/;
 
 const queryChanged = (query, newQuery) => {
   return !["size", "difficulty", "symbols", "seed"].reduce(
-    (result, field) => result && query[field] && newQuery[field] && query[field] == newQuery[field],
+    (result, field) =>
+      result &&
+      query[field] &&
+      newQuery[field] &&
+      query[field] === newQuery[field],
     true
   );
 };
@@ -105,7 +132,7 @@ const queryChanged = (query, newQuery) => {
 export default {
   name: "Sudoku",
   components: {
-    Board
+    Board,
   },
   data() {
     return {
@@ -115,49 +142,56 @@ export default {
       size: null,
       difficulty: null,
       symbols: null,
-      seed: null
+      seed: null,
     };
   },
   computed: {
     sizes() {
-      return Object.keys(gridspack).map(size => parseInt(size));
+      return Object.keys(gridspack).map((size) => parseInt(size));
     },
     difficultyKeys() {
       return Object.keys(difficulties);
     },
     symbolsKeys() {
       return Object.keys(symbolspack);
-    }
+    },
   },
   watch: {
-    size: function(newVal) {
+    size: function (newVal) {
       this.updateQuery({ size: newVal });
     },
-    difficulty: function(newVal) {
+    difficulty: function (newVal) {
       this.updateQuery({ difficulty: newVal });
     },
-    symbols: function(newVal) {
+    symbols: function (newVal) {
       this.updateQuery({ symbols: newVal });
-    }
+    },
   },
   created() {
     let query = Object.assign({}, this.$route.query);
 
     let size = parseInt(query.size);
-    query.size = !isNaN(size) && this.sizes.indexOf(size) !== -1 ? size : DEFAULT_SIZE;
+    query.size =
+      !isNaN(size) && this.sizes.indexOf(size) !== -1 ? size : DEFAULT_SIZE;
     this.size = query.size;
 
     let difficulty = query.difficulty;
     query.difficulty =
-      !isNull(difficulty) && this.difficultyKeys.indexOf(difficulty) !== -1 ? difficulty : DEFAULT_DIFFICULTY;
+      !isNull(difficulty) && this.difficultyKeys.indexOf(difficulty) !== -1
+        ? difficulty
+        : DEFAULT_DIFFICULTY;
     this.difficulty = query.difficulty;
 
     let symbols = query.symbols;
-    query.symbols = !isNull(symbols) && this.symbolsKeys.indexOf(symbols) !== -1 ? symbols : DEFAULT_SYMBOLS;
+    query.symbols =
+      !isNull(symbols) && this.symbolsKeys.indexOf(symbols) !== -1
+        ? symbols
+        : DEFAULT_SYMBOLS;
     this.symbols = query.symbols;
 
     let seed = query.seed;
-    query.seed = !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
+    query.seed =
+      !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
     this.seed = query.seed;
 
     if (queryChanged(this.$route.query, query)) {
@@ -171,7 +205,7 @@ export default {
         size: fallback(options.size, this.size),
         difficulty: fallback(options.difficulty, this.difficulty),
         symbols: fallback(options.symbols, this.symbols),
-        seed: fallback(options.seed, this.seed)
+        seed: fallback(options.seed, this.seed),
       };
       if (queryChanged(this.$route.query, query)) {
         this.$router.push({ query });
@@ -182,11 +216,9 @@ export default {
       this.updateQuery();
     },
     randomSeed() {
-      return Math.random()
-        .toString()
-        .substring(2, 10);
-    }
-  }
+      return Math.random().toString().substring(2, 10);
+    },
+  },
 };
 </script>
 

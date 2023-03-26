@@ -13,9 +13,13 @@ function start() {
   let size = 9;
   let prng = new PRNG("42");
   let solver = new Sudoku(size, prng);
-  
-  let isUniqueInitial = solver.gridHasUniqueSolution("8..7..6.........82..1.....7......2........95...7........9.....8..4.....3..8....4.");
-  let isUniqueFinal = solver.gridHasUniqueSolution("471..9.2.2.3..5..7..5..2.9...4....8.58....27...7....6.638.....91.........4.....5.");
+
+  let isUniqueInitial = solver.gridHasUniqueSolution(
+    "8..7..6.........82..1.....7......2........95...7........9.....8..4.....3..8....4."
+  );
+  let isUniqueFinal = solver.gridHasUniqueSolution(
+    "471..9.2.2.3..5..7..5..2.9...4....8.58....27...7....6.638.....91.........4.....5."
+  );
 
   let i = 0;
 }

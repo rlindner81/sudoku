@@ -1,0 +1,63 @@
+{
+  "name": "sudoku",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "offline": "node --experimental-modules src/offline/start.mjs"
+  },
+  "dependencies": {
+    "register-service-worker": "1.7.2",
+    "vue": "2.7.8",
+    "vue-router": "3.5.4",
+    "vuejs-logger": "1.5.5",
+    "vuex": "3.6.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "4.5.19",
+    "@vue/cli-plugin-eslint": "4.5.19",
+    "@vue/cli-plugin-pwa": "4.5.19",
+    "@vue/cli-service": "4.5.19",
+    "@vue/eslint-config-prettier": "6.0.0",
+    "babel-eslint": "10.1.0",
+    "bootstrap": "5.2.0",
+    "eslint": "7.32.0",
+    "eslint-plugin-prettier": "3.4.1",
+    "eslint-plugin-vue": "7.20.0",
+    "fibers": "5.0.2",
+    "jquery": "3.6.0",
+    "popper.js": "1.16.1",
+    "sass": "1.54.0",
+    "sass-loader": "12.6.0",
+    "vue-template-compiler": "2.7.8"
+  },
+  "prettier": {
+    "printWidth": 120
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/recommended",
+      "@vue/prettier"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}

@@ -3,7 +3,7 @@ const TIME_UNITS = Object.entries({
   sec: 60,
   min: 60,
   hour: 24,
-  day: null
+  day: null,
 });
 
 function timeDiffToString(timeDiff) {
@@ -32,13 +32,13 @@ function Counter(name) {
   this.lastCallTime = now;
 }
 
-Counter.prototype.log = function(additionalLogs = null) {
+Counter.prototype.log = function (additionalLogs = null) {
   let now = new Date();
   let logs = [
     this.name,
     `total ${timeDiffToString(now - this.startTime)}`,
     `delta ${timeDiffToString(now - this.lastCallTime)}`,
-    `call ${this.calls++}`
+    `call ${this.calls++}`,
   ];
   if (additionalLogs) {
     Object.entries(additionalLogs).forEach(([logKey, value]) => {
@@ -50,7 +50,7 @@ Counter.prototype.log = function(additionalLogs = null) {
   console.log(logs.join(" | "));
 };
 
-Counter.prototype.logEvery = function(frequency = 100, additionalLogs = null) {
+Counter.prototype.logEvery = function (frequency = 100, additionalLogs = null) {
   if (this.calls % frequency !== 0) {
     this.calls++;
     return;
