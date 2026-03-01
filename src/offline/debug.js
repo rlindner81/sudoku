@@ -6,8 +6,8 @@
 //   final hintgrid 471..9.2.2.3..5..7..5..2.9...4....8.58....27...7....6.638.....91.........4.....5.
 //   final fullgrid 471639528293485617865712394324576981586194273917823465638257149152948736749361852
 
-import { default as Sudoku } from "./../util/Sudoku.mjs";
-import PRNG from "./../util/PRNG.mjs";
+import { default as Sudoku } from "./../util/Sudoku.js";
+import PRNG from "./../util/PRNG.js";
 
 function start() {
   let size = 9;

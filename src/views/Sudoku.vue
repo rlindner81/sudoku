@@ -104,7 +104,7 @@
 
 <script>
 import Board from "@/components/Board.vue";
-import { isNull, fallback } from "@/util/helper.mjs";
+import { isNull, fallback } from "@/util/helper.js";
 
 import gridspack from "@/data/gridspack.json";
 import difficulties from "@/data/difficulties.json";

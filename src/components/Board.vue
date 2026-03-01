@@ -27,11 +27,11 @@
 <script>
 // import Keypad from "@/components/Keypad.vue";
 
-import { isNull, fallback, flatten, numbers } from "@/util/helper.mjs";
-import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.mjs";
-import PRNG from "@/util/PRNG.mjs";
+import { isNull, fallback, flatten, numbers } from "@/util/helper.js";
+import { default as Sudoku, charFromNum, numFromChar } from "@/util/Sudoku.js";
+import PRNG from "@/util/PRNG.js";
 
-// import Counter from "@/util/Counter.mjs";
+// import Counter from "@/util/Counter.js";
 // const generateCounter = new Counter("generate");
 
 const countOccurrences = (grid, size) => {

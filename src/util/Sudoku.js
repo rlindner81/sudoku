@@ -17,8 +17,8 @@
  *   -----------------
  *
  */
-import { flatten, numbers } from "./helper.mjs";
-import Counter from "./Counter.mjs";
+import { flatten, numbers } from "./helper.js";
+import Counter from "./Counter.js";
 
 const EMPTY_CHAR = ".";
 const HINT_QUOTIENT = 1 / 4;

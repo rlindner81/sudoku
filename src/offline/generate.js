@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import { writeFileSync } from "fs";
 
-import Counter from "./../util/Counter.mjs";
-import { default as Sudoku, isValidSize } from "./../util/Sudoku.mjs";
-import PRNG from "./../util/PRNG.mjs";
-import { argValue } from "./../util/helper.mjs";
+import Counter from "./../util/Counter.js";
+import { default as Sudoku, isValidSize } from "./../util/Sudoku.js";
+import PRNG from "./../util/PRNG.js";
+import { argValue } from "./../util/helper.js";
 
 const successCounter = new Counter("success");
 
