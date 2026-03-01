@@ -19,26 +19,15 @@
       <div class="pb-2 pt-3 d-print-none">
         <div class="row">
           <div class="col">
-            <button
-              type="button"
-              class="btn btn-primary w-100 text-white"
-              @click="onClickNew()"
-            >
-              New
-            </button>
+            <button type="button" class="btn btn-primary w-100 text-white" @click="onClickNew()">New</button>
           </div>
           <div class="col">
             <select v-model="size" class="btn btn-primary w-100 text-white">
-              <option v-for="(s, i) in sizes" :key="i" :value="s">
-                Size {{ s }}
-              </option>
+              <option v-for="(s, i) in sizes" :key="i" :value="s">Size {{ s }}</option>
             </select>
           </div>
           <div class="col">
-            <select
-              v-model="difficulty"
-              class="btn btn-primary w-100 text-white"
-            >
+            <select v-model="difficulty" class="btn btn-primary w-100 text-white">
               <option v-for="(d, i) in difficultyKeys" :key="i" :value="d">
                 {{ d }}
               </option>
@@ -52,28 +41,19 @@
             </select>
           </div>
           <div class="col">
-            <button
-              type="button"
-              class="btn btn-primary w-100 text-white"
-              @click="$refs.board.solve()"
-            >
-              Solve
-            </button>
+            <button type="button" class="btn btn-primary w-100 text-white" @click="$refs.board.solve()">Solve</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-primary w-100 text-white" @click="$refs.board.reset()">Reset</button>
           </div>
           <div class="col">
             <button
               type="button"
               class="btn btn-primary w-100 text-white"
-              @click="$refs.board.reset()"
-            >
-              Reset
-            </button>
-          </div>
-          <div class="col">
-            <button
-              type="button"
-              class="btn btn-primary w-100 text-white"
-              onclick="window.print();return false;"
+              onclick="
+                window.print();
+                return false;
+              "
             >
               Print
             </button>
@@ -120,12 +100,8 @@ const SEED_RE = /^\d{8}$/;
 
 const queryChanged = (query, newQuery) => {
   return !["size", "difficulty", "symbols", "seed"].reduce(
-    (result, field) =>
-      result &&
-      query[field] &&
-      newQuery[field] &&
-      query[field] == newQuery[field], // NOTE: this double equals is on purpose, because size is an int that gets compared to a string
-    true
+    (result, field) => result && query[field] && newQuery[field] && query[field] == newQuery[field], // NOTE: this double equals is on purpose, because size is an int that gets compared to a string
+    true,
   );
 };
 
@@ -171,27 +147,20 @@ export default {
     let query = Object.assign({}, this.$route.query);
 
     let size = parseInt(query.size);
-    query.size =
-      !isNaN(size) && this.sizes.indexOf(size) !== -1 ? size : DEFAULT_SIZE;
+    query.size = !isNaN(size) && this.sizes.indexOf(size) !== -1 ? size : DEFAULT_SIZE;
     this.size = query.size;
 
     let difficulty = query.difficulty;
     query.difficulty =
-      !isNull(difficulty) && this.difficultyKeys.indexOf(difficulty) !== -1
-        ? difficulty
-        : DEFAULT_DIFFICULTY;
+      !isNull(difficulty) && this.difficultyKeys.indexOf(difficulty) !== -1 ? difficulty : DEFAULT_DIFFICULTY;
     this.difficulty = query.difficulty;
 
     let symbols = query.symbols;
-    query.symbols =
-      !isNull(symbols) && this.symbolsKeys.indexOf(symbols) !== -1
-        ? symbols
-        : DEFAULT_SYMBOLS;
+    query.symbols = !isNull(symbols) && this.symbolsKeys.indexOf(symbols) !== -1 ? symbols : DEFAULT_SYMBOLS;
     this.symbols = query.symbols;
 
     let seed = query.seed;
-    query.seed =
-      !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
+    query.seed = !isNull(seed) && seed.match(SEED_RE) ? seed : this.randomSeed();
     this.seed = query.seed;
 
     if (queryChanged(this.$route.query, query)) {

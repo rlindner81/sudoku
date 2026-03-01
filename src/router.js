@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from "vue-router";
 import Sudoku from "./views/Sudoku.vue";
 
 const router = createRouter({

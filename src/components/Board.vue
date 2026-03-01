@@ -2,12 +2,7 @@
   <div>
     <table :class="getBoardClasses()">
       <tr v-for="(row, i) in size" :key="i" :class="getRowClasses(i)">
-        <td
-          v-for="(col, j) in size"
-          :key="j"
-          :class="getColumnClasses(i, j)"
-          @click="onClick($event, j + size * i)"
-        >
+        <td v-for="(col, j) in size" :key="j" :class="getColumnClasses(i, j)" @click="onClick($event, j + size * i)">
           {{ displayCell(board[j + size * i]) }}
         </td>
       </tr>
@@ -82,9 +77,7 @@ export default {
   },
   computed: {
     selectedSquare() {
-      return this.selectedPosition !== null
-        ? this.board[this.selectedPosition]
-        : null;
+      return this.selectedPosition !== null ? this.board[this.selectedPosition] : null;
     },
   },
   watch: {
@@ -133,8 +126,8 @@ export default {
       return value === 0
         ? "\u00a0" // non-breaking space
         : value <= this.symbols.length
-        ? this.symbols[value - 1]
-        : value;
+          ? this.symbols[value - 1]
+          : value;
     },
 
     //
@@ -144,10 +137,7 @@ export default {
       options = fallback(options, {});
       let size = fallback(options.size, this.size);
       let seed = fallback(options.seed, this.seed);
-      let difficultyQuotient = fallback(
-        options.difficultyQuotient,
-        this.difficultyQuotient
-      );
+      let difficultyQuotient = fallback(options.difficultyQuotient, this.difficultyQuotient);
       this.prng = new PRNG(seed);
       this.sudoku = new Sudoku(size, this.prng);
       // let debugSudoku = new Sudoku(size, new PRNG(seed));  // eslint-disable-line
@@ -156,40 +146,28 @@ export default {
       let hintBoard = this.sudoku.boardFromGrid(grid);
       let fullBoard = this.sudoku.searchAnySolution(hintBoard);
       let hintGrid = grid.split("").map(numFromChar);
-      let fullGrid = this.sudoku
-        .gridFromBoard(fullBoard)
-        .split("")
-        .map(numFromChar);
+      let fullGrid = this.sudoku.gridFromBoard(fullBoard).split("").map(numFromChar);
 
       this.$log.debug("initial hintgrid", hintGrid.map(charFromNum).join(""));
       // this.$log.debug("unique?", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join("")));  // eslint-disable-line
       this.$log.debug("initial fullgrid", fullGrid.map(charFromNum).join(""));
 
-      this.$log.debug(
-        "occurrences before scale",
-        countOccurrences(hintGrid, size)
-      );
+      this.$log.debug("occurrences before scale", countOccurrences(hintGrid, size));
       this.scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid);
-      this.$log.debug(
-        "occurrences after scale",
-        countOccurrences(hintGrid, size)
-      );
+      this.$log.debug("occurrences after scale", countOccurrences(hintGrid, size));
 
       this.$log.debug("after scale", hintGrid.map(charFromNum).join(""));
 
-      [
-        this.randomRelabel,
-        this.randomTranspose,
-        this.randomRowPermutation,
-        this.randomColumnPermutation,
-      ].forEach((fn) => {
-        let state = {};
-        [hintGrid, fullGrid].forEach((grid) => {
-          state.grid = grid;
-          fn(state);
-          grid = state.grid;
-        });
-      });
+      [this.randomRelabel, this.randomTranspose, this.randomRowPermutation, this.randomColumnPermutation].forEach(
+        (fn) => {
+          let state = {};
+          [hintGrid, fullGrid].forEach((grid) => {
+            state.grid = grid;
+            fn(state);
+            grid = state.grid;
+          });
+        },
+      );
 
       this.$log.debug("final hintgrid", hintGrid.map(charFromNum).join(""));
       // this.$log.debug("unique?", debugSudoku.gridHasUniqueSolution(hintGrid.map(charFromNum).join(""))); // eslint-disable-line
@@ -202,8 +180,7 @@ export default {
     scaleDifficulty(size, difficultyQuotient, hintGrid, fullGrid) {
       let hintPositions = this.prng.shuffle(numbers(0, this.sudoku.cells));
       let hints = hintGrid.filter((c) => c !== 0).length;
-      let missingHints =
-        Math.ceil(this.sudoku.cells / difficultyQuotient) - hints;
+      let missingHints = Math.ceil(this.sudoku.cells / difficultyQuotient) - hints;
 
       let occurrences = countOccurrences(hintGrid, size);
       let least = occurrences.indexOf(Math.min(...occurrences));
@@ -221,15 +198,8 @@ export default {
       }
     },
     randomRelabel(state) {
-      state.labels = fallback(
-        state.labels,
-        this.prng.shuffle(numbers(1, this.size))
-      );
-      this.$log.debug(
-        "before relabel",
-        state.grid.map(charFromNum).join(""),
-        state.labels
-      );
+      state.labels = fallback(state.labels, this.prng.shuffle(numbers(1, this.size)));
+      this.$log.debug("before relabel", state.grid.map(charFromNum).join(""), state.labels);
 
       for (let i = 0; i < this.sudoku.cells; i++) {
         let value = state.grid[i];
@@ -245,11 +215,7 @@ export default {
         return;
       }
       state.transpose = fallback(state.transpose, this.prng.rand() < 0.5);
-      this.$log.debug(
-        "before transpose",
-        state.grid.map(charFromNum).join(""),
-        state.transpose
-      );
+      this.$log.debug("before transpose", state.grid.map(charFromNum).join(""), state.transpose);
 
       if (state.transpose) {
         for (let i = 0; i < this.size; i++) {
@@ -278,11 +244,7 @@ export default {
       if (isNull(state.rows)) {
         state.rows = this.getPermutationIndices(true);
       }
-      this.$log.debug(
-        "before row permute",
-        state.grid.map(charFromNum).join(""),
-        state.rows
-      );
+      this.$log.debug("before row permute", state.grid.map(charFromNum).join(""), state.rows);
 
       let oldGrid = state.grid.slice();
       for (let i = 0; i < this.size; i++) {
@@ -293,20 +255,13 @@ export default {
         }
       }
 
-      this.$log.debug(
-        " after row permute",
-        state.grid.map(charFromNum).join("")
-      );
+      this.$log.debug(" after row permute", state.grid.map(charFromNum).join(""));
     },
     randomColumnPermutation(state) {
       if (isNull(state.cols)) {
         state.cols = this.getPermutationIndices(false);
       }
-      this.$log.debug(
-        "before col permute",
-        state.grid.map(charFromNum).join(""),
-        state.cols
-      );
+      this.$log.debug("before col permute", state.grid.map(charFromNum).join(""), state.cols);
 
       let oldGrid = state.grid.slice();
       for (let i = 0; i < this.size; i++) {
@@ -317,10 +272,7 @@ export default {
         }
       }
 
-      this.$log.debug(
-        " after col permute",
-        state.grid.map(charFromNum).join("")
-      );
+      this.$log.debug(" after col permute", state.grid.map(charFromNum).join(""));
     },
     // debug() {
     //   let grid = this.gridFromSquares(this.squares);

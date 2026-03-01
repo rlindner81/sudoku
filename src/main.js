@@ -5,5 +5,5 @@ import logger from "@/util/logger.js";
 
 const app = createApp(App);
 app.config.globalProperties.$log = logger;
-app.use(router)
-app.mount('#app')
+app.use(router);
+app.mount("#app");

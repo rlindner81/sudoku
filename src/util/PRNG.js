@@ -3,8 +3,7 @@
  * https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
  */
 function xmur3(str) {
-  for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
-    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+  for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
   h = (h << 13) | (h >>> 19);
   return function () {
     h = Math.imul(h ^ (h >>> 16), 2246822507);
@@ -38,8 +37,7 @@ function sfc32(a, b, c, d) {
  * Pseudorandom number generator with seeded randomness.
  */
 function PRNG(seed) {
-  let _seed =
-    seed === undefined || seed === null ? Math.random().toString() : seed;
+  let _seed = seed === undefined || seed === null ? Math.random().toString() : seed;
   let hash = xmur3(_seed);
   this.rand = sfc32(hash(), hash(), hash(), hash());
 }

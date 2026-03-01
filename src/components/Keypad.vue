@@ -5,11 +5,7 @@
         <section class="modal-body">
           <table class="keypad">
             <tr v-for="(row, i) in boxSize" :key="i">
-              <td
-                v-for="(col, j) in boxSize"
-                :key="j"
-                @click="updateValue($event, j + boardSize * i)"
-              >
+              <td v-for="(col, j) in boxSize" :key="j" @click="updateValue($event, j + boardSize * i)">
                 {{ displaySquare(j + boardSize * i) }}
               </td>
             </tr>

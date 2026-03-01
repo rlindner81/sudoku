@@ -8,7 +8,7 @@ export function isNull() {
     function (result, argument) {
       return result || argument === undefined || argument === null;
     },
-    false
+    false,
   );
 }
 
@@ -99,9 +99,7 @@ export function getByPath() {
  *        capitalize("hello world") === "Hello world"
  */
 export function capitalize(s) {
-  return typeof s === "string" && s.length > 0
-    ? s.charAt(0).toUpperCase() + s.slice(1)
-    : null;
+  return typeof s === "string" && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : null;
 }
 
 /**

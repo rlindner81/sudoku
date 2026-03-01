@@ -28,22 +28,22 @@ $btn-info-color: color.adjust($info, $lightness: -45%);
 
 // Override alert background colors
 $state-success-bg: color.adjust($success, $lightness: 30%);
-$state-info-bg:    color.adjust($info, $lightness: 30%);
+$state-info-bg: color.adjust($info, $lightness: 30%);
 $state-warning-bg: color.adjust($warning, $lightness: 30%);
-$state-danger-bg:  color.adjust($danger, $lightness: 45%);
+$state-danger-bg: color.adjust($danger, $lightness: 45%);
 
 // Override alert text colors
 $state-success-text: color.adjust($success, $lightness: -30%);
-$state-info-text:    color.adjust($info, $lightness: -30%);
+$state-info-text: color.adjust($info, $lightness: -30%);
 $state-warning-text: color.adjust($warning, $lightness: -30%);
-$state-danger-text:  color.adjust($danger, $lightness: -10%);
+$state-danger-text: color.adjust($danger, $lightness: -10%);
 
 // Override line height
-// $line-height-base: 1; 
+// $line-height-base: 1;
 
 // Override page size
 $print-page-size: a4;
-// $print-body-min-width: 1200px; 
+// $print-body-min-width: 1200px;
 
 // Set global options
 $enable-shadows: false;
