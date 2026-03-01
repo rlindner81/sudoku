@@ -1,17 +1,9 @@
-import VueLogger from "vuejs-logger";
-
-import Vue from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router.js";
+import logger from "@/util/logger.mjs";
 
-Vue.config.productionTip = false;
-const isProduction = process.env.NODE_ENV === "production";
-
-Vue.use(VueLogger, {
-  logLevel: isProduction ? "error" : "debug",
-});
-
-new Vue({
-  router,
-  render: (h) => h(App),
-}).$mount("#app");
+const app = createApp(App);
+app.config.globalProperties.$log = logger;
+app.use(router)
+app.mount('#app')

@@ -1,18 +1,26 @@
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from "vite";
-import vue2 from "@vitejs/plugin-vue2";
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue2()],
-  // base: process.env.NODE_ENV === "production" ? "/sudoku/" : "/",
+  plugins: [
+    vue(),
+    vueDevTools(),
+  ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Suppress the @import and global-builtin warnings
+        silenceDeprecations: ['import', 'global-builtin', 'if-function', 'color-functions'],
+      }
+    }
+  },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  // build: {
-  //   sourcemap: true,
-  // },
-});
+})
